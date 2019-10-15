@@ -1,0 +1,31 @@
+package com.fashion.mars.spring.event;
+
+import com.fashion.mars.spring.config.MarsDataConfig;
+import lombok.Data;
+import org.springframework.context.ApplicationEvent;
+
+@Data
+public class MarsListenerEvent extends ApplicationEvent {
+
+    private static final long serialVersionUID = 975253233625382817L;
+
+
+    private MarsDataConfig dataConfig;
+
+    private String content;
+
+    /**
+     * Create a new ApplicationEvent.
+     *
+     * @param source the object on which the event initially occurred (never {@code null})
+     */
+    public MarsListenerEvent(Object source) {
+        super(source);
+    }
+
+    public MarsListenerEvent(Object source, String content, MarsDataConfig dataConfig) {
+        super(source);
+        this.content = content;
+        this.dataConfig = dataConfig;
+    }
+}

@@ -21,6 +21,7 @@
     <inceptionYear>2019</inceptionYear>
     <modules>
         <module>mars-config</module>
+        <module>mars-test</module>
     </modules>
     <groupId>com.fashion.dynamic.config</groupId>
     <artifactId>dynamic-config</artifactId>
