@@ -1,6 +1,8 @@
 package com.config.springboot.controller;
 
 import com.config.springboot.config.TestConfig;
+import com.fashion.mars.spring.listener.annotation.MarsConfigListener;
+import com.fashion.mars.spring.value.MarsValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,8 +13,10 @@ import java.util.Properties;
 @Controller
 public class TestController {
 
-//    @ManagerValue(value = "${abc:abc}",autoRefreshed = true)
+    @MarsValue(value = "${abc}",autoRefreshed = true)
     private String abc;
+
+    private Properties test;
 
     @RequestMapping("/test")
     @ResponseBody
@@ -29,18 +33,19 @@ public class TestController {
         return testConfig.appName+":"+testConfig.name;
     }
 
-   /* @ManagerConfigListener(fileName = "app.properties")
+    @MarsConfigListener(fileName = "aaa.properties")
     public void testP(Properties properties){
+        this.test = properties;
         System.out.printf(properties.toString());
     }
-
-    @ManagerConfigListener(fileName = "app.text",type = ConfigTypeEnum.TEXT)
+    /**
+    @MarsConfigListener(fileName = "app.text",type = ConfigTypeEnum.TEXT)
     public void testT(String  properties){
         System.out.printf(properties.toString());
     }
 
 
-    @ManagerConfigListener(fileName = "app.yaml",type = ConfigTypeEnum.YAML)
+    @MarsConfigListener(fileName = "app.yaml",type = ConfigTypeEnum.YAML)
     public void testY(Properties  properties){
         System.out.printf(properties.toString());
     }*/

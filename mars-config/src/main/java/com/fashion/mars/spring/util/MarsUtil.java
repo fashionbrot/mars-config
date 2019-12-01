@@ -32,29 +32,6 @@ public class MarsUtil {
     }
 
 
-   /* public static Properties loadProperties(DataConfig dataConfig, CuratorFramework zkClient){
-        ServiceLoader<DynamicPropertySource> serviceLoader = ServiceLoader.load(DynamicPropertySource.class);
-        List<ManagerSourceProperties> sourcePropertiesList = new ArrayList<>();
-        for (DynamicPropertySource source : serviceLoader) {
-            List<ManagerSourceProperties> propertiesList = source.initLoadProperties(dataConfig, zkClient);
-            if (!CollectionUtils.isEmpty(propertiesList)) {
-                sourcePropertiesList.addAll(propertiesList);
-            }
-        }
-        Properties properties = new Properties();
-        for (ManagerSourceProperties managerSource : sourcePropertiesList) {
-            ConfigTypeEnum configType = managerSource.getDataConfig().getConfigType();
-            switch (configType) {
-                case PROPERTIES:
-                case YAML:
-                    properties.putAll(ConfigParseUtils.toProperties(managerSource.getContent(), configType.getType()));
-                default:
-                    break;
-            }
-        }
-        return properties;
-    }
-*/
 
 
     public static PropertyValues resolvePropertyValues(Object bean, final String prefix, String appId, String envCode, String content, String type) {
@@ -98,12 +75,12 @@ public class MarsUtil {
 
 
     private static String resolvePropertyName(Field field) {
-        // Ignore property name if @ManagerIgnoreField present
+        // Ignore property name if @MarsIgnoreField present
         if (getAnnotation(field, MarsIgnoreField.class) != null) {
             return null;
         }
         MarsProperty property = getAnnotation(field, MarsProperty.class);
-        // If @ManagerProperty present ,return its value() , or field name
+        // If @MarsProperty present ,return its value() , or field name
         return property != null ? property.value() : field.getName();
     }
 

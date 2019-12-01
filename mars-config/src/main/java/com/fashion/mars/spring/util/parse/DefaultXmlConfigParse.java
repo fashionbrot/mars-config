@@ -16,8 +16,7 @@
  */
 package com.fashion.mars.spring.util.parse;
 
-import com.yooli.appserver.manager.center.config.enums.ConfigTypeEnum;
-import com.yooli.appserver.manager.center.config.util.AbstractConfigParse;
+import com.fashion.mars.spring.enums.ConfigTypeEnum;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

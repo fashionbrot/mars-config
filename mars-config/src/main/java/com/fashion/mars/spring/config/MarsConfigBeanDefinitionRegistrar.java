@@ -67,6 +67,8 @@ public class MarsConfigBeanDefinitionRegistrar  implements ImportBeanDefinitionR
         registerMarsListener(registry);
 
         registerMarsPropertySourcePostProcessor(registry);
+
+        registerMarsTimerHttpBeanPostProcessor(registry);
     }
 
 

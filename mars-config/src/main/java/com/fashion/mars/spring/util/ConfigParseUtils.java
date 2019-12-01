@@ -1,10 +1,6 @@
 package com.fashion.mars.spring.util;
 
-import com.fashion.mars.spring.util.parse.ConfigParse;
-import com.yooli.appserver.manager.center.config.util.parse.DefaultJsonConfigParse;
-import com.yooli.appserver.manager.center.config.util.parse.DefaultPropertiesConfigParse;
-import com.yooli.appserver.manager.center.config.util.parse.DefaultXmlConfigParse;
-import com.yooli.appserver.manager.center.config.util.parse.DefaultYamlConfigParse;
+import com.fashion.mars.spring.util.parse.*;
 
 import java.util.*;
 
@@ -23,7 +19,7 @@ public class ConfigParseUtils {
         DefaultXmlConfigParse xmlConfigParse = new DefaultXmlConfigParse();
 
         // register  default ConfigParse
-        DEFAULT_CONFIG_PARSE_MAP.put(jsonConfigParse.processType().toLowerCase(), jsonConfigParse);
+        DEFAULT_CONFIG_PARSE_MAP.put(jsonConfigParse.processType().toLowerCase(),  jsonConfigParse);
         DEFAULT_CONFIG_PARSE_MAP.put(propertiesConfigParse.processType().toLowerCase(), propertiesConfigParse);
         DEFAULT_CONFIG_PARSE_MAP.put(yamlConfigParse.processType().toLowerCase(), yamlConfigParse);
         DEFAULT_CONFIG_PARSE_MAP.put(xmlConfigParse.processType().toLowerCase(), xmlConfigParse);
@@ -56,6 +52,7 @@ public class ConfigParseUtils {
         if (context == null) {
             return new Properties();
         }
+
 
         configType = configType.toLowerCase();
         Properties properties = new Properties();

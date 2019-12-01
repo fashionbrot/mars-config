@@ -25,4 +25,12 @@ public class GlobalMarsProperties {
      */
     String serverAddress;
 
+    /**
+     * listen long poll timeout
+     */
+    long listenLongPollMs;
+    /**
+     * listen long poll enabled
+     */
+    boolean listenLongPollLogEnabled;
 }

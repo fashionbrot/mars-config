@@ -1,7 +1,28 @@
 package com.fashion.mars.spring.env;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.fashion.mars.ribbon.enums.SchemeEnum;
+import com.fashion.mars.ribbon.loadbalancer.BaseLoadBalancer;
+import com.fashion.mars.ribbon.loadbalancer.ILoadBalancer;
+import com.fashion.mars.ribbon.loadbalancer.Server;
+import com.fashion.mars.spring.api.ApiConstant;
+import com.fashion.mars.spring.api.CheckForUpdateVo;
+import com.fashion.mars.spring.api.ForDataVo;
+import com.fashion.mars.spring.config.GlobalMarsProperties;
+import com.fashion.mars.spring.config.MarsDataConfig;
+import com.fashion.mars.spring.enums.ApiResultEnum;
+import com.fashion.mars.spring.enums.ConfigTypeEnum;
+import com.fashion.mars.spring.server.ServerHttpAgent;
+import com.fashion.mars.spring.util.BeanUtil;
+import com.fashion.mars.spring.util.ConfigParseUtils;
+import com.fashion.mars.spring.util.StringUtil;
+import com.fashion.mars.spring.util.parse.ConfigParse;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -9,23 +30,15 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.ConfigurationClassPostProcessor;
 import org.springframework.core.Ordered;
-import org.springframework.core.convert.support.ConfigurableConversionService;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
-import org.springframework.core.env.MutablePropertySources;
-
-import java.util.*;
 
 
+@Slf4j
 public class MarsPropertySourcePostProcessor implements BeanDefinitionRegistryPostProcessor, BeanFactoryPostProcessor,
-        EnvironmentAware, Ordered {
+        EnvironmentAware, Ordered, DisposableBean {
 
-    public static final String BEAN_NAME="marsPropertySourcePostProcessor";
-
-
-    private static BeanFactory beanFactory;
-
-    private final Set<String> processedBeanNames = new LinkedHashSet<String>();
+    public static final String BEAN_NAME = "marsPropertySourcePostProcessor";
 
     private ConfigurableEnvironment environment;
 
@@ -36,14 +49,36 @@ public class MarsPropertySourcePostProcessor implements BeanDefinitionRegistryPo
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        ConfigurableConversionService configurableConversionService = environment.getConversionService();
 
-        MutablePropertySources mutablePropertySources =  environment.getPropertySources();
 
+        GlobalMarsProperties globalMarsProperties = (GlobalMarsProperties) BeanUtil.getSingletion(beanFactory, GlobalMarsProperties.BEAN_NAME);
+        if (globalMarsProperties == null) {
+            log.warn("globalMarsProperties is null");
+            return;
+        }
+        String appId = globalMarsProperties.getAppName();
+        String envCode = globalMarsProperties.getEnvCode();
+        if (StringUtils.isEmpty(appId) || StringUtils.isEmpty(envCode)) {
+            if (log.isInfoEnabled()) {
+                log.info(" mars init appId is null or envCode is null");
+            }
+            return;
+        }
+        String serverAddress = globalMarsProperties.getServerAddress();
+        if (StringUtil.isEmpty(serverAddress)) {
+            log.warn(" ${mars.config.server-address} is null");
+            return;
+        }
+        ILoadBalancer loadBalancer = new BaseLoadBalancer();
+        ServerHttpAgent.setServer(serverAddress, loadBalancer);
+        Server server = loadBalancer.chooseServer();
+        if (server == null) {
+            log.error("MarsPropertySourcePostProcessor next server is null serverList:" + JSONObject.toJSONString(loadBalancer.getAllServers()));
+            return;
+        }
+        ServerHttpAgent.checkForUpdate(server, globalMarsProperties, environment);
 
     }
-
-
 
 
     /**
@@ -64,4 +99,8 @@ public class MarsPropertySourcePostProcessor implements BeanDefinitionRegistryPo
     }
 
 
+    @Override
+    public void destroy() throws Exception {
+        ServerHttpAgent.shutdown();
+    }
 }

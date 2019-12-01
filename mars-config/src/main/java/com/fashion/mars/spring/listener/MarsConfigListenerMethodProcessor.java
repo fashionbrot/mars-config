@@ -1,12 +1,20 @@
 package com.fashion.mars.spring.listener;
 
+import com.fashion.mars.spring.api.ApiConstant;
+import com.fashion.mars.spring.config.MarsDataConfig;
 import com.fashion.mars.spring.enums.ConfigTypeEnum;
+import com.fashion.mars.spring.env.MarsPropertySource;
 import com.fashion.mars.spring.event.MarsListenerEvent;
 import com.fashion.mars.spring.listener.annotation.MarsConfigListener;
 
+import com.fashion.mars.spring.util.ConfigParseUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
@@ -16,12 +24,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 public class MarsConfigListenerMethodProcessor extends AnnotationListenerMethodProcessor<MarsConfigListener>
-        implements ApplicationListener<MarsListenerEvent>  {
+        implements ApplicationListener<MarsListenerEvent>, EnvironmentAware {
 
     private static Map<String,MarsListenerSourceTarget> targetMap = new ConcurrentHashMap<>();
 
     public static final String BEAN_NAME = "MarsConfigListenerMethodProcessor";
 
+    private ConfigurableEnvironment environment;
 
     @Override
     protected void processListenerMethod(String beanName, final Object bean, Class<?> beanClass,
@@ -58,31 +67,33 @@ public class MarsConfigListenerMethodProcessor extends AnnotationListenerMethodP
             log.error(" processListenerMethod invokeMethod target method parameterType Parameter type mismatch ");
             return;
         }
-        /*try {
-            ForDataVo dataVo = FileCache.getCache(fileName);
-            if (dataVo != null) {
-                if (type == ConfigTypeEnum.TEXT) {
-                    ReflectionUtils.invokeMethod(target.getMethod(), target.getBean(), dataVo.getContent());
-                } else if (type == ConfigTypeEnum.PROPERTIES) {
-                    Properties p = ConfigParseUtils.toProperties(dataVo.getContent(), ConfigTypeEnum.PROPERTIES.getType());
-                    ReflectionUtils.invokeMethod(target.getMethod(), target.getBean(), p);
-                }else if (type == ConfigTypeEnum.YAML){
-                    Properties p = ConfigParseUtils.toProperties(dataVo.getContent(), ConfigTypeEnum.YAML.getType());
-                    ReflectionUtils.invokeMethod(target.getMethod(), target.getBean(), p);
+        MarsPropertySource marsPropertySource = (MarsPropertySource) environment.getPropertySources().get(ApiConstant.NAME+target.getListener().fileName());
+        if (marsPropertySource!=null) {
+            try {
+                MarsDataConfig marsDataConfig =  marsPropertySource.getMarsDataConfig();
+                if (marsDataConfig!=null) {
+                    String content = marsDataConfig.getContent();
+                    if (type == ConfigTypeEnum.TEXT) {
+                        ReflectionUtils.invokeMethod(target.getMethod(), target.getBean(), content);
+                    } else if (type == ConfigTypeEnum.PROPERTIES) {
+                        Properties p = ConfigParseUtils.toProperties(content, ConfigTypeEnum.PROPERTIES.getType());
+                        ReflectionUtils.invokeMethod(target.getMethod(), target.getBean(), p);
+                    } else if (type == ConfigTypeEnum.YAML) {
+                        Properties p = ConfigParseUtils.toProperties(content, ConfigTypeEnum.YAML.getType());
+                        ReflectionUtils.invokeMethod(target.getMethod(), target.getBean(), p);
+                    }
                 }
-            } else {
-                log.error("invokeMethod getSourceConfig source is null");
+            } catch (Exception e) {
+                if (log.isErrorEnabled()) {
+                    log.error("invokeMethod can't add Listener for fileName: {} error:{} ", fileName, e);
+                }
             }
-        } catch (Exception e) {
-            if (log.isErrorEnabled()) {
-                log.error("invokeMethod can't add Listener for fileName: {} error:{} ",fileName, e);
-            }
-        }*/
+        }
     }
 
     @Override
-    public void onApplicationEvent(MarsListenerEvent managerListenerEvent) {
-        MarsListenerSourceTarget target =targetMap.get(managerListenerEvent.getDataConfig().getFileName());
+    public void onApplicationEvent(MarsListenerEvent marsListenerEvent) {
+        MarsListenerSourceTarget target =targetMap.get(marsListenerEvent.getDataConfig().getFileName());
         if(target!=null){
             invokeMethod(target);
         }
@@ -92,12 +103,16 @@ public class MarsConfigListenerMethodProcessor extends AnnotationListenerMethodP
 
     protected boolean isCandidateMethod(Object bean, Class<?> beanClass, MarsListenerEvent listener, Method method) {
         /*if (listener.type()!= ConfigTypeEnum.PROPERTIES || listener.type()!= ConfigTypeEnum.TEXT || listener.type() == ConfigTypeEnum.YAML){
-            log.error("ManagerConfigListenerMethodProcessor isCandidateMethod error configType:{}",listener.type());
+            log.error("MarsConfigListenerMethodProcessor isCandidateMethod error configType:{}",listener.type());
             return true;
         }
-        log.error("ManagerConfigListener  nonsupport "+listener.type().getType()+" isCandidateMethod");*/
+        log.error("MarsConfigListener  nonsupport "+listener.type().getType()+" isCandidateMethod");*/
         return false;
     }
 
 
+    @Override
+    public void setEnvironment(Environment environment) {
+        this.environment = (ConfigurableEnvironment) environment;
+    }
 }

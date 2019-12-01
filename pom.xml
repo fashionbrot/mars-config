@@ -22,6 +22,7 @@
     <modules>
         <module>mars-config</module>
         <module>mars-test</module>
+        <module>mars-ribbon</module>
     </modules>
     <groupId>com.fashion.dynamic.config</groupId>
     <artifactId>dynamic-config</artifactId>

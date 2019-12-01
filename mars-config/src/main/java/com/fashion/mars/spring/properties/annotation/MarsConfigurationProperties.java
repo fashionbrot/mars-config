@@ -12,7 +12,7 @@ import java.lang.annotation.*;
 public @interface MarsConfigurationProperties {
 
     /**
-     * appManagerCenter fileName
+     * mars fileName
      */
     String fileName();
 

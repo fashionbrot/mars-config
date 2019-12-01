@@ -1,17 +1,23 @@
 package com.config.springboot.config;
 
+import com.fashion.mars.spring.properties.annotation.MarsConfigurationProperties;
+import com.fashion.mars.spring.properties.annotation.MarsIgnoreField;
+import com.fashion.mars.spring.properties.annotation.MarsProperty;
 import lombok.Data;
+import org.springframework.stereotype.Component;
 
-//@MarsConfigurationProperties(fileName = "app.properties",autoRefreshed = true,prefix = "app")
+@MarsConfigurationProperties(fileName = "aaa.properties",autoRefreshed = true)
 @Data
+@Component
 public class TestConfig {
 
+    @MarsProperty("abc")
     public String name ;
 
-//    @ManagerProperty("name")
+//    @MarsProperty("name")
     public String appName ;
 
-//    @ManagerIgnoreField
+    @MarsIgnoreField
     private String sgrTest;
 
 }

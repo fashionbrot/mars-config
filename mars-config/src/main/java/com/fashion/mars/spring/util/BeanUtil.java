@@ -3,6 +3,7 @@ package com.fashion.mars.spring.util;
 import com.fashion.mars.spring.config.GlobalMarsProperties;
 import com.fashion.mars.spring.context.ApplicationContextHolder;
 import com.fashion.mars.spring.env.MarsPropertySourcePostProcessor;
+import com.fashion.mars.spring.event.MarsTimerHttpBeanPostProcessor;
 import com.fashion.mars.spring.listener.MarsConfigListenerMethodProcessor;
 import com.fashion.mars.spring.properties.config.MarsConfigurationPropertiesBindingPostProcessor;
 import com.fashion.mars.spring.value.MarsValueAnnotationBeanPostProcessor;
@@ -48,6 +49,8 @@ public class BeanUtil {
                 .appName(getProperties(globalProperties,"appId"))
                 .envCode(getProperties(globalProperties,"envCode"))
                 .serverAddress(getProperties(globalProperties,"serverAddress"))
+                .listenLongPollMs(StringUtil.parseLong(getProperties(globalProperties,"listenLongPollMs"),30000L))
+                .listenLongPollLogEnabled(attributes.getBoolean("listenLongPollLogEnabled"))
                 .build();
         registerSingleton(registry, GlobalMarsProperties.BEAN_NAME, globalMarsProperties);
     }
@@ -64,95 +67,10 @@ public class BeanUtil {
         registerInfrastructureBeanIfAbsent(registry, MarsPropertySourcePostProcessor.BEAN_NAME,MarsPropertySourcePostProcessor.class);
     }
 
-/*
-    public static void registerHttpGlobalManagerProperties(AnnotationAttributes attributes,
-                                                           BeanDefinitionRegistry registry,
-                                                           PropertyResolver propertyResolver,
-                                                           ConfigurableListableBeanFactory beanFactory,
-                                                           java.net.URL url){
-        if (attributes == null) {
-            return; // Compatible with null
-        }
-        GlobalManagerProperties properties = new GlobalManagerProperties();
-
-        Properties globalProperties = getGlobalManagerProperties(attributes,propertyResolver,url);
-
-        properties.setAppName(getProperties(globalProperties,"appId"));
-        properties.setEnvCode(getProperties(globalProperties,"envCode"));
-        properties.setServerAddress(getProperties(globalProperties,"serverAddress"));
-        properties.setListenLongPollMs(Long.valueOf(getProperties(globalProperties,"listenLongPollMs")));
-        properties.setProtocolEnum("http".equals(getProperties(globalProperties,"protocol"))?ProtocolEnum.HTTP:ProtocolEnum.HTTPS);
-
-        registerSingleton(registry, GlobalManagerProperties.BEAN_NAME, properties);
-
+    public static void registerMarsTimerHttpBeanPostProcessor(BeanDefinitionRegistry registry) {
+        registerInfrastructureBeanIfAbsent(registry, MarsTimerHttpBeanPostProcessor.BEAN_NAME,MarsTimerHttpBeanPostProcessor.class);
     }
-*/
 
-   /* public static void registerHttpConfigBeanDefinitionRegistrar(BeanDefinitionRegistry registry){
-        registerInfrastructureBeanIfAbsent(registry, ManagerHttpConfigBeanPostProcessor.BEAN_NAME,ManagerHttpConfigBeanPostProcessor.class);
-    }*/
-
-   /* private static Properties getGlobalManagerProperties(AnnotationAttributes attributes,PropertyResolver propertyResolver,java.net.URL url){
-
-        String configProperties = (String) attributes.get("configProperties");
-
-        Properties globalProperties ;
-
-        if (!StringUtils.isEmpty(configProperties)){
-            //configProperties it exists or not
-            boolean fileExist =FileUtil.searchFile(url.getPath(),configProperties);
-            //if exists read configProperties or else read resources all *.properties file
-            Properties resourcesProperties = FileUtil.getResources(url,fileExist?configProperties:null);
-            globalProperties = PropertiesUtil.resolve(attributes,resourcesProperties);
-
-        }else{
-            //read springboot application.properties
-            globalProperties = resolveProperties(attributes, propertyResolver);
-
-            //if not springboot application or else read resources all *.properties file
-            if (!mapCompar(attributes,globalProperties)){
-                Properties resourcesProperties = FileUtil.getResources(url,null);
-                globalProperties = PropertiesUtil.resolve(attributes,resourcesProperties);
-            }
-        }
-        return globalProperties;
-    }*/
-
-
-   /* public static void registerGlobalManagerProperties(AnnotationAttributes attributes,
-                                                     BeanDefinitionRegistry registry,
-                                                     PropertyResolver propertyResolver,
-                                                     ConfigurableListableBeanFactory beanFactory,
-                                                     java.net.URL url) {
-        if (attributes == null) {
-            return; // Compatible with null
-        }
-        GlobalManagerProperties properties = new GlobalManagerProperties();
-
-        Properties globalProperties = getGlobalManagerProperties(attributes,propertyResolver,url);
-
-        properties.setAppName(getProperties(globalProperties,"appId"));
-        properties.setEnvCode(getProperties(globalProperties,"envCode"));
-        properties.setZkConnectString(getProperties(globalProperties,"zookeeperConnect"));
-        properties.setZkAuth(getProperties(globalProperties,"zookeeperAuth"));
-        properties.setZkScheme(getProperties(globalProperties,"zookeeperScheme"));
-        registerSingleton(registry, GlobalManagerProperties.BEAN_NAME, properties);
-    }*/
-
-
-
-
-    private static boolean mapCompar(Map<?, ?> map1,Map<?, ?> map2) {
-        boolean isChange = false;
-        for (Map.Entry<?, ?> entry1 : map1.entrySet()) {
-            String m1value = entry1.getValue() == null ? "" : (String)entry1.getValue();
-            String m2value = map2.get(entry1.getKey()) == null ? "" : (String)map2.get(entry1.getKey());
-            if (!m1value.equals(m2value)) {
-                isChange = true;
-            }
-        }
-        return isChange;
-    }
 
     /**
      * Resolve placeholders of properties via specified {@link PropertyResolver} if present
@@ -200,11 +118,6 @@ public class BeanUtil {
         }
         return null;
     }
-
-
-    /*public static void registerZookeeperConfigBeanDefinitionRegistrar(BeanDefinitionRegistry registry) {
-        registerInfrastructureBeanIfAbsent(registry, ManagerZookeeperConfigBeanPostProcessor.BEAN_NAME, ManagerZookeeperConfigBeanPostProcessor.class);
-    }*/
 
 
 
@@ -533,6 +446,7 @@ public class BeanUtil {
         }
         return value;
     }
+
 
 
 }

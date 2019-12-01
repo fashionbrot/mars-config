@@ -24,6 +24,8 @@ public class MarsDataConfig {
 
     private String parentPath;
 
+    private String content;
+
     /**
      * @see ConfigTypeEnum
      */

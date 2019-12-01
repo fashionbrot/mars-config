@@ -24,11 +24,11 @@ import static org.springframework.core.annotation.AnnotationUtils.findAnnotation
 public class MarsConfigurationPropertiesBindingPostProcessor implements BeanPostProcessor, ApplicationContextAware,
         ApplicationListener<MarsListenerEvent> {
 
-    public static final String BEAN_NAME = "managerConfigurationPropertiesBindingPostProcessor";
+    public static final String BEAN_NAME = "marsConfigurationPropertiesBindingPostProcessor";
 
     private ConfigurableApplicationContext applicationContext;
 
-    private Map<String,ManagerConfigurationTarget> configurationTargetMap =new ConcurrentHashMap<>();
+    private Map<String,MarsConfigurationTarget> configurationTargetMap =new ConcurrentHashMap<>();
 
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
@@ -41,7 +41,7 @@ public class MarsConfigurationPropertiesBindingPostProcessor implements BeanPost
 
             if (configurationProperties.autoRefreshed()){
                 configurationTargetMap.put(configurationProperties.fileName(),
-                        ManagerConfigurationTarget.builder()
+                        MarsConfigurationTarget.builder()
                                 .bean(bean)
                                 .beanName(beanName)
                                 .marsConfigurationProperties(configurationProperties)
@@ -91,15 +91,15 @@ public class MarsConfigurationPropertiesBindingPostProcessor implements BeanPost
             return;
         }
         String fileName = event.getDataConfig().getFileName();
-        ManagerConfigurationTarget target= configurationTargetMap.get(fileName);
+        MarsConfigurationTarget target= configurationTargetMap.get(fileName);
         if (target==null){
-            if (log.isInfoEnabled()){
-                log.info("onApplicationEvent fileName:{} ManagerConfigurationProperties autoRefreshed false ",fileName);
+            if (log.isDebugEnabled()){
+                log.debug("onApplicationEvent fileName:{} marsConfigurationProperties autoRefreshed false ",fileName);
             }
             return;
         }
         if (log.isInfoEnabled()){
-            log.info("onApplicationEvent ManagerConfigurationReceivedEvent:\n{} ", JSON.toJSONString(event) );
+            log.info("onApplicationEvent marsConfigurationReceivedEvent:\n{} ", JSON.toJSONString(event) );
         }
         bind(target.getBean(),target.getBeanName(),target.getMarsConfigurationProperties());
     }
@@ -109,7 +109,7 @@ public class MarsConfigurationPropertiesBindingPostProcessor implements BeanPost
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    private static class ManagerConfigurationTarget {
+    private static class MarsConfigurationTarget {
 
         private Object bean;
 

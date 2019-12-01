@@ -29,10 +29,10 @@ import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 public class MarsValueAnnotationBeanPostProcessor extends AnnotationInjectedBeanPostProcessor<MarsValue>
         implements BeanFactoryAware, ApplicationListener<MarsListenerEvent> {
 
-    public static final String BEAN_NAME = "managerValueAnnotationBeanPostProcessor";
+    public static final String BEAN_NAME = "marsValueAnnotationBeanPostProcessor";
 
     /**
-     * placeholder, managerValueTarget
+     * placeholder, marsValueTarget
      */
     private Map<String, List<MarsValueTarget>> placeholderValueTargetMap;
 

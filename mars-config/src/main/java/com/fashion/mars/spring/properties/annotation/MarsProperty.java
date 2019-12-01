@@ -10,7 +10,7 @@ public @interface MarsProperty {
 
 
     /**
-     * The property name of manager Configuration to bind a field
+     * The property name of mars Configuration to bind a field
      *
      * @return property name
      */

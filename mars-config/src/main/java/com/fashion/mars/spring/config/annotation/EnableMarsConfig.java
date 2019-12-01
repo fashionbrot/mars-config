@@ -22,4 +22,14 @@ public @interface EnableMarsConfig {
     String envCode() default ENV_CODE;
 
     String serverAddress() default SERVER_ADDRESS;
+
+    /**
+     * listen long poll timeout  default 30000 ms
+     */
+    String listenLongPollMs() default "30000";
+
+    /**
+     * listen long poll log enabled
+     */
+    boolean listenLongPollLogEnabled() default false;
 }

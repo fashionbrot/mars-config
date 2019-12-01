@@ -16,13 +16,13 @@
  */
 package com.fashion.mars.spring.util.parse;
 
-import com.yooli.appserver.manager.center.config.enums.ConfigTypeEnum;
-import com.yooli.appserver.manager.center.config.util.AbstractConfigParse;
+
+import com.fashion.mars.spring.enums.ConfigTypeEnum;
 
 import java.util.Map;
 import java.util.Properties;
 
-import static com.yooli.appserver.manager.center.config.util.parse.DefaultYamlConfigParse.createYaml;
+import static com.fashion.mars.spring.util.parse.DefaultYamlConfigParse.createYaml;
 
 
 public class DefaultJsonConfigParse extends AbstractConfigParse {

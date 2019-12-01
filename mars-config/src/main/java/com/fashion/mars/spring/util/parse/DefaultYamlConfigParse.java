@@ -16,8 +16,8 @@
  */
 package com.fashion.mars.spring.util.parse;
 
-import com.yooli.appserver.manager.center.config.enums.ConfigTypeEnum;
-import com.yooli.appserver.manager.center.config.util.AbstractConfigParse;
+
+import com.fashion.mars.spring.enums.ConfigTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.yaml.snakeyaml.Yaml;

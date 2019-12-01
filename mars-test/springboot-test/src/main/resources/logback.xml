@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration >
-	<property name="destination" value="${catalina.base}/logs/app-manager-center/springboot-test/" />
+	<property name="destination" value="${catalina.base}/logs/mars/springboot-test/" />
 
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<target>System.out</target>
@@ -11,7 +11,7 @@
 	</appender>
 
 	<appender name="APP" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${destination}/app-manager-center.log</file>
+		<file>${destination}/mars.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<fileNamePattern>${destination}/app.%d{yyyy-MM-dd}.log</fileNamePattern>
 		</rollingPolicy>
