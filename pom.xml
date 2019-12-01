@@ -20,16 +20,16 @@
     <modelVersion>4.0.0</modelVersion>
     <inceptionYear>2019</inceptionYear>
     <modules>
-        <module>mars-config</module>
+        <module>mars-spring-config</module>
         <module>mars-test</module>
         <module>mars-ribbon</module>
     </modules>
     <groupId>com.fashion.dynamic.config</groupId>
-    <artifactId>dynamic-config</artifactId>
+    <artifactId>mars-config</artifactId>
     <version>0.1.0</version>
     <packaging>pom</packaging>
 
-    <name>dynamic config mars ${project.version}</name>
+    <name>mars config ${project.version}</name>
     <description>Top mars project pom.xml file</description>
 
     <licenses>

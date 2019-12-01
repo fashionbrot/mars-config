@@ -36,7 +36,7 @@
 
         <dependency>
             <groupId>com.fashion.mars</groupId>
-            <artifactId>mars-config</artifactId>
+            <artifactId>mars-spring-config</artifactId>
             <version>1.0.0</version>
         </dependency>
 

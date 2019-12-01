@@ -1,19 +1,4 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+
 package com.fashion.mars.spring.util.parse;
 
 import com.fashion.mars.spring.enums.ConfigTypeEnum;
@@ -27,40 +12,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.util.*;
 
-/*
-<xmlSign>
-    <Students>
-        <Student>
-            <Name>lct-1</Name>
-            <Num>1006010022</Num>
-            <Classes>major-1</Classes>
-            <Address>hangzhou</Address>
-            <Tel>123456</Tel>
-        </Student>
-        <Student>
-            <Name>lct-2</Name>
-            <Num>1006010033</Num>
-            <Classes>major-2</Classes>
-            <Address>shengzheng</Address>
-            <Tel>234567</Tel>
-        </Student>
-        <Student>
-            <Name>lct-3</Name>
-            <Num>1006010044</Num>
-            <Classes>major-3</Classes>
-            <Address>wenzhou</Address>
-            <Tel>345678</Tel>
-        </Student>
-        <Student>
-            <Name>lct-4</Name>
-            <Num>1006010055</Num>
-            <Classes>major-3</Classes>
-            <Address>wuhan</Address>
-            <Tel>456789</Tel>
-        </Student>
-    </Students>
-</xmlSign>
- */
 
 /**
  * Just support xml config like this

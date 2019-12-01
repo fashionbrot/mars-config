@@ -1,4 +1,4 @@
-# dynamic-config
+# mars-config
 
 #### Description
 springmvc 、springboot 动态配置系统。 支持 zookeeper 监听方式、http 轮训方式 更新 动态配置
