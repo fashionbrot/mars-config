@@ -1,27 +1,16 @@
 package com.fashion.mars.spring.env;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.fashion.mars.ribbon.enums.SchemeEnum;
 import com.fashion.mars.ribbon.loadbalancer.BaseLoadBalancer;
 import com.fashion.mars.ribbon.loadbalancer.ILoadBalancer;
 import com.fashion.mars.ribbon.loadbalancer.Server;
-import com.fashion.mars.spring.api.ApiConstant;
-import com.fashion.mars.spring.api.CheckForUpdateVo;
-import com.fashion.mars.spring.api.ForDataVo;
 import com.fashion.mars.spring.config.GlobalMarsProperties;
-import com.fashion.mars.spring.config.MarsDataConfig;
-import com.fashion.mars.spring.enums.ApiResultEnum;
-import com.fashion.mars.spring.enums.ConfigTypeEnum;
 import com.fashion.mars.spring.server.ServerHttpAgent;
 import com.fashion.mars.spring.util.BeanUtil;
-import com.fashion.mars.spring.util.ConfigParseUtils;
 import com.fashion.mars.spring.util.StringUtil;
-import com.fashion.mars.spring.util.parse.ConfigParse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
