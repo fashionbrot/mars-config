@@ -64,12 +64,9 @@ public class MarsConfigurationPropertiesBinder {
     }
 
     protected void doBind(Object bean, String beanName, String appId, String envCode,MarsConfigurationProperties properties, String content) {
-        String type = properties.type().getType();
-        String prefix = properties.prefix();
 
-        PropertyValues propertyValues = MarsUtil.resolvePropertyValues(bean, prefix, appId, envCode, content, type);
+        PropertyValues propertyValues = MarsUtil.resolvePropertyValues(bean, properties.prefix(), content, properties.type());
         doBind(bean, properties, propertyValues);
-
     }
 
     private void doBind(Object bean, MarsConfigurationProperties properties,

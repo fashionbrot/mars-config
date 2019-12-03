@@ -2,9 +2,11 @@ package com.fashion.mars.spring.util;
 
 
 
+import com.fashion.mars.spring.enums.ConfigTypeEnum;
 import com.fashion.mars.spring.properties.annotation.MarsIgnoreField;
 import com.fashion.mars.spring.properties.annotation.MarsProperty;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValues;
@@ -34,14 +36,14 @@ public class MarsUtil {
 
 
 
-    public static PropertyValues resolvePropertyValues(Object bean, final String prefix, String appId, String envCode, String content, String type) {
-        final Properties configProperties = toProperties(appId, envCode, content, type);
+    public static PropertyValues resolvePropertyValues(Object bean, final String prefix, String content, ConfigTypeEnum configTypeEnum) {
+        final Properties configProperties = ConfigParseUtils.toProperties(content, configTypeEnum);
         final MutablePropertyValues propertyValues = new MutablePropertyValues();
         ReflectionUtils.doWithFields(bean.getClass(), new ReflectionUtils.FieldCallback() {
             @Override
-            public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
+            public void doWith(Field field) throws IllegalArgumentException {
                 String propertyName = resolvePropertyName(field);
-                propertyName = org.springframework.util.StringUtils.isEmpty(prefix) ? propertyName : prefix + "." + propertyName;
+                propertyName = StringUtils.isEmpty(prefix) ? propertyName : prefix + "." + propertyName;
                 if (hasText(propertyName)) {
                     // If it is a map, the data will not be fetched
                     if (Collection.class.isAssignableFrom(field.getType()) ||
@@ -57,20 +59,6 @@ public class MarsUtil {
             }
         });
         return propertyValues;
-    }
-
-    /**
-     * XML configuration parsing to support different schemas
-     *
-     * @param dataId config dataId
-     * @param group config group
-     * @param text config context
-     * @param type config type
-     * @return {@link Properties}
-     */
-    public static Properties toProperties(String dataId, String group, String text, String type) {
-        type = type.toLowerCase();
-        return ConfigParseUtils.toProperties(dataId, group, text, type);
     }
 
 

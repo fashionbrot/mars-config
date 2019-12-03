@@ -43,6 +43,7 @@ public enum ConfigTypeEnum {
 
     String type;
 
+
     private static Map<String, ConfigTypeEnum> map = new HashMap<String, ConfigTypeEnum>();
 
     static {

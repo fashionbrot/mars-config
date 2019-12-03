@@ -40,7 +40,7 @@ public class MarsPropertySourcePostProcessor implements BeanDefinitionRegistryPo
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 
 
-        GlobalMarsProperties globalMarsProperties = (GlobalMarsProperties) BeanUtil.getSingletion(beanFactory, GlobalMarsProperties.BEAN_NAME);
+        GlobalMarsProperties globalMarsProperties = (GlobalMarsProperties) BeanUtil.getSingleton(beanFactory, GlobalMarsProperties.BEAN_NAME);
         if (globalMarsProperties == null) {
             log.warn("globalMarsProperties is null");
             return;
@@ -55,7 +55,7 @@ public class MarsPropertySourcePostProcessor implements BeanDefinitionRegistryPo
         }
         String serverAddress = globalMarsProperties.getServerAddress();
         if (StringUtil.isEmpty(serverAddress)) {
-            log.warn(" ${mars.config.server-address} is null");
+            log.warn(" ${mars.config.http.server-address} is null");
             return;
         }
         ILoadBalancer loadBalancer = new BaseLoadBalancer();

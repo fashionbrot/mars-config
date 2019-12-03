@@ -9,7 +9,7 @@ import java.io.StringReader;
 import java.util.Properties;
 
 
-public class DefaultPropertiesConfigParse extends AbstractConfigParse {
+public class DefaultPropertiesConfigParse implements ConfigParse {
 
 
     @Override
@@ -26,8 +26,8 @@ public class DefaultPropertiesConfigParse extends AbstractConfigParse {
     }
 
     @Override
-    public String processType() {
-        return ConfigTypeEnum.PROPERTIES.getType();
+    public ConfigTypeEnum configType() {
+        return ConfigTypeEnum.PROPERTIES;
     }
 
 }

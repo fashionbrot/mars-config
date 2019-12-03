@@ -1,36 +1,20 @@
 package com.fashion.mars.spring.util.parse;
 
+import com.fashion.mars.spring.enums.ConfigTypeEnum;
+
 import java.util.Properties;
 
 public interface ConfigParse {
 
     /**
-     * parse config context to map
-     *
-     * @param configText receive config context
+     * parse config context to Properties
      * @return {@link Properties}
      */
-    Properties parse(String configText);
+    Properties parse(String context);
 
     /**
-     * get this ConfigParse process config type
-     *
-     * @return this parse process type
+     * config type
+     * @return {@link ConfigTypeEnum}
      */
-    String processType();
-
-    /**
-     * get config appId
-     *
-     * @return appId
-     */
-    String appId();
-
-    /**
-     * get config envCode
-     *
-     * @return envCode
-     */
-    String envCode();
-
+    ConfigTypeEnum configType();
 }

@@ -10,7 +10,7 @@ import java.util.Properties;
 import static com.fashion.mars.spring.util.parse.DefaultYamlConfigParse.createYaml;
 
 
-public class DefaultJsonConfigParse extends AbstractConfigParse {
+public class DefaultJsonConfigParse implements ConfigParse {
 
     @Override
     public Properties parse(String configText) {
@@ -25,8 +25,8 @@ public class DefaultJsonConfigParse extends AbstractConfigParse {
     }
 
     @Override
-    public String processType() {
-        return ConfigTypeEnum.JSON.getType();
+    public ConfigTypeEnum configType() {
+        return ConfigTypeEnum.JSON;
     }
 
 }

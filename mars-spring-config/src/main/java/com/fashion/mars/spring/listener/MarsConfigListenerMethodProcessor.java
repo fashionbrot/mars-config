@@ -76,10 +76,10 @@ public class MarsConfigListenerMethodProcessor extends AnnotationListenerMethodP
                     if (type == ConfigTypeEnum.TEXT) {
                         ReflectionUtils.invokeMethod(target.getMethod(), target.getBean(), content);
                     } else if (type == ConfigTypeEnum.PROPERTIES) {
-                        Properties p = ConfigParseUtils.toProperties(content, ConfigTypeEnum.PROPERTIES.getType());
+                        Properties p = ConfigParseUtils.toProperties(content, ConfigTypeEnum.PROPERTIES);
                         ReflectionUtils.invokeMethod(target.getMethod(), target.getBean(), p);
                     } else if (type == ConfigTypeEnum.YAML) {
-                        Properties p = ConfigParseUtils.toProperties(content, ConfigTypeEnum.YAML.getType());
+                        Properties p = ConfigParseUtils.toProperties(content, ConfigTypeEnum.YAML);
                         ReflectionUtils.invokeMethod(target.getMethod(), target.getBean(), p);
                     }
                 }

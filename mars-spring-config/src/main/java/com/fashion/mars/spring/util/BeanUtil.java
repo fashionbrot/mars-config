@@ -46,10 +46,10 @@ public class BeanUtil {
         Properties globalProperties = resolveProperties(attributes, environment);
 
         GlobalMarsProperties globalMarsProperties = GlobalMarsProperties.builder()
-                .appName(getProperties(globalProperties,"appId"))
-                .envCode(getProperties(globalProperties,"envCode"))
-                .serverAddress(getProperties(globalProperties,"serverAddress"))
-                .listenLongPollMs(StringUtil.parseLong(getProperties(globalProperties,"listenLongPollMs"),30000L))
+                .appName(getProperties(globalProperties, "appId"))
+                .envCode(getProperties(globalProperties, "envCode"))
+                .serverAddress(getProperties(globalProperties, "serverAddress"))
+                .listenLongPollMs(StringUtil.parseLong(getProperties(globalProperties, "listenLongPollMs"), 30000L))
                 .listenLongPollLogEnabled(attributes.getBoolean("listenLongPollLogEnabled"))
                 .build();
         registerSingleton(registry, GlobalMarsProperties.BEAN_NAME, globalMarsProperties);
@@ -61,14 +61,15 @@ public class BeanUtil {
 
     public static void registerApplicationContextHolder(BeanDefinitionRegistry registry) {
         // Register applicationContextHolder Bean
-        registerInfrastructureBeanIfAbsent(registry, ApplicationContextHolder.BEAN_NAME,ApplicationContextHolder.class);
+        registerInfrastructureBeanIfAbsent(registry, ApplicationContextHolder.BEAN_NAME, ApplicationContextHolder.class);
     }
+
     public static void registerMarsPropertySourcePostProcessor(BeanDefinitionRegistry registry) {
-        registerInfrastructureBeanIfAbsent(registry, MarsPropertySourcePostProcessor.BEAN_NAME,MarsPropertySourcePostProcessor.class);
+        registerInfrastructureBeanIfAbsent(registry, MarsPropertySourcePostProcessor.BEAN_NAME, MarsPropertySourcePostProcessor.class);
     }
 
     public static void registerMarsTimerHttpBeanPostProcessor(BeanDefinitionRegistry registry) {
-        registerInfrastructureBeanIfAbsent(registry, MarsTimerHttpBeanPostProcessor.BEAN_NAME,MarsTimerHttpBeanPostProcessor.class);
+        registerInfrastructureBeanIfAbsent(registry, MarsTimerHttpBeanPostProcessor.BEAN_NAME, MarsTimerHttpBeanPostProcessor.class);
     }
 
 
@@ -105,7 +106,7 @@ public class BeanUtil {
         }
     }
 
-    public static Object getSingletion(BeanFactory registry,String beanName){
+    public static Object getSingleton(BeanFactory registry, String beanName) {
         SingletonBeanRegistry beanRegistry = null;
         if (registry instanceof SingletonBeanRegistry) {
             beanRegistry = (SingletonBeanRegistry) registry;
@@ -113,20 +114,20 @@ public class BeanUtil {
             // Maybe AbstractApplicationContext or its sub-classes
             beanRegistry = ((AbstractApplicationContext) registry).getBeanFactory();
         }
-        if (beanRegistry!=null){
+        if (beanRegistry != null) {
             return beanRegistry.getSingleton(beanName);
         }
         return null;
     }
 
 
-
     public static void registerMarsValueAnnotationBeanPostProcessor(BeanDefinitionRegistry registry) {
         registerInfrastructureBeanIfAbsent(registry, MarsValueAnnotationBeanPostProcessor.BEAN_NAME,
                 MarsValueAnnotationBeanPostProcessor.class);
     }
+
     public static void registerMarsListener(BeanDefinitionRegistry registry) {
-        registerInfrastructureBeanIfAbsent(registry, MarsConfigListenerMethodProcessor.BEAN_NAME,MarsConfigListenerMethodProcessor.class);
+        registerInfrastructureBeanIfAbsent(registry, MarsConfigListenerMethodProcessor.BEAN_NAME, MarsConfigListenerMethodProcessor.class);
     }
 
     /**
@@ -139,13 +140,11 @@ public class BeanUtil {
      */
     public static void registerInfrastructureBeanIfAbsent(BeanDefinitionRegistry registry, String beanName, Class<?> beanClass,
                                                           Object... constructorArgs) {
-        if (!isBeanDefinitionPresent(registry, beanName, beanClass) && !registry.containsBeanDefinition(beanName)) {
+        if (!registry.containsBeanDefinition(beanName)) {
             registerInfrastructureBean(registry, beanName, beanClass, constructorArgs);
         }
     }
-    public static ApplicationContextHolder getApplicationContextHolder(BeanFactory beanFactory) throws NoSuchBeanDefinitionException {
-        return beanFactory.getBean(ApplicationContextHolder.BEAN_NAME, ApplicationContextHolder.class);
-    }
+
     /**
      * Register Infrastructure Bean
      *
@@ -169,284 +168,17 @@ public class BeanUtil {
 
 
 
-    /**
-     * Is {@link BeanDefinition} present in {@link BeanDefinitionRegistry}
-     *
-     * @param registry        {@link BeanDefinitionRegistry}
-     * @param beanName        the name of bean
-     * @param targetBeanClass the type of bean
-     * @return If Present , return <code>true</code>
-     */
-    public static boolean isBeanDefinitionPresent(BeanDefinitionRegistry registry, String beanName, Class<?> targetBeanClass) {
-        String[] beanNames = BeanUtil.getBeanNames((ListableBeanFactory) registry, targetBeanClass);
-        return ArrayUtils.contains(beanNames, beanName);
-    }
+    public static String getProperties(Properties properties, String key) {
 
-
-
-    /**
-     * Get Bean Names from {@link ListableBeanFactory} by type.
-     *
-     * @param beanFactory {@link ListableBeanFactory}
-     * @param beanClass   The  {@link Class} of Bean
-     * @return If found , return the array of Bean Names , or empty array.
-     */
-    public static String[] getBeanNames(ListableBeanFactory beanFactory, Class<?> beanClass) {
-        return getBeanNames(beanFactory, beanClass, false);
-    }
-
-
-    /**
-     * Get Bean Names from {@link ListableBeanFactory} by type.
-     *
-     * @param beanFactory        {@link ListableBeanFactory}
-     * @param beanClass          The  {@link Class} of Bean
-     * @param includingAncestors including ancestors or not
-     * @return If found , return the array of Bean Names , or empty array.
-     */
-    public static String[] getBeanNames(ListableBeanFactory beanFactory, Class<?> beanClass,
-                                        boolean includingAncestors) {
-
-        final BeanFactory actualBeanFactory;
-
-
-        if (beanFactory instanceof ConfigurableApplicationContext) {
-
-
-            ConfigurableApplicationContext applicationContext = ConfigurableApplicationContext.class.cast(beanFactory);
-
-            actualBeanFactory = applicationContext.getBeanFactory();
-
-        } else {
-
-            actualBeanFactory = beanFactory;
-
-        }
-
-
-        if (actualBeanFactory instanceof ConfigurableListableBeanFactory) {
-
-            return getBeanNames((ConfigurableListableBeanFactory) actualBeanFactory, beanClass, includingAncestors);
-
-        }
-
-        return EMPTY_BEAN_NAMES;
-
-    }
-
-
-    /**
-     * Get Bean Names from {@link ConfigurableListableBeanFactory} by type.
-     *
-     * @param beanFactory        {@link ConfigurableListableBeanFactory}
-     * @param beanClass          The  {@link Class} of Bean
-     * @param includingAncestors including ancestors or not
-     * @return If found , return the array of Bean Names , or empty array.
-     */
-    public static String[] getBeanNames(ConfigurableListableBeanFactory beanFactory, Class<?> beanClass,
-                                        boolean includingAncestors) {
-
-        Set<String> beanNames = new LinkedHashSet<String>();
-
-        beanNames.addAll(doGetBeanNames(beanFactory, beanClass));
-
-        if (includingAncestors) {
-
-            BeanFactory parentBeanFactory = beanFactory.getParentBeanFactory();
-
-            if (parentBeanFactory instanceof ConfigurableListableBeanFactory) {
-
-                ConfigurableListableBeanFactory configurableListableBeanFactory =
-                        (ConfigurableListableBeanFactory) parentBeanFactory;
-
-                String[] parentBeanNames = getBeanNames(configurableListableBeanFactory, beanClass, includingAncestors);
-
-                beanNames.addAll(Arrays.asList(parentBeanNames));
-
-            }
-
-        }
-
-        return StringUtils.toStringArray(beanNames);
-    }
-
-    /**
-     * Get Bean names from {@link ConfigurableListableBeanFactory} by type
-     *
-     * @param beanFactory {@link ConfigurableListableBeanFactory}
-     * @param beanType    The  {@link Class type} of Bean
-     * @return the array of bean names.
-     */
-    protected static Set<String> doGetBeanNames(ConfigurableListableBeanFactory beanFactory, Class<?> beanType) {
-
-        String[] allBeanNames = beanFactory.getBeanDefinitionNames();
-
-        Set<String> beanNames = new LinkedHashSet<String>();
-
-        for (String beanName : allBeanNames) {
-
-            BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
-
-            Class<?> beanClass = resolveBeanType(beanFactory, beanDefinition);
-
-            if (beanClass != null && ClassUtils.isAssignable(beanType, beanClass)) {
-
-                beanNames.add(beanName);
-
-            }
-
-        }
-
-        return Collections.unmodifiableSet(beanNames);
-
-    }
-
-    private static Class<?> resolveBeanType(ConfigurableListableBeanFactory beanFactory, BeanDefinition beanDefinition) {
-
-        String factoryBeanName = beanDefinition.getFactoryBeanName();
-
-        ClassLoader classLoader = beanFactory.getBeanClassLoader();
-
-        Class<?> beanType = null;
-
-        if (StringUtils.hasText(factoryBeanName)) {
-
-            beanType = getFactoryBeanType(beanFactory, beanDefinition);
-
-        }
-
-        if (beanType == null) {
-
-            String beanClassName = beanDefinition.getBeanClassName();
-
-            if (StringUtils.hasText(beanClassName)) {
-
-                beanType = resolveBeanType(beanClassName, classLoader);
-
-            }
-
-        }
-
-        if (beanType == null) {
-
-            if (log.isErrorEnabled()) {
-
-                String message = beanDefinition + " can't be resolved bean type!";
-
-                log.error(message);
-            }
-
-        }
-
-        return beanType;
-
-    }
-
-    private static Class<?> getFactoryBeanType(ConfigurableListableBeanFactory beanFactory,
-                                               BeanDefinition factoryBeanDefinition) {
-
-        BeanDefinition actualFactoryBeanDefinition = factoryBeanDefinition;
-
-        final List<Class<?>> beanClasses = new ArrayList<Class<?>>(1);
-
-        ClassLoader classLoader = beanFactory.getBeanClassLoader();
-
-        String factoryBeanClassName = actualFactoryBeanDefinition.getBeanClassName();
-
-        if (StringUtils.isEmpty(factoryBeanClassName)) {
-
-            String factoryBeanName = factoryBeanDefinition.getFactoryBeanName();
-
-            actualFactoryBeanDefinition = beanFactory.getBeanDefinition(factoryBeanName);
-
-            factoryBeanClassName = actualFactoryBeanDefinition.getBeanClassName();
-
-        }
-
-        if (StringUtils.hasText(factoryBeanClassName)) {
-
-            Class<?> factoryBeanClass = resolveBeanType(factoryBeanClassName, classLoader);
-
-            final String factoryMethodName = factoryBeanDefinition.getFactoryMethodName();
-
-            // @Configuration only allow one method FactoryBean
-            ReflectionUtils.doWithMethods(factoryBeanClass, new ReflectionUtils.MethodCallback() {
-
-                @Override
-                public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
-
-                    beanClasses.add(method.getReturnType());
-
-                }
-            }, new ReflectionUtils.MethodFilter() {
-
-                @Override
-                public boolean matches(Method method) {
-                    return factoryMethodName.equals(method.getName());
-                }
-            });
-
-        }
-
-        return beanClasses.isEmpty() ? null : beanClasses.get(0);
-
-    }
-
-    /**
-     * Resolve Bean Type
-     *
-     * @param beanClassName the class name of Bean
-     * @param classLoader   {@link ClassLoader}
-     * @return Bean type if can be resolved , or return <code>null</code>.
-     */
-    public static Class<?> resolveBeanType(String beanClassName, ClassLoader classLoader) {
-
-        if (!StringUtils.hasText(beanClassName)) {
-            return null;
-        }
-
-        Class<?> beanType = null;
-
-        try {
-
-            beanType = ClassUtils.resolveClassName(beanClassName, classLoader);
-
-            beanType = ClassUtils.getUserClass(beanType);
-
-        } catch (Exception e) {
-
-            if (log.isErrorEnabled()) {
-                log.error(e.getMessage(), e);
-            }
-
-        }
-
-        return beanType;
-
-    }
-
-    public static Properties getBeanProperties(BeanFactory beanFactory, String beanName) {
-        Properties properties = new Properties();
-        // If Bean is absent , source will be empty.
-        Map<?, ?> propertiesSource = beanFactory.containsBean(beanName) ?
-                beanFactory.getBean(beanName, Properties.class) : emptyMap();
-        properties.putAll(propertiesSource);
-        return properties;
-    }
-
-    public static String getProperties(Properties properties,String key){
-
-        String value =  properties.containsKey(key)?properties.getProperty(key):"";
+        String value = properties.containsKey(key) ? properties.getProperty(key) : "";
         if (org.apache.commons.lang3.StringUtils.isNotEmpty(value) && value.startsWith(PLACEHOLDER_PREFIX)) {
             return null;
         }
-
         if (org.apache.commons.lang3.StringUtils.isNotEmpty(value) && value.endsWith(PLACEHOLDER_SUFFIX)) {
             return null;
         }
         return value;
     }
-
 
 
 }

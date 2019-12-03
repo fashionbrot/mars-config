@@ -15,9 +15,8 @@ import java.util.*;
 
 /**
  * Just support xml config like this
- *
  */
-public class DefaultXmlConfigParse extends AbstractConfigParse {
+public class DefaultXmlConfigParse implements ConfigParse  {
 
     private DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
@@ -34,6 +33,11 @@ public class DefaultXmlConfigParse extends AbstractConfigParse {
             throw new ConfigParseException(e);
         }
         return properties;
+    }
+
+    @Override
+    public ConfigTypeEnum configType() {
+        return ConfigTypeEnum.XML;
     }
 
     private void recursionXmlToMap(Map<String, Object> outMap, Element element) {
@@ -89,9 +93,5 @@ public class DefaultXmlConfigParse extends AbstractConfigParse {
         }
     }
 
-    @Override
-    public String processType() {
-        return ConfigTypeEnum.XML.getType();
-    }
 
 }

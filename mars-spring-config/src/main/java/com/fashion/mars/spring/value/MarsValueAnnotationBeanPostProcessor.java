@@ -90,7 +90,7 @@ public class MarsValueAnnotationBeanPostProcessor extends AnnotationInjectedBean
 
         if (!StringUtils.isEmpty(content) && ConfigTypeEnum.YAML == event.getDataConfig().getConfigType() || ConfigTypeEnum.PROPERTIES == event.getDataConfig().getConfigType()) {
 
-            Properties configProperties = ConfigParseUtils.toProperties(event.getDataConfig().getAppId(), event.getDataConfig().getEnvCode(), content, event.getDataConfig().getConfigType().getType());
+            Properties configProperties = ConfigParseUtils.toProperties( content, event.getDataConfig().getConfigType());
 
             for (Object key : configProperties.keySet()) {
                 String propertyKey = (String) key;

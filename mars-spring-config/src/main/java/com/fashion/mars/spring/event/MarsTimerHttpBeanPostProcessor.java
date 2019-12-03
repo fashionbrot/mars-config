@@ -60,7 +60,7 @@ public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,Applicat
         if (log.isInfoEnabled()) {
             log.info("MarsTimerHttpBeanPostProcessor afterPropertiesSet ");
         }
-        GlobalMarsProperties globalMarsProperties = (GlobalMarsProperties) BeanUtil.getSingletion(beanFactory,GlobalMarsProperties.BEAN_NAME);
+        GlobalMarsProperties globalMarsProperties = (GlobalMarsProperties) BeanUtil.getSingleton(beanFactory,GlobalMarsProperties.BEAN_NAME);
         if (globalMarsProperties==null){
             return;
         }
@@ -91,12 +91,17 @@ public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,Applicat
         });
         ILoadBalancer loadBalancer = new BaseLoadBalancer();
         ServerHttpAgent.setServer(serverAddress, loadBalancer);
-        Server server = loadBalancer.chooseServer();
+
 
         executorService.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
                 try{
+                    Server server = loadBalancer.chooseServer();
+                    if (server==null){
+                        log.error("loadBalancer is null  rule:{} ping:{}",loadBalancer.getRule(),loadBalancer.getPing());
+                        return;
+                    }
                     checkForUpdate(server,globalMarsProperties);
                 }catch (Throwable e){
                     log.error("MarsTimerHttpBeanPostProcessor longPull error",e);
@@ -166,16 +171,11 @@ public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,Applicat
             return;
         }
         ConfigTypeEnum configTypeEnum = ServerHttpAgent.match(dataConfig.getFileName());
-        Properties properties ;
-        if (configTypeEnum == ConfigTypeEnum.YAML || configTypeEnum == ConfigTypeEnum.PROPERTIES){
-            properties = ConfigParseUtils.toProperties(forDataVo.getContent(), configTypeEnum.getType());
-        }else{
-            properties =  new Properties();
-        }
+        Properties properties =ConfigParseUtils.toProperties(forDataVo.getContent(), configTypeEnum);
 
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
         if (mutablePropertySources==null){
-            log.error("environment get property sources is null");
+            log.error("environment get MutablePropertySources  is null");
             return;
         }
         String environmentFileName =  ApiConstant.NAME+dataConfig.getFileName();

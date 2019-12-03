@@ -14,7 +14,7 @@ import java.util.*;
 
 
 @Slf4j
-public class DefaultYamlConfigParse extends AbstractConfigParse {
+public class DefaultYamlConfigParse implements ConfigParse {
 
 
 
@@ -35,8 +35,8 @@ public class DefaultYamlConfigParse extends AbstractConfigParse {
     }
 
     @Override
-    public String processType() {
-        return ConfigTypeEnum.YAML.getType();
+    public ConfigTypeEnum configType() {
+        return ConfigTypeEnum.YAML;
     }
 
     protected static boolean process(MatchCallback callback, Yaml yaml, String content) {

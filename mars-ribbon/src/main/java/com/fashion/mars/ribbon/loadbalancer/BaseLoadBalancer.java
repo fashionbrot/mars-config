@@ -44,7 +44,14 @@ public class BaseLoadBalancer  implements ILoadBalancer {
 
     @Override
     public Server chooseServer() {
-        return rule.choose(this);
+        Lock lock = allServerLock.readLock();
+        lock.lock();
+        try {
+            return rule.choose(this);
+        }finally {
+            lock.unlock();
+        }
+
     }
 
     @Override

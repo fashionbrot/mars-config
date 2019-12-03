@@ -80,12 +80,8 @@ public class ServerHttpAgent {
             return;
         }
         ConfigTypeEnum configTypeEnum = match(dataConfig.getFileName());
-        Properties properties ;
-        if (configTypeEnum == ConfigTypeEnum.YAML || configTypeEnum == ConfigTypeEnum.PROPERTIES){
-            properties = ConfigParseUtils.toProperties(forDataVo.getContent(), configTypeEnum.getType());
-        }else{
-            properties =  new Properties();
-        }
+        Properties properties =  ConfigParseUtils.toProperties(forDataVo.getContent(), configTypeEnum);
+
 
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
         if (mutablePropertySources==null){
