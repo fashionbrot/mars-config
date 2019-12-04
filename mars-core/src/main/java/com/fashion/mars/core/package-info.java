@@ -1,0 +1,1 @@
+package com.fashion.mars.core;
