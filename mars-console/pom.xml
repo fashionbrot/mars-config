@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>mars-config</artifactId>
+        <groupId>com.gitee.mars.config</groupId>
+        <version>0.1.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.gitee.mars.config</groupId>
+    <artifactId>mars-console</artifactId>
+    <packaging>war</packaging>
+    <properties>
+        <profiles.dir>src/profiles</profiles.dir>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.gitee.mars.config</groupId>
+            <artifactId>mars-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.gitee.mars.config</groupId>
+            <artifactId>mars-core</artifactId>
+        </dependency>
+    </dependencies>
+
+
+    <profiles>
+        <profile>
+            <id>local</id>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>${profiles.dir}/local</directory>
+                    </resource>
+                </resources>
+            </build>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>${profiles.dir}/prod</directory>
+                    </resource>
+                </resources>
+            </build>
+        </profile>
+    </profiles>
+
+</project>

@@ -87,19 +87,6 @@ CREATE TABLE `system_config_history` (
   KEY `idx_envcode_appname` (`env_code`,`app_name`) USING BTREE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='应用系统配置历史表';
 
-CREATE TABLE `system_config_role_relation` (
-  `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
-  `role_id` bigint(20) NOT NULL COMMENT '角色ID',
-  `system_config_id` bigint(20) NOT NULL COMMENT '动态配置ID',
-  `create_date` datetime NOT NULL COMMENT '创建时间',
-  `update_date` datetime DEFAULT NULL COMMENT '修改时间',
-  `view_status` tinyint(2) NOT NULL DEFAULT '0' COMMENT '权限状态 1有权限 0无权限',
-  `push_status` tinyint(2) NOT NULL DEFAULT '0' COMMENT '权限状态 1有权限 0无权限',
-  `edit_status` tinyint(2) NOT NULL DEFAULT '0' COMMENT '权限状态 1有权限 0无权限',
-  `delete_status` tinyint(2) NOT NULL DEFAULT '0' COMMENT '权限状态 1有权限 0无权限',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='动态配置-角色关系表';
-
 
 CREATE TABLE `menu` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
@@ -136,3 +123,6 @@ CREATE TABLE `system_config_role_relation` (
   `delete_status` int(2) NOT NULL DEFAULT '0' COMMENT '权限状态 1有权限 0无权限',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='动态配置-角色关系表';
+
+
+INSERT INTO `user_info` (`user_name`, `real_name`, `password`, `salt`, `create_date`, `update_date`, `status`, `last_login_time`) VALUES ('admin', 'admin', 'd1b0b73301fa0e3a97da8ab2d80e5c75', '709dda768e94a3d62680786dac0e72a0', '2019-12-05 23:36:31', '2019-12-05 23:36:34', '1', NULL);

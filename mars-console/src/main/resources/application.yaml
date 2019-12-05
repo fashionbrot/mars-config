@@ -1,0 +1,18 @@
+spring:
+    http:
+        encoding:
+            charset: UTF-8
+            enabled: true
+            force: true
+
+
+pagehelper:
+    helper-dialect: mysql
+    params: count=countSql
+    reasonable: true
+    support-methods-arguments: true
+
+mybatis-plus:
+    mapper-locations: classpath*:com/gitee/mars/dao/dao/mapper/xml/*.xml
+    type-aliases-package: com.gitee.mars.dao.entity
+
