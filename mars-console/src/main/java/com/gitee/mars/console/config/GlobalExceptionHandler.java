@@ -16,7 +16,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MarsException.class)
     @ResponseStatus(HttpStatus.OK)
-    public RespVo wealthException(MarsException e) {
+    public RespVo marsException(MarsException e) {
         return RespVo.fail(e.getMsg(), e.getCode());
     }
 
