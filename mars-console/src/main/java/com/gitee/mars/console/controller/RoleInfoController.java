@@ -7,6 +7,7 @@ import com.gitee.mars.dao.entity.RoleInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -26,15 +27,15 @@ public class RoleInfoController {
 
     @RequestMapping(value = "add")
     @ResponseBody
-    public RespVo add(RoleInfo envInfo) {
-        envInfoFacade.add(envInfo);
+    public RespVo add(@RequestBody  RoleInfo roleInfo) {
+        envInfoFacade.add(roleInfo);
         return RespVo.success();
     }
 
     @RequestMapping(value = "update")
     @ResponseBody
-    public RespVo update(RoleInfo envInfo) {
-        envInfoFacade.update(envInfo);
+    public RespVo update(@RequestBody RoleInfo roleInfo) {
+        envInfoFacade.update(roleInfo);
         return RespVo.success();
     }
 

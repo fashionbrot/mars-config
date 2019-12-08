@@ -21,6 +21,8 @@ public class PasswordUtils {
     }
 
     public static void main(String[] args) {
-        System.out.println(encryptPassword("123456","709dda768e94a3d62680786dac0e72a0"));
+        String salt = getSalt();
+        System.out.println("salt:"+salt);
+        System.out.println("password:"+encryptPassword("mars",salt));
     }
 }

@@ -18,6 +18,7 @@ public class SystemConfigHistoryDao {
     @Autowired
     private SystemConfigHistoryMapper systemConfigHistoryMapper;
 
+
     public void insert(SystemConfigHistoryInfo generateHistoryInfo) {
         if (systemConfigHistoryMapper.insert(generateHistoryInfo)!=1){
             throw new MarsException(RespCode.SAVE_ERROR,"历史记录");

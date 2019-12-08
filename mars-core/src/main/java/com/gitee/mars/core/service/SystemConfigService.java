@@ -32,7 +32,7 @@ public class SystemConfigService {
     private SystemConfigHistoryDao systemConfigHistoryDao;
 
     @Autowired
-    private SystemConfigRoleRelationDao systemConfigRoleRelationService;
+    private SystemConfigRoleRelationDao systemConfigRoleRelationDao;
 
 
     public void add(SystemConfigInfo systemConfigInfo) {
@@ -82,7 +82,9 @@ public class SystemConfigService {
 
     public SystemConfigHistoryInfo queryHistoryById(Long fileId) {
         SystemConfigHistoryInfo systemConfigHistoryInfo = systemConfigHistoryDao.selectById(fileId);
-        systemConfigRoleRelationService.checkRole(systemConfigHistoryInfo.getFileId(), SystemConfigRoleEnum.VIEW);
+        if (systemConfigHistoryInfo!=null) {
+            systemConfigRoleRelationDao.checkRole(systemConfigHistoryInfo.getFileId(), SystemConfigRoleEnum.VIEW);
+        }
         return systemConfigHistoryInfo;
     }
 
@@ -130,9 +132,10 @@ public class SystemConfigService {
 
 
     public void deleteHistoryById(Long id) {
+
         SystemConfigHistoryInfo systemConfigHistoryInfo = systemConfigHistoryDao.selectById(id);
         if (systemConfigHistoryInfo != null) {
-            systemConfigRoleRelationService.checkRole(systemConfigHistoryInfo.getFileId(), SystemConfigRoleEnum.VIEW);
+            systemConfigRoleRelationDao.checkRole(systemConfigHistoryInfo.getFileId(), SystemConfigRoleEnum.DELETE);
         }
         if (systemConfigHistoryDao.deleteById(id) != 1) {
             throw new MarsException(RespCode.DELETE_ERROR);

@@ -45,17 +45,17 @@
                         <input type="hidden" id="addJson" name="json" />
                         <div class="col-control-right">
 
-                            <div style="width: 120px;float: left;">
+                            <div style="width: 120px;float: left;" onclick="changeMode('properties')">
                                 <div style="float: left;padding-top: 7px;">
                                     <label><input  type="radio"   name="fileType" onchange="changeMode('properties')"  mode="properties"  value="properties" checked />PROPERTIES </label>
                                 </div>
                             </div>
-                            <div style="width: 120px;float: left;">
+                            <div style="width: 120px;float: left;" onclick="changeMode('yaml')">
                                 <div style="float: left;padding-top: 7px;">
                                     <label><input  type="radio"   name="fileType" onchange="changeMode('yaml')" mode="yaml"  value="yaml"/>YAML </label>
                                 </div>
                             </div>
-                            <div style="width: 120px;float: left;">
+                            <div style="width: 120px;float: left;" onclick="changeMode('textile')">
                                 <div style="float: left;padding-top: 7px;">
                                     <label><input type="radio" name="fileType" onchange="changeMode('textile')" mode="textile" value="text"  />TEXT </label>
                                 </div>

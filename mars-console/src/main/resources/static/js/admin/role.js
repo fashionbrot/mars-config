@@ -8,7 +8,7 @@ var userInfoAdd = function () {
     var a = $("#userInfoAddForm").serializeJson();
     loading();
     $.ajax({
-        url: "../role/add",
+        url: "./role/add",
         type: "post",
         data: JSON.stringify(a),
         contentType: "application/json",
@@ -35,7 +35,7 @@ function showModal(id) {
 var userInfoDel = function () {
     loading();
     $.ajax({
-        url: "../role/deleteById",
+        url: "./role/deleteById",
         type: "post",
         data: {"id": $("#userInfoId").val()},
         dataType: "json",
@@ -55,7 +55,7 @@ var userInfoEdit = function () {
     loading();
     var a = $("#userInfoEditForm").serializeJson();
     $.ajax({
-        url: "../role/update",
+        url: "./role/update",
         type: "post",
         data: JSON.stringify(a),
         contentType: "application/json",
@@ -78,14 +78,14 @@ var queryByUserId = function (id) {
 
     loading();
     $.ajax({
-        url: "../role/queryById",
+        url: "./role/queryById",
         type: "post",
         data: {"id": id},
         dataType: "json",
         success: function (data) {
             loaded();
             $("#editId").val(data.id);
-            $("#editDescription").val(data.description);
+            $("#editRoleName").val(data.roleName);
             $("#editStatus").val(data.status);
             $("#userInfoEditModal").modal("show");
         }
@@ -110,7 +110,7 @@ $(document).ready(function () {
 function loadData() {
     loading();
     $.ajax({
-        url: "../role/queryAll?v="+new Date().getTime(),
+        url: "./role/queryAll?v="+new Date().getTime(),
         type: "post",
         dataType: "json",
         success: function (data) {
@@ -281,85 +281,11 @@ function submitMenuRole() {
 }
 
 
-function showRoleTemplate(id) {
-    loading();
-    $("#roleId2").val(id);
-    $.ajax({
-        url: "../../menu/loadCheckedTemplate?v="+new Date().getTime(),
-        type: "post",
-        dataType: "json",
-        async:false,
-        data:{"roleId":id},
-        success: function (data) {
-            loaded();
-            if(data!=null){
-                var html="";
-                var appName="";
-                for(var i=0;i<data.length;i++){
-                    var dd=data[i];
-
-                    var checkedHtml="";
-                    if(appName=="" || appName!=dd.appName){
-                        appName=dd.appName;
-                        html+="<div>";
-                        html+="<span style=\"font-size: 16px;color:red\">"+appName+"项目</span><br/>"
-                        html+="<div style='padding-left:1.5rem;min-height: 20px;'>";
-                    }else{
-                        html+="<div style='padding-left:1.5rem;min-height: 20px;'>";
-                    }
-
-                    if(dd.active==1){
-                        checkedHtml+="checked='true'"
-                    }
-                    html+="<input type='checkbox'  "+checkedHtml+" style='width: 1rem;height: 1rem;'  data-id='"+dd.templateKey+"'>"+"<span style='font-size: 14px;'>"+dd.templateName+"</span>";
-                    html+="</div>";
-                    if(dd.appName!=appName){
-                        html+="</div>";
-                    }
-                    appName=dd.appName;
-                }
-
-                $("#roleTemplateForm").html(html);
-            }
-        }
-    });
-    $("#roleTemplateModal").modal("show");
-}
 
 
 
 
-function submitTemplateRole() {
-    var inputs=$("#roleTemplateForm").find("input[type=checkbox]:checked");
-    var ids="";
-    if(inputs.length>0){
-        for(var i=0;i<inputs.length;i++){
-            if(ids==""){
-                ids+=$(inputs[i]).attr("data-id");
-            }else{
-                ids+=","+$(inputs[i]).attr("data-id");
-            }
-        }
 
-    }
-    loading();
-    var roleId= $("#roleId2").val();
-    $.ajax({
-        url: "../../menu/updateRoleTemplate?v="+new Date().getTime(),
-        type: "post",
-        dataType: "json",
-        async:false,
-        data:{"roleId":roleId,"templateKeys":ids},
-        success: function (data) {
-            loaded();
-            if(data.code==0){
-                $("#roleTemplateModal").modal("hide");
-            }else{
-                alert(data.msg);
-            }
-        }
-    });
-}
 
 function showSystemConfigRoleTemplate(roleId){
     $("#systemConfigDiv").html('');
@@ -386,7 +312,7 @@ function loadSystemConfigRole() {
         return;
     }
     $.ajax({
-        url: "../system-config-role-relation/selectBy?v="+new Date().getTime(),
+        url: "./system-config-role-relation/selectBy?v="+new Date().getTime(),
         type: "post",
         dataType: "json",
         async:false,
@@ -425,7 +351,7 @@ function syncSystemConfigRole(){
         return;
     }
     $.ajax({
-        url: "../system-config-role-relation/sync-role?v="+new Date().getTime(),
+        url: "./system-config-role-relation/sync-role?v="+new Date().getTime(),
         type: "post",
         dataType: "json",
         async:false,
@@ -455,7 +381,7 @@ function saveRole(){
     });
 
     $.ajax({
-        url: "../system-config-role-relation/save-role?v="+new Date().getTime(),
+        url: "./system-config-role-relation/save-role?v="+new Date().getTime(),
         type: "post",
         dataType: "json",
         contentType: "application/json",

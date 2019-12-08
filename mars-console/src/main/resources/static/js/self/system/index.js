@@ -20,6 +20,7 @@ function addView() {
         loadNoSearchSelect("addEnvCode");
         $(".addEnvCode").show();
     }else{
+        manager.loadEnv("addEnvCode");
         $("#addEnvCode").val(envCode);
         $(".addEnvCode").hide();
     }
@@ -32,6 +33,7 @@ function addView() {
         loadNoSearchSelect("addAppName");
         $(".addAppName").show();
     }else{
+        manager.loadApp("addAppName");
         $("#addAppName").val(appName);
         $(".addAppName").hide();
     }
@@ -45,7 +47,7 @@ function addView() {
     $('#addModal').modal('show');
 
     setTimeout(function () {
-        changeMode("textile")
+        changeMode("properties")
     },500);
 }
 

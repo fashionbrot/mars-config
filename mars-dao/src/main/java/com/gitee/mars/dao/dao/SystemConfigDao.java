@@ -57,9 +57,9 @@ public class SystemConfigDao {
     @Transactional(rollbackFor = Exception.class)
     public int add(SystemConfigInfo systemConfigInfo) {
 
-        if (!FileUtil.isMatch(systemConfigInfo.getFileName())){
+        /*if (!FileUtil.isMatch(systemConfigInfo.getFileName())){
             throw new MarsException("文件名不能以 "+systemConfigInfo.getFileName() +"为后缀");
-        }
+        }*/
 
         if(isFileHasExisted(systemConfigInfo)){
             throw new MarsException(RespCode.EXIST_ERROR,"配置文件");
@@ -73,7 +73,7 @@ public class SystemConfigDao {
         }
 
         systemConfigInfo.setVersion(snowflakeIdWorkerUtil.nextId()+"");
-        systemConfigInfo.setFileName(systemConfigInfo.getFileName()+"."+systemConfigInfo.getFileType());
+        systemConfigInfo.setFileName(systemConfigInfo.getFileName());
 
         systemConfigInfo.setCreateDate(new Date());
         return systemConfigDao.insert(systemConfigInfo);

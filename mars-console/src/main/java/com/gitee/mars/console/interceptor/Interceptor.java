@@ -36,7 +36,7 @@ public class Interceptor implements HandlerInterceptor {
                 throw new MarsException(RespCode.SIGNATURE_MISMATCH);
             }
             if(!menuService.checkPermissionUrl(handler,request)){
-                response.sendRedirect(url(request)+"/401");
+                response.sendRedirect(url(request)+"/401?requestUrl="+request.getRequestURI());
             }
             return true;
         }

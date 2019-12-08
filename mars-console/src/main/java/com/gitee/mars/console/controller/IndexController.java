@@ -17,6 +17,7 @@ public class IndexController {
     }
 
     @GetMapping("/index")
+    @IsMenu(checkMenuUrlPermission = false)
     public String index(){
         return "index";
     }
