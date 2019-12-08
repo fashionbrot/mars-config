@@ -140,7 +140,7 @@ public class ServerHttpAgent {
                         .host(svr[0])
                         .scheme(svr[0].startsWith("https") ? SchemeEnum.HTTPS : SchemeEnum.HTTP)
                         .port(port)
-                        .path(ApiConstant.health)
+                        .path(ApiConstant.HEALTH)
                         .build());
             }
             loadBalancer.addServers(serverList);

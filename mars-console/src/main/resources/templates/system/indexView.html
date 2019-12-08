@@ -1,0 +1,81 @@
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="systemView" >
+<div class="modal fade" id="viewModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop='static'
+
+    >
+    <div class="modal-dialog" style="width:800px;min-width: 550px;max-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">查看</h4>
+            </div>
+            <div class="modal-body" style="padding-top: 10px;padding-bottom: 0px;">
+
+                <form class="form-horizontal" role="form" id="viewForm">
+                    <!--<input type="hidden" id="id" name="id" />-->
+
+                    <div class="form-group">
+                        <label for="viewFileName" class="col-control-left control-label">文件名称</label>
+                        <div class="col-control-right">
+                            <input type="text" class="form-control" id="viewFileName" name="fileName" placeholder="请输入文件名称">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="viewFileDesc" class="col-control-left control-label">文件描述</label>
+                        <div class="col-control-right">
+                            <textarea class="form-control" id="viewFileDesc" name="fileDesc" rows="3" placeholder="请输入文件描述"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label  class="col-control-left control-label">文件类型</label>
+                        <!--<div class="col-control-right">
+                            <div style="width: 100px;float: left;line-height: 34px;">
+                                <input type="radio" style="min-height: 34px" class="radio viewFileType" disabled name="fileType" onchange="editChangeMode('textile')" mode="textile" value="text" />
+                                <span style="line-height: 25px;">TEXT</span>
+                            </div>
+                            <div style="width: 120px;float: left;line-height: 34px;">
+                                <input type="radio" style="min-height: 34px"  class="radio viewFileType" disabled name="fileType" onchange="editChangeMode('properties')" mode="properties"   value="properties" />
+                                <span style="line-height: 25px;">PROPERTIES</span>
+                            </div>
+                            <div style="width: 120px;float: left;line-height: 34px;">
+                                <input type="radio" style="min-height: 34px"  class="radio viewFileType" disabled name="fileType" onchange="editChangeMode('yaml')" mode="yaml"  value="yaml" />
+                                <span style="line-height: 25px;">YAML</span>
+                            </div>
+                        </div>-->
+                        <div class="col-control-right">
+
+                            <div style="width: 120px;float: left;">
+                                <div style="float: left;padding-top: 7px;">
+                                    <label><input  type="radio"  class="viewFileType" name="fileType" onchange="changeMode('properties')"  mode="properties"  value="properties" />PROPERTIES </label>
+                                </div>
+                            </div>
+                            <div style="width: 120px;float: left;">
+                                <div style="float: left;padding-top: 7px;">
+                                    <label><input  type="radio" class="viewFileType"    name="fileType" onchange="changeMode('yaml')" mode="yaml"  value="yaml"/>YAML </label>
+                                </div>
+                            </div>
+                            <div style="width: 120px;float: left;">
+                                <div style="float: left;padding-top: 7px;">
+                                    <label><input type="radio"  class="viewFileType" name="fileType" onchange="changeMode('textile')" mode="textile" value="text"  />TEXT </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="viewContent" class="col-control-left control-label">配置内容</label>
+                        <div class="col-control-right">
+                            <textarea class="form-control" id="viewContent" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <input type="reset" name="viewReset" style="display: none;"/>
+                </form>
+
+
+            </div>
+            <div class="modal-footer" style="    margin-top:0px;">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-off"></span>Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>

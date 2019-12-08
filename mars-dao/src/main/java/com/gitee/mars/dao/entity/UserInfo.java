@@ -36,6 +36,9 @@ public class UserInfo {
     @TableField("last_login_time")
     private Date lastLoginTime;
 
+    @TableField("status")
+    private int status;
+
 
 
     private transient String roleName;

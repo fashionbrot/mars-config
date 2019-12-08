@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <head th:replace="/common/head :: head"></head>
+</head>
+<body>
+<!-- START PAGE CONTAINER -->
+<div class="page-container">
+
+    <!-- START PAGE SIDEBAR -->
+    <div class="page-sidebar">
+        <!-- START X-NAVIGATION -->
+        <div th:replace="/common/left :: left"></div>
+        <!-- END X-NAVIGATION -->
+    </div>
+    <!-- END PAGE SIDEBAR -->
+
+    <!-- PAGE CONTENT -->
+    <div class="page-content">
+
+        <div th:replace="/common/top :: top"/>
+
+        <!-- START BREADCRUMB -->
+
+        <!-- END BREADCRUMB -->
+
+        <!-- PAGE CONTENT WRAPPER -->
+        <div class="page-content-wrap" style="font-size: 30px;height: 100%;line-height: 200px;text-align: center">
+            您访问的&nbsp;&nbsp;<span th:text="${requestUrl}"></span>&nbsp;&nbsp;地址无权限，请联系管理员
+        </div>
+    <!-- END PAGE CONTENT -->
+</div>
+<!-- END PAGE CONTAINER -->
+
+<div id="toolbar">
+
+</div>
+
+
+
+<div id="Layer1" style="display: none; position: absolute; z-index: 100;">
+
+    <div th:replace="/common/footer :: footer"/>
+</body>
+</html>
+
+
+
+
+
+

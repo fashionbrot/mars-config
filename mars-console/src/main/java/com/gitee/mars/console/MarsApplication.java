@@ -10,7 +10,7 @@ import java.util.Date;
 
 @Slf4j
 @SpringBootApplication(scanBasePackages = {"com.gitee.mars"})
-@MapperScan(basePackages = {"com.gitee.mars.dao.dao"})
+@MapperScan(basePackages = {"com.gitee.mars.dao.mapper"})
 public class MarsApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {

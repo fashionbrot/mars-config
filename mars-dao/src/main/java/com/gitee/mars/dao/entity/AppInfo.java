@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.util.Date;
 
 @TableName("app_info")
@@ -27,8 +26,8 @@ public class AppInfo implements Serializable{
 
 
     @TableField(value = "create_date")
-    private Date createTime;
+    private Date createDate;
 
     @TableField(value = "update_date")
-    private Date updateTime;
+    private Date updateDate;
 }

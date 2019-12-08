@@ -1,0 +1,106 @@
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="systemAddView" >
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop='static'
+
+    >
+    <div class="modal-dialog" style="width:800px;min-width: 550px;max-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">新增</h4>
+            </div>
+            <div class="modal-body" style="padding-top: 10px;padding-bottom: 0px;">
+
+                <form class="form-horizontal" role="form" id="addForm">
+                    <div class="form-group addEnvCode">
+                        <label for="addAppName" class="col-control-left control-label">环境Env</label>
+                        <div class="col-control-right">
+                            <select class="form-control" id="addEnvCode" name="envCode" style="width: 100%;height: 34px">
+
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group addAppName">
+                        <label for="addAppName" class="col-control-left control-label">应用App</label>
+                        <div class="col-control-right">
+                            <select class="form-control" id="addAppName" name="appName" style="width: 100%;height: 34px">
+
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="addFileName" class="col-control-left control-label">文件名称</label>
+                        <div class="col-control-right">
+                            <input type="text" class="form-control" id="addFileName" name="fileName" placeholder="请输入文件名称">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="addFileDesc" class="col-control-left control-label">文件描述</label>
+                        <div class="col-control-right">
+                            <textarea class="form-control" id="addFileDesc" name="fileDesc" rows="3" placeholder="请输入文件描述"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label  class="col-control-left control-label">文件类型</label>
+                        <input type="hidden" id="addJson" name="json" />
+                        <div class="col-control-right">
+
+                            <div style="width: 120px;float: left;">
+                                <div style="float: left;padding-top: 7px;">
+                                    <label><input  type="radio"   name="fileType" onchange="changeMode('properties')"  mode="properties"  value="properties" checked />PROPERTIES </label>
+                                </div>
+                            </div>
+                            <div style="width: 120px;float: left;">
+                                <div style="float: left;padding-top: 7px;">
+                                    <label><input  type="radio"   name="fileType" onchange="changeMode('yaml')" mode="yaml"  value="yaml"/>YAML </label>
+                                </div>
+                            </div>
+                            <div style="width: 120px;float: left;">
+                                <div style="float: left;padding-top: 7px;">
+                                    <label><input type="radio" name="fileType" onchange="changeMode('textile')" mode="textile" value="text"  />TEXT </label>
+                                </div>
+                            </div>
+                            <!--<label><input  type="radio"   name="fileType" onchange="changeMode('textile')"  value="text" />text </label>
+                            <label><input  type="radio"   name="fileType" onchange="changeMode('properties')"    value="properties"/>properties </label>
+                            <label><input  type="radio"   name="fileType" onchange="changeMode('yaml')"   value="yaml"/>yaml </label>-->
+
+
+                            <!--<div style="width: 100px;float: left;line-height: 34px;">
+                                <div style="float: left;padding-top: 7px;">
+                                    <input type="radio" style="" class=".checkbox-circle" name="fileType" onchange="changeMode('textile')" mode="textile" value="text" checked />
+                                </div>
+                                    <span style="line-height: 25px;">TEXT</span>
+                            </div>
+                            <div style="width: 120px;float: left;line-height: 34px;">
+                                <div style="float: left;padding-top: 7px;">
+                                    <input type="radio" style=""  class="checkbox-circle" name="fileType" onchange="changeMode('properties')" mode="properties"   value="properties" />
+                                </div>
+                                    <span style="line-height: 25px;">PROPERTIES</span>
+                            </div>
+                            <div style="width: 120px;float: left;line-height: 34px;">
+                                <div style="float: left;padding-top: 7px;">
+                                    <input type="radio" style=""  class="radio" name="fileType" onchange="changeMode('yaml')" mode="yaml"  value="yaml" />
+                                </div>
+                                    <span style="line-height: 25px;">YAML</span>
+                            </div>-->
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="addContent" class="col-control-left control-label">配置内容</label>
+                        <div class="col-control-right">
+                            <textarea class="form-control" id="addContent" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <input type="reset" name="addReset" style="display: none;"/>
+                </form>
+
+
+            </div>
+            <div class="modal-footer" style="    margin-top:0px;">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-off"></span>Close</button>
+                <button type="button" class="btn btn-primary saveSystemConfig"><span class="glyphicon glyphicon-ok"></span>Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>

@@ -17,6 +17,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SystemConfigHistoryInfo {
+
     @TableId(value = "id",type = IdType.AUTO)
     private Long id;
 
@@ -48,4 +49,7 @@ public class SystemConfigHistoryInfo {
 
     @TableField("json")
     private String json;
+
+    @TableField("operation_type")
+    private int operationType;
 }

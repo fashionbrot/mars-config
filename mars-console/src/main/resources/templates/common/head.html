@@ -1,0 +1,18 @@
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head">
+    <title>Mars控制台</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="icon" th:href="@{/favicon.ico}" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" id="theme" th:href="@{/css/theme-default.css}"/>
+    <link rel="stylesheet" type="text/css"  th:href="@{/css/select2.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap/bootstrap.min.css}" />
+<!--    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap/bootstrap.css}" />-->
+    <base th:href="${#request.getContextPath()}+'/'">
+    <script type="text/javascript" th:src="@{/js/plugins/jquery/jquery.min.js}"></script>
+
+    <script type="text/javascript" th:src="@{/js/plugins/tableexport/jspdf/libs/base64.js}"></script>
+    <script src="https://unpkg.com/ajax-hook/dist/ajaxhook.min.js"></script>
+
+</head>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <head th:replace="/common/head :: head"></head>
+</head>
+<body>
+<!-- START PAGE CONTAINER -->
+<div class="page-container">
+
+    <!-- START PAGE SIDEBAR -->
+    <div class="page-sidebar">
+        <!-- START X-NAVIGATION -->
+        <div th:replace="/common/left :: left"></div>
+        <!-- END X-NAVIGATION -->
+    </div>
+    <!-- END PAGE SIDEBAR -->
+
+    <!-- PAGE CONTENT -->
+    <div class="page-content">
+
+        <div th:replace="/common/top :: top"/>
+
+
+        <iframe id="body-iframe" style="width: 100%;height:100%" th:src="@{/control}" frameborder="0" class="content-wrapper">
+
+        </iframe>
+
+
+    </div>
+    <!-- END PAGE CONTENT -->
+</div>
+
+<div th:replace="/common/footer :: footer"/>
+
+</body>
+</html>
+
+
+
+
+
+

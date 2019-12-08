@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" class="body-full-height" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <head th:replace="/common/head :: head"></head>
+</head>
+<body>
+
+<div class="login-container">
+
+    <div class="login-box animated fadeInDown">
+        <div class="login-logo">Mars 控制台</div>
+        <div class="login-body">
+            <div class="login-title"><strong>欢迎使用</strong>, 请登录</div>
+            <!--<form id="loginForm" class="form-horizontal" >-->
+                <div class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <input name="userName" type="text" class="form-control userName" placeholder="用户名"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <input name="password" type="password" class="form-control password" placeholder="密码"/>
+                    </div>
+                </div>
+                <!--<div class="form-group">
+                    <div class="col-md-12">
+                        <input name="secret" type="text" class="form-control secret" placeholder="动态秘钥"/>
+                    </div>
+                </div>-->
+                <div class="form-group">
+                    <div class="col-md-6">
+                       <!-- <a href="#" class="btn btn-link btn-block">Forgot your password?</a>-->
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-info btn-block" id="loginIn">登录</button>
+                    </div>
+                </div>
+                </div>
+            <!--</form>-->
+        </div>
+        <div class="login-footer">
+            <!--<div class="pull-left">
+                &copy; 2015 AppName
+            </div>
+            <div class="pull-right">
+                <a href="#">About</a> |
+                <a href="#">Privacy</a> |
+                <a href="#">Contact Us</a>
+            </div>-->
+        </div>
+    </div>
+
+</div>
+<script type="text/javascript" th:src="@{/js/plugins/metisMenu/metisMenu.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/momentjs/momentjs.js}"></script>
+<script type="text/javascript" th:src="@{/js/self/common.js}"></script>
+<script type="text/javascript" th:src="@{/js/self/lg.js}"></script>
+</body>
+</html>
+
+
+
+
+
+

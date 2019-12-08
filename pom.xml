@@ -83,6 +83,7 @@
         <commons-lang3>3.8.1</commons-lang3>
         <slf4j-api>1.7.28</slf4j-api>
         <pagehelper-spring-boot-starter>1.2.10</pagehelper-spring-boot-starter>
+        <shiro-core>1.4.0</shiro-core>
     </properties>
 
     <dependencyManagement>
@@ -148,6 +149,11 @@
                 <groupId>com.github.pagehelper</groupId>
                 <artifactId>pagehelper-spring-boot-starter</artifactId>
                 <version>${pagehelper-spring-boot-starter}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.shiro</groupId>
+                <artifactId>shiro-core</artifactId>
+                <version>${shiro-core}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

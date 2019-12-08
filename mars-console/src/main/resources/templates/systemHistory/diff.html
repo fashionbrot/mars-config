@@ -1,0 +1,37 @@
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="diff" >
+
+
+
+
+    <div class="modal fade" id="diffModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop='static'
+
+    >
+        <div class="modal-dialog" style="width:800px;min-width: 550px;max-width: 900px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="myModalLabel">diff</h4>
+                </div>
+                <div class="modal-body" >
+                    <input type="hidden" id="diffId" />
+                    <div>
+                        <span style="padding-left: 150px;font-size: 20px;">修改前</span>
+                        <span style="padding-left:250px;font-size: 20px;">修改后</span>
+                    </div>
+                    <div id="editDiff" style="">
+
+                    </div>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default cancelDiff" >Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="rollback()">回滚到修改前</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>

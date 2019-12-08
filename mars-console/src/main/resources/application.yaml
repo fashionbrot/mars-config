@@ -4,7 +4,15 @@ spring:
             charset: UTF-8
             enabled: true
             force: true
-
+    thymeleaf:
+        cache: false
+        enabled: true
+        encoding: UTF-8
+        mode: LEGACYHTML5
+        prefix: classpath:/templates/
+        servlet:
+            content-type: text/html
+        suffix: .html
 
 pagehelper:
     helper-dialect: mysql
@@ -13,6 +21,7 @@ pagehelper:
     support-methods-arguments: true
 
 mybatis-plus:
-    mapper-locations: classpath*:com/gitee/mars/dao/dao/mapper/xml/*.xml
+    mapper-locations: classpath*:com/gitee/mars/dao/mapper/xml/*.xml
     type-aliases-package: com.gitee.mars.dao.entity
+
 

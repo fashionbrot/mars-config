@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <head th:replace="/common/head :: head"></head>
+
+</head>
+<body>
+<!-- START PAGE CONTAINER -->
+<div class="page-container">
+
+    <!-- START PAGE SIDEBAR -->
+    <div class="page-sidebar">
+
+        <div th:replace="/common/left :: left"></div>
+        <!-- END X-NAVIGATION -->
+    </div>
+    <!-- END PAGE SIDEBAR -->
+
+    <!-- PAGE CONTENT -->
+    <div class="page-content">
+
+        <div th:replace="/common/top :: top"/>
+
+        <!-- START BREADCRUMB -->
+        <!--<ul class="breadcrumb">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">角色管理</a></li>
+            <li class="active">角色列表</li>
+        </ul>-->
+        <!-- END BREADCRUMB -->
+
+        <!-- PAGE CONTENT WRAPPER -->
+        <div class="page-content-wrap">
+
+
+            <div class="row">
+                <div class="col-md-12">
+
+                    <!-- START DATATABLE EXPORT -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">角色列表</h3>
+                            <div class="pull-right">
+                            </div>
+                        </div>
+                        <div class="panel-heading" style="float: right;">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-success addProject dropdown-toggle btn-condensed"
+                                        onclick="">
+                                    <i class="glyphicon glyphicon-plus"></i>新增
+                                </button>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table id="dataTables-userInfo" class="table datatable">
+                                    <thead>
+                                    <tr>
+                                        <th width="10%">角色名称</th>
+                                        <th width="5%">角色状态</th>
+                                        <th width="8%">创建时间</th>
+                                        <th width="30%">操作</th>
+                                    </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END DATATABLE EXPORT -->
+
+                </div>
+            </div>
+
+        </div>
+        <!-- END PAGE CONTENT WRAPPER -->
+    </div>
+    <!-- END PAGE CONTENT -->
+</div>
+<!-- END PAGE CONTAINER -->
+
+<div class="modal fade" id="userInfoDelModal" tabindex="-1" role="dialog"
+     aria-labelledby="userInfoDelModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="userInfoDelModalLabel">删除认证</h4>
+            </div>
+            <div class="modal-body">
+                <input id="userInfoId" type="hidden">
+                确定要删除这个环境信息么？
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><i class="glyphicon glyphicon-ban-circle"></i>取消</button>
+                <button type="button" class="btn btn-primary" onclick="userInfoDel()"><i class="glyphicon glyphicon-trash"></i>删除</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="userInfoEditModal" tabindex="-1" role="dialog"
+     aria-labelledby="userInfoAddModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="">编辑</h4>
+            </div>
+            <div class="modal-body">
+                <form id="userInfoEditForm">
+                    <input  type="hidden" name="id" id="editId"/>
+                    角色名称：<input name="description" class="form-control" maxlength="16" minlength="2" placeholder="菜单名称" type="text"
+                                id="editDescription" aria-required="true"/>
+                    角色状态:
+                    <select name="status" class="form-control" id="editStatus" aria-required="true">
+                        <option value="1">开启</option>
+                        <option value="0">关闭</option>
+                    </select>
+                    <input type="reset" name="addReset" style="display: none;"/>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><i class="glyphicon glyphicon-ban-circle"></i>取消</button>
+                <button type="button" class="btn btn-primary" onclick="userInfoEdit()"><i class="glyphicon glyphicon-ok-circle"></i>确认</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="userInfoAddModal" tabindex="-1" role="dialog"
+     aria-labelledby="userInfoAddModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="userInfoAddModalLabel">新增项目</h4>
+            </div>
+            <div class="modal-body">
+                <form id="userInfoAddForm">
+                    角色名称：<input name="description" class="form-control" maxlength="16" minlength="2" placeholder="菜单名称" type="text"
+                                id="description" aria-required="true"/>
+                    角色状态:
+                    <select name="status" class="form-control" id="status" aria-required="true">
+                        <option value="1">开启</option>
+                        <option value="0">关闭</option>
+                    </select>
+                    <input type="reset" name="addReset" style="display: none;"/>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><i class="glyphicon glyphicon-ban-circle"></i>取消</button>
+                <button type="button" class="btn btn-primary" onclick="userInfoAdd()"><i class="glyphicon glyphicon-ok-circle"></i>确认</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="roleMenuModal" tabindex="-1" role="dialog"
+     aria-labelledby="userInfoAddModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="roleMenuModalLabel">菜单权限</h4>
+            </div>
+            <p><input type="button" id="roleQuanxuan" value="全选">&nbsp;&nbsp;<input type="button" id="roleQuanquxiao" value="全取消"><br/></p>
+            <div class="modal-body">
+                <input type="hidden" id="roleId" value="" />
+                <form id="roleMenuForm">
+                    <div id="container">
+
+                    </div>
+                    <input type="reset" name="addReset" style="display: none;"/>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><i class="glyphicon glyphicon-ban-circle"></i>取消</button>
+                <button type="button" class="btn btn-primary" onclick="submitMenuRole()"><i class="glyphicon glyphicon-ok-circle"></i>确认</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="roleTemplateModal" tabindex="-1" role="dialog"
+     aria-labelledby="userInfoAddModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="roleTemplateModalLabel">模板权限</h4>
+            </div>
+            <p><input type="button" id="quanxuan" value="全选">&nbsp;&nbsp;<input type="button" id="quanquxiao" value="全取消"><br/></p>
+
+            <div class="modal-body">
+                <input type="hidden" id="roleId2" value="" />
+                <form id="roleTemplateForm">
+
+                    <input type="reset" name="addReset" style="display: none;"/>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><i class="glyphicon glyphicon-ban-circle"></i>取消</button>
+                <button type="button" class="btn btn-primary" onclick="submitTemplateRole()"><i class="glyphicon glyphicon-ok-circle"></i>确认</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="roleSystemConfigModal" tabindex="-1" role="dialog"
+     aria-labelledby="userInfoAddModalLabel"
+     aria-hidden="true" >
+    <div class="modal-dialog" style="width: 780px">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="roleSystemConfigModalLabel">动态配置权限管理</h4>
+            </div>
+
+
+
+            <div class="modal-body" style="padding-top: 5px;">
+
+                <div style="padding-left:10px;">
+                    <label>环境选择:</label>
+                    <div class="btn-group" >
+                        <select name="envCode" class="form-control" style="width: 180px" id="envCode" aria-required="true">
+
+                        </select>
+                    </div>
+                    <div class="btn-group" style="width: 20px" >&nbsp;</div>
+                    <label>选择应用:</label>
+                    <div class="btn-group" >
+                        <select name="appName" class="form-control" style="width:180px;" id="appName" aria-required="true">
+
+                        </select>
+                    </div>
+                    <div class="btn-group" >
+                        <button type="button" class="btn btn-success dropdown-toggle"
+                                onclick="loadSystemConfigRole()">
+                            <span class="glyphicon glyphicon-search"></span>查询
+                        </button>
+                    </div>
+
+                    <div class="btn-group" >
+                        <input class="form-control" type="button" value="同步到权限表" onclick="syncSystemConfigRole()">
+                    </div>
+                </div>
+
+                <input type="hidden" id="roleId3" value="" />
+                <form id="roleSystemConfigForm">
+
+                    <table class="table table-bordered " id="roleTable" style="margin-top: 30px;">
+                        <thead>
+                            <tr>
+                                <th>文件名</th>
+                                <th>查看权限</th>
+                                <th>编辑权限</th>
+                                <th>删除权限</th>
+                                <th>发布权限</th>
+                            </tr>
+                        </thead>
+                        <tbody id="systemConfigDiv">
+
+                        </tbody>
+                    </table>
+
+                    <input type="reset" name="addReset" style="display: none;"/>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><i class="glyphicon glyphicon-ban-circle"></i>取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveRole()"><i class="glyphicon glyphicon-ok-circle"></i>确认</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div th:replace="/common/footer :: footer"/>
+<script type="text/javascript" th:src="@{/js/admin/role.js}"></script>
+
+
+</body>
+</html>
+
+
+
+
+
+

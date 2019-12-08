@@ -31,4 +31,10 @@ public class MarsException extends RuntimeException {
         this.msg = respCode.getMsg();
     }
 
+    public MarsException(RespCode respCode,String msg){
+        super(respCode.getMsg());
+        this.code = respCode.getCode();
+        this.msg = msg+respCode.getMsg();
+    }
+
 }

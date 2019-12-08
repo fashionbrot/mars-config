@@ -83,6 +83,7 @@ CREATE TABLE `system_config_history` (
   `create_date` datetime NOT NULL COMMENT '创建时间',
   `update_date` datetime DEFAULT NULL COMMENT '修改时间',
   `operation_type` int(2) unsigned NOT NULL COMMENT '操作类型',
+  `modifier` varchar(32) DEFAULT NULL COMMENT '修改人',
   PRIMARY KEY (`id`),
   KEY `idx_envcode_appname` (`env_code`,`app_name`) USING BTREE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='应用系统配置历史表';

@@ -1,22 +1,53 @@
 package com.gitee.mars.dao.dao;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.gitee.mars.dao.dao.provider.MenuRoleRelationProvider;
-import com.gitee.mars.dao.entity.Menu;
-import com.gitee.mars.dao.entity.MenuRoleRelation;
-import com.gitee.mars.dao.entity.UserInfo;
-import org.apache.ibatis.annotations.SelectProvider;
-import org.springframework.stereotype.Repository;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.gitee.mars.dao.entity.Menu;
+import com.gitee.mars.dao.mapper.MenuMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import java.util.Date;
 import java.util.List;
 
-@Repository
-public interface MenuDao extends BaseMapper<Menu> {
+@Service
+public class MenuDao  {
+    @Autowired
+    private MenuMapper menuMapper;
 
-    @SelectProvider(method = "selectMenuRole",type = MenuRoleRelationProvider.class)
-    List<Menu> selectMenuRole(MenuRoleRelation relation);
+
+    public int add(Menu envInfo) {
+        envInfo.setCreateDate(new Date());
+        return menuMapper.insert(envInfo);
+    }
 
 
-    @SelectProvider(method = "selectMenuRoleByUser",type = MenuRoleRelationProvider.class)
-    List<Menu> selectMenuRoleByUser(UserInfo userInfo);
+    public Integer update(Menu envInfo) {
+        envInfo.setUpdateDate(new Date());
+        return menuMapper.updateById(envInfo);
+    }
+
+
+    public Integer deleteById(Long id) {
+        return menuMapper.deleteById(id);
+    }
+
+
+    public Menu queryById(Long id) {
+        return menuMapper.selectById(id);
+    }
+
+
+    public List<Menu> queryAll(QueryWrapper queryWrapper) {
+        return menuMapper.selectList(queryWrapper);
+    }
+
+
+    public List<Menu> selectMenuRole(Long roleId) {
+        return menuMapper.selectMenuRole(roleId);
+    }
+
+
+    public List<Menu> selectMenuRoleByUser(Long userId) {
+        return menuMapper.selectMenuRoleByUser(userId);
+    }
 }

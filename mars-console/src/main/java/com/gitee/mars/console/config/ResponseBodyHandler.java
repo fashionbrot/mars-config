@@ -1,3 +1,4 @@
+/*
 package com.gitee.mars.console.config;
 
 import com.gitee.mars.common.annotation.NoReturnValue;
@@ -30,3 +31,4 @@ public class ResponseBodyHandler implements ResponseBodyAdvice {
         return vo;
     }
 }
+*/

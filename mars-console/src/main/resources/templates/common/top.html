@@ -1,0 +1,62 @@
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<!-- START X-NAVIGATION VERTICAL -->
+<ul class="x-navigation x-navigation-horizontal x-navigation-panel" th:fragment="top">
+    <!-- TOGGLE NAVIGATION -->
+    <li class="xn-icon-button">
+        <a href="#" class="x-navigation-minimize"><span class="fa fa-dedent"></span></a>
+    </li>
+    <!-- END TOGGLE NAVIGATION -->
+    <!-- SEARCH -->
+    <!--<li class="xn-search">
+        <form role="form">
+            <input type="text" name="search" placeholder="Search..."/>
+        </form>
+    </li>-->
+    <!-- END SEARCH -->
+    <!-- POWER OFF -->
+
+    <li class="pull-right last" style="text-align: center;">
+        <a href="javascript:void(0);" id="logout" style="width: 110px;" ><span class="glyphicon glyphicon-log-out" style="margin-right:0px;"></span>退出登陆</a>
+    </li>
+    <li class="pull-right">
+        <a href="javascript:void(0);" id="changePwd"><span class="glyphicon glyphicon-edit" style="margin-right: 0px"></span>修改密码</a>
+    </li>
+    <li class="pull-right">
+
+        <a href="#"><span ></span>欢迎您：<span  id="realName"></span> </a>
+    </li>
+
+    <!-- END POWER OFF -->
+
+
+    <div class="modal fade" id="pwdViewId" tabindex="-1" role="dialog"
+         aria-labelledby="userInfoAddModalLabel"
+         aria-hidden="true"
+         data-backdrop='static'
+    >
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title" id="">修改密码</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="changePwdForm">
+                        <!--<input  type="hidden" name="id" id="envId"/>-->
+                        原密码：<input name="oldPwd" id="oldPwd" class="form-control" maxlength="64" minlength="2" placeholder="原密码" type="password"/>
+                        新密码：<input name="newPwd" id="newPwd" class="form-control" maxlength="64" minlength="2" placeholder="新密码" type="password"/>
+                        确认密码：<input name="newPwd2" id="newPwd2" class="form-control" maxlength="64" minlength="2" placeholder="确认密码" type="password"/>
+                        <input type="reset" name="addReset" style="display: none;"/>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="resetPwd()">确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</ul>
+<!-- END X-NAVIGATION VERTICAL -->

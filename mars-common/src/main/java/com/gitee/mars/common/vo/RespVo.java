@@ -1,5 +1,6 @@
 package com.gitee.mars.common.vo;
 
+import com.gitee.mars.common.constant.MarsConst;
 import com.gitee.mars.common.enums.RespCode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,8 +14,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class RespVo implements Serializable{
 
-    private static final int SUCCESS = RespCode.SUCCESS.getCode();
-    private static final int FAILED = RespCode.FAIL.getCode();
+    public static final int SUCCESS = RespCode.SUCCESS.getCode();
+    public static final int FAILED = RespCode.FAIL.getCode();
 
     private int code;
     private String msg;
@@ -34,7 +35,7 @@ public class RespVo implements Serializable{
     }
 
     public static RespVo success(){
-        return RespVo.builder().code(SUCCESS).msg("成功").build();
+        return MarsConst.RESP_VO;
     }
 
     public static RespVo respCode(RespCode respCode){

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+
+
+    <style>
+
+        .modal-header{
+            cursor:move;
+        }
+        .radio{
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+        }
+
+        @media (min-width: 768px) {
+            .col-sm-2 {
+                width: 11.5%;
+            }
+        }
+        .col-control-left{
+            float: left;
+            margin-left: 20px;
+            /*width: 16.666666666666664%*/
+        }
+        .col-control-right{
+            float:right;
+            width: 85%;
+            margin-right: 20px;
+        }
+
+    </style>
+    <head th:replace="/common/head :: head"></head>
+
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/codemirror/merge/merge.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/codemirror/codemirror.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/codemirror/theme/abcdef.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/codemirror/theme/3024-night.css}">
+    <script type="text/javascript" th:src="@{/js/plugins/codemirror/codemirror.js}"></script>
+    <script type="text/javascript" th:src="@{/js/plugins/codemirror/mode/properties.js}"></script>
+    <script type="text/javascript" th:src="@{/js/plugins/codemirror/mode/yaml.js}"></script>
+    <script type="text/javascript" th:src="@{/js/plugins/codemirror/mode/textile.js}"></script>
+    <script type="text/javascript" th:src="@{/js/plugins/codemirror/mode/shell.js}"></script>
+    <script type="text/javascript" th:src="@{/js/plugins/codemirror/mode/javascript.js}"></script>
+    <script type="text/javascript" th:src="@{/js/plugins/codemirror/mode/diff.js}"></script>
+    <script type="text/javascript" th:src="@{/js/plugins/codemirror/merge/merge.js}"></script>
+    <script type="text/javascript" th:src="@{/js/plugins/codemirror/diff_match_patch.js}"></script>
+    <script type="text/javascript" th:src="@{/js/plugins/codemirror/htmlmixed/htmlmixed.js}"></script>
+
+</head>
+<body>
+<!-- START PAGE CONTAINER -->
+<div class="page-container">
+
+    <!-- START PAGE SIDEBAR -->
+    <div class="page-sidebar">
+        <!-- START X-NAVIGATION -->
+        <div th:replace="/common/left :: left"></div>
+        <!-- END X-NAVIGATION -->
+    </div>
+    <!-- END PAGE SIDEBAR -->
+
+    <!-- PAGE CONTENT -->
+    <div class="page-content">
+
+        <div th:replace="/common/top :: top"/>
+
+        <!-- START BREADCRUMB -->
+        <!--<ul class="breadcrumb">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">实例管理</a></li>
+            <li class="active">系统参数配置</li>
+        </ul>-->
+        <!-- END BREADCRUMB -->
+
+        <!-- PAGE CONTENT WRAPPER -->
+        <div class="page-content-wrap">
+
+
+            <div class="row">
+                <div class="col-md-12">
+
+                    <!-- START DATATABLE EXPORT -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">配置列表</h3>
+                            <div class="pull-right">
+                            </div>
+                        </div>
+                        <div class="panel-heading" style="float: right;">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-success dropdown-toggle" onclick="addView()">
+                                    <span class="glyphicon glyphicon-plus"></span>新增
+                                </button>
+                            </div>
+
+                            <div class="pull-right" style="margin-right: 5rem;">
+                                <label>环境选择:</label>
+                                <div class="btn-group" style="width:180px;">
+                                    <select name="envCode" class="form-control" id="envCode" aria-required="true">
+
+                                    </select>
+                                </div>
+                                <div class="btn-group" style="width: 20px" >&nbsp;</div>
+                                <label>选择应用:</label>
+                                <div class="btn-group" style="width:180px;">
+                                    <select name="appName" class="form-control" id="appName" aria-required="true">
+
+                                    </select>
+                                </div>
+                                <div class="btn-group" style="width: 20px" >&nbsp;</div>
+
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-success dropdown-toggle"
+                                            onclick="loadData(false)">
+                                        <span class="glyphicon glyphicon-search"></span>查询
+                                    </button>
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table id="dataTables" class="table datatable">
+                                    <thead>
+                                    <tr>
+                                        <th  width="6%">文件名称</th>
+                                        <th  width="10%">描述</th>
+                                        <th  width="5%">状态</th>
+                                        <th  width="4%">操作人</th>
+                                        <th  width="7%">修改时间</th>
+                                        <th  width="18%">操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="tbody">
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END DATATABLE EXPORT -->
+
+                </div>
+            </div>
+
+        </div>
+        <!-- END PAGE CONTENT WRAPPER -->
+    </div>
+    <!-- END PAGE CONTENT -->
+</div>
+<!-- END PAGE CONTAINER -->
+
+<div id="toolbar">
+
+</div>
+
+
+<div class="modal fade" id="delModal" tabindex="-1" role="dialog"
+     aria-labelledby="userInfoDelModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="userInfoDelModalLabel">删除认证</h4>
+            </div>
+            <input id="delId" type="hidden" />
+            <div class="modal-body">
+                <input id="userInfoId" type="hidden">
+                确定要删除吗？
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="del()">删除</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="/system/indexAdd :: systemAddView"/>
+<div th:replace="/system/indexEdit :: systemEditView"/>
+<div th:replace="/system/indexView :: systemView"/>
+<div th:replace="/system/diff :: diff"/>
+
+<div id="Layer1" style="display: none; position: absolute; z-index: 100;">
+
+    <div th:replace="/common/footer :: footer"/>
+<script type="text/javascript" th:src="@{/js/self/system/index.js}"></script>
+<script type="text/javascript" th:src="@{/js/self/system/diff.js}"></script>
+
+
+
+</body>
+</html>
+
+
+
+
+
+

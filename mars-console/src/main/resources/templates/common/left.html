@@ -1,0 +1,45 @@
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+
+<ul class="x-navigation" th:fragment="left">
+
+    <li style="background-color: cadetblue">
+        <a href="javaScript:;" style="text-align: center">控制台</a>
+        <a href="#" class="x-navigation-control"></a>
+    </li>
+    <li class="xn-profile">
+        <a href="#" class="profile-mini">
+        </a>
+    </li>
+   <!-- <li class="xn-title" >导航栏</li>-->
+    <!--<li class="xn-openable active">
+        <a><span class="fa fa-wrench"></span> <span class="xn-text">后台管理系统</span></a>
+        <ul>
+            <li class="nav-item"><a th:href="@{/user/index}"><span class="fa fa-user"></span>用户管理</a></li>
+        </ul>
+        <ul>
+            <li class="nav-item"><a th:href="@{/admin/menu/index}"><span class="fa fa-user"></span>菜单管理</a></li>
+        </ul>
+        <ul>
+            <li class="nav-item"><a th:href="@{/role/index}"><span class="fa fa-user"></span>权限管理</a></li>
+        </ul>
+        <ul>
+            <li class="nav-item"><a th:href="@{/system/index}"><span class="fa fa-user"></span>系统配置</a></li>
+        </ul>
+        <ul>
+            <li class="nav-item"><a th:href="@{/system/history-index}"><span class="fa fa-user"></span>系统配置记录</a></li>
+        </ul>
+    </li>
+-->
+    <li  th:each="menuInfo,menuInfoStat : ${menuList}" th:class="${menuInfo.active==1}?'xn-openable active':'xn-openable'">
+        <a><span class="fa fa-user"></span> <span class="xn-text" th:text="${menuInfo.menuName}"></span></a>
+        <ul >
+            <li th:each="subMenu,subMenuStat :${menuInfo.childMenu}" th:class="${subMenu.active==1}?'active':''">
+                <a  th:href="@{${subMenu.menuUrl}}"  th:text="${subMenu.menuName}" style="padding-left: 5rem;" >
+                </a>
+            </li>
+        </ul>
+    </li>
+
+
+
+</ul>

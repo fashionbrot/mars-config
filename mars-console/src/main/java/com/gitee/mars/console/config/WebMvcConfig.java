@@ -34,16 +34,17 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
 
         registry.addInterceptor(getInterceptor())
-                .addPathPatterns("/api/**");
+                .addPathPatterns("/**")
+                .excludePathPatterns("/")
+                .excludePathPatterns("/user/login")
+                .excludePathPatterns("/user/doLogin")
+                .excludePathPatterns("/user/logout")
+                .excludePathPatterns("/js/**")
+                .excludePathPatterns("/css/**")
+                .excludePathPatterns("/img/**")
+                .excludePathPatterns("/api/**")
+        ;
     }
 
-
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("*")
-                .allowedMethods("POST", "GET", "OPTIONS")
-                .allowCredentials(true);
-    }
 
 }

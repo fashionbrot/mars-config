@@ -9,6 +9,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.gitee.mars.common.enums.RespCode;
 import com.gitee.mars.common.exception.MarsException;
 import lombok.extern.slf4j.Slf4j;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -23,7 +24,11 @@ public class JwtTokenUtil {
      */
     private static final String SECRET = "+f+KCxF5UVl+OAb0EETlPv9aml/Iu16IWeIPVXbMp5M8bOvqj1VEmGoB7IEn+";
 
-    private static final String USER_ID="userId";
+    public static final String USER_ID = "userId";
+
+    public static final String REAL_NAME = "realName";
+
+    public static final String ROLE_NAME = "roleName";
 
     /**
      * token 过期时间: 30min
@@ -32,13 +37,13 @@ public class JwtTokenUtil {
     private static final int CALENDAR_INTERVAL = 30;
 
     public static void main(String[] args) {
-        String token = JwtTokenUtil.createToken(11);
-        System.out.println(token);
-        Integer userId = JwtTokenUtil.verifyTokenAndGetUser(token);
-        System.out.println(userId);
+        /*String token = JwtTokenUtil.createToken(11);
+        System.out.println(token);*/
+        /*Integer userId = JwtTokenUtil.verifyTokenAndGetUser(token);
+        System.out.println(userId);*/
     }
 
-    private JwtTokenUtil(){
+    private JwtTokenUtil() {
     }
 
     /**
@@ -65,7 +70,7 @@ public class JwtTokenUtil {
      *
      * @return token
      */
-    public static String createToken(int userId) {
+    public static String createToken(long userId,String realName,String roleName) {
         Date iatDate = new Date();
         // expire time
         Calendar nowTime = Calendar.getInstance();
@@ -89,7 +94,9 @@ public class JwtTokenUtil {
                 // jwt接收方
                 .withClaim("aud", "mars")
                 // 用户id
-                .withClaim("userId", userId)
+                .withClaim(USER_ID, userId)
+                .withClaim(REAL_NAME,realName)
+                .withClaim(ROLE_NAME, roleName)
                 // sign time
                 .withIssuedAt(iatDate)
                 // expire time
@@ -105,13 +112,13 @@ public class JwtTokenUtil {
      * @param token token
      * @return user
      */
-    public static Integer verifyTokenAndGetUser(String token) {
+    public static Long verifyTokenAndGetUser(String token) {
         Map<String, Claim> claimMap = verifyToken(token);
         Claim userIdClaim = claimMap.get(USER_ID);
         if (userIdClaim == null || userIdClaim.asInt() == null) {
             // token 校验失败, 抛出Token验证非法异常
             throw new MarsException(RespCode.SIGNATURE_MISMATCH);
         }
-        return userIdClaim.asInt();
+        return userIdClaim.asLong();
     }
 }
