@@ -144,9 +144,9 @@ public class SystemConfigService {
 
 
     public CheckForUpdateVo checkForUpdate(DataConfigReq dataConfig) {
-        if (dataConfig != null && StringUtils.isEmpty(dataConfig.getToken())) {
+        /*if (dataConfig != null && StringUtils.isEmpty(dataConfig.getToken())) {
             return null;
-        }
+        }*/
         /*MD5 md5 = MD5.getInstance();
         String token =md5.getMD5String(getToken(dataConfig.getEnvCode(),dataConfig.getAppId(),dataConfig.getVersion()));
         if (!token.equals(dataConfig.getToken())){
@@ -157,9 +157,9 @@ public class SystemConfigService {
 
 
     public ForDataVo forDataVo(DataConfigReq dataConfig) {
-        if (dataConfig != null && StringUtils.isEmpty(dataConfig.getToken())) {
+        /*if (dataConfig != null && StringUtils.isEmpty(dataConfig.getToken())) {
             return null;
-        }
+        }*/
         /*MD5 md5 = MD5.getInstance();
         String token =md5.getMD5String(getToken(dataConfig.getEnvCode(),dataConfig.getAppId(),dataConfig.getFileName(),dataConfig.getVersion()));
         if (!token.equals(dataConfig.getToken())){

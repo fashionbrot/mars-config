@@ -22,9 +22,9 @@ public class ConfigParseUtils {
     }
 
     public static Properties toProperties(final String context, ConfigTypeEnum configTypeEnum) {
-        if (StringUtil.isEmpty(context) || configTypeEnum==ConfigTypeEnum.TEXT) {
+        /*if (StringUtil.isEmpty(context) || configTypeEnum==ConfigTypeEnum.TEXT) {
             return new Properties();
-        }
+        }*/
         if (DEFAULT_CONFIG_PARSE_MAP.containsKey(configTypeEnum)) {
             try {
                 return DEFAULT_CONFIG_PARSE_MAP.get(configTypeEnum).parse(context);

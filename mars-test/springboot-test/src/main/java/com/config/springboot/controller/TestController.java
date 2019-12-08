@@ -33,7 +33,7 @@ public class TestController {
         return testConfig.appName+":"+testConfig.name;
     }
 
-    @MarsConfigListener(fileName = "aaa.properties")
+    @MarsConfigListener(fileName = "aaa")
     public void testP(Properties properties){
         this.test = properties;
         System.out.printf(properties.toString());

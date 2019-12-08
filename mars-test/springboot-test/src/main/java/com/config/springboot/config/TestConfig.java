@@ -6,7 +6,7 @@ import com.fashion.mars.spring.properties.annotation.MarsProperty;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
-@MarsConfigurationProperties(fileName = "aaa.properties",autoRefreshed = true)
+@MarsConfigurationProperties(fileName = "aaa",autoRefreshed = true)
 @Data
 @Component
 public class TestConfig {
