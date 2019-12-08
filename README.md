@@ -9,6 +9,7 @@ spring mvc 、springboot 动态配置系统。http 轮训方式 更新 动态配
 ##### 后端使用技术 ：springboot mybatis jwt
 ##### 前端使用：thymeleaf 模板引擎
 ##### 数据库 ：mysql
+##### jdk   ：1.8
 
 
 #### 安装教程
