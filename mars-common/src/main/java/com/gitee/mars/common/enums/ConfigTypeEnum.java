@@ -15,26 +15,10 @@ public enum ConfigTypeEnum {
      * config type is "properties"
      */
     PROPERTIES("properties"),
-
-    /**
-     * config type is "xml"
-     */
-    XML("xml"),
-
-    /**
-     * config type is "json"
-     */
-    JSON("json"),
-
     /**
      * config type is "text"
      */
     TEXT("text"),
-
-    /**
-     * config type is "html"
-     */
-    HTML("html"),
 
     /**
      * config type is "yaml"
