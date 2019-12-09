@@ -9,14 +9,22 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.Date;
-
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ */
 @TableName("system_config_info")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SystemConfigInfo {
+public class SystemConfigInfo implements Serializable {
+
+    private static final long serialVersionUID = 5109704606150311695L;
+
     @TableId(value = "id",type = IdType.AUTO)
     private Long id;
 

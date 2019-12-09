@@ -10,6 +10,11 @@ import java.lang.ref.SoftReference;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ */
 @Slf4j
 public class RandomRule extends AbstractLoadBalancerRule {
 

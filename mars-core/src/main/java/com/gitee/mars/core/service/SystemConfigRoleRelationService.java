@@ -11,42 +11,47 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ */
 @Service
 public class SystemConfigRoleRelationService {
 
     @Autowired
-    private SystemConfigRoleRelationDao systemConfigRoleRelationService;
+    private SystemConfigRoleRelationDao systemConfigRoleRelationDao;
 
 
 
     public void add(SystemConfigRoleRelation systemConfigRoleRelation) {
-         if(systemConfigRoleRelationService.add(systemConfigRoleRelation)!=1){
+         if(systemConfigRoleRelationDao.add(systemConfigRoleRelation)!=1){
              throw new MarsException(RespCode.SAVE_ERROR);
          }
     }
 
 
     public void update(SystemConfigRoleRelation appInfo) {
-        if (systemConfigRoleRelationService.update(appInfo)!=1){
+        if (systemConfigRoleRelationDao.update(appInfo)!=1){
             throw new MarsException(RespCode.UPDATE_ERROR);
         }
     }
 
 
     public void deleteById(Long id) {
-        if (systemConfigRoleRelationService.deleteById(id)!=1){
+        if (systemConfigRoleRelationDao.deleteById(id)!=1){
             throw new MarsException(RespCode.DELETE_ERROR);
         }
     }
 
 
     public SystemConfigRoleRelation queryById(Long id) {
-        return systemConfigRoleRelationService.queryById(id);
+        return systemConfigRoleRelationDao.queryById(id);
     }
 
 
     public List<SystemConfigRoleRelation> queryAll() {
-        List<SystemConfigRoleRelation> menuBarList= systemConfigRoleRelationService.queryAll();
+        List<SystemConfigRoleRelation> menuBarList= systemConfigRoleRelationDao.queryAll();
 
         return menuBarList;
     }
@@ -55,17 +60,17 @@ public class SystemConfigRoleRelationService {
 
     public List<SystemConfigRoleRelation> selectBy(SystemConfigInfo systemConfigInfo) {
 
-        return systemConfigRoleRelationService.selectBy(systemConfigInfo);
+        return systemConfigRoleRelationDao.selectBy(systemConfigInfo);
     }
 
 
     public int syncRole(SystemConfigInfo systemConfigInfo) {
-        return systemConfigRoleRelationService.syncRole(systemConfigInfo);
+        return systemConfigRoleRelationDao.syncRole(systemConfigInfo);
     }
 
 
     public void saveRole(List<SystemConfigRoleRelation> relations) {
-        if (systemConfigRoleRelationService.saveRole(relations)<=0){
+        if (systemConfigRoleRelationDao.saveRole(relations)<=0){
             throw new MarsException(RespCode.SAVE_ERROR);
         }
     }

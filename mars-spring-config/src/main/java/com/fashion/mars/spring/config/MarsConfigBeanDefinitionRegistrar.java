@@ -17,6 +17,11 @@ import org.springframework.util.Assert;
 import static com.fashion.mars.spring.util.BeanUtil.*;
 import static org.springframework.core.annotation.AnnotationAttributes.fromMap;
 
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ */
 public class MarsConfigBeanDefinitionRegistrar  implements ImportBeanDefinitionRegistrar, EnvironmentAware, BeanFactoryAware {
 
 

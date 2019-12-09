@@ -32,7 +32,11 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
 
-
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ */
 @Component
 @Slf4j
 public class UserInfoService {
@@ -43,12 +47,10 @@ public class UserInfoService {
     @Autowired
     private RoleInfoDao roleInfoDao;
     @Autowired
-    private MenuService menuItemService;
+    private MenuService menuService;
 
     @Autowired
     private HttpServletRequest request;
-    @Autowired
-    private HttpServletResponse response;
 
 
     public RespVo login(String userName, String password, HttpServletRequest request, HttpServletResponse response) {
@@ -97,7 +99,7 @@ public class UserInfoService {
         }
         int result = userInfoDao.update(userInfo);
         if (result == 1) {
-            menuItemService.clearMenuList();
+            menuService.clearMenuList();
         }else{
             throw new MarsException(RespCode.UPDATE_ERROR);
         }

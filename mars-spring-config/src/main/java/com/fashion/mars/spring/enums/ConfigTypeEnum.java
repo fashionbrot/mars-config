@@ -7,6 +7,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ */
 @Getter
 @AllArgsConstructor
 public enum ConfigTypeEnum {
@@ -17,24 +22,9 @@ public enum ConfigTypeEnum {
     PROPERTIES("properties"),
 
     /**
-     * config type is "xml"
-     */
-    XML("xml"),
-
-    /**
-     * config type is "json"
-     */
-    JSON("json"),
-
-    /**
      * config type is "text"
      */
     TEXT("text"),
-
-    /**
-     * config type is "html"
-     */
-    HTML("html"),
 
     /**
      * config type is "yaml"

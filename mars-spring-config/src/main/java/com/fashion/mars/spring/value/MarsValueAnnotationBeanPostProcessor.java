@@ -25,6 +25,12 @@ import java.util.*;
 import static com.fashion.mars.spring.util.PropertiesUtil.resolvePlaceholder;
 import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ *
+ */
 @Slf4j
 public class MarsValueAnnotationBeanPostProcessor extends AnnotationInjectedBeanPostProcessor<MarsValue>
         implements BeanFactoryAware, ApplicationListener<MarsListenerEvent> {
@@ -120,8 +126,7 @@ public class MarsValueAnnotationBeanPostProcessor extends AnnotationInjectedBean
 
         } catch (Throwable e) {
             if (log.isErrorEnabled()) {
-                log.error(
-                        "Can't update value with " + method.getName() + " (method) in "
+                log.error("Can't update value with " + method.getName() + " (method) in "
                                 + valueTarget.beanName + " (bean)", e);
             }
         }
@@ -141,8 +146,7 @@ public class MarsValueAnnotationBeanPostProcessor extends AnnotationInjectedBean
 
         } catch (Throwable e) {
             if (log.isErrorEnabled()) {
-                log.error(
-                        "Can't update value of the " + fieldName + " (field) in "
+                log.error("Can't update value of the " + fieldName + " (field) in "
                                 + valueTarget.beanName + " (bean)", e);
             }
         }

@@ -15,6 +15,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ */
 @Service
 public class SystemConfigRoleRelationDao {
 
@@ -24,7 +29,7 @@ public class SystemConfigRoleRelationDao {
     @Autowired
     private SystemConfigDao systemConfigDao;
     @Autowired
-    private UserInfoDao userInfoService;
+    private UserInfoDao userInfoDao;
 
 
     public int add(SystemConfigRoleRelation systemConfigRoleRelation) {
@@ -104,7 +109,7 @@ public class SystemConfigRoleRelationDao {
     }
 
     public void checkRole(Long systemConfigId, SystemConfigRoleEnum configRoleEnum){
-        Long  userId  =userInfoService.getUserId();
+        Long  userId  =userInfoDao.getUserId();
         if (userId==null){
             return;
         }

@@ -9,50 +9,55 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ */
 @Service
 public class AppInfoService {
     @Autowired
-    private AppInfoDao appInfoService;
+    private AppInfoDao appInfoDao;
 
 
     public void add(AppInfo appInfo) {
-        if (appInfoService.add(appInfo)!=1){
+        if (appInfoDao.add(appInfo)!=1){
             throw new MarsException(RespCode.SAVE_ERROR);
         }
     }
 
 
     public void update(AppInfo appInfo) {
-        if (appInfoService.update(appInfo)!=1){
+        if (appInfoDao.update(appInfo)!=1){
             throw new MarsException(RespCode.UPDATE_ERROR);
         }
     }
 
 
     public void deleteById(Long id) {
-        if(appInfoService.deleteById(id) !=1) {
+        if(appInfoDao.deleteById(id) !=1) {
             throw new MarsException(RespCode.DELETE_ERROR);
         }
     }
 
 
     public AppInfo queryById(Long id) {
-        return appInfoService.queryById(id);
+        return appInfoDao.queryById(id);
     }
 
 
     public List<AppInfo> queryAll() {
-        return appInfoService.queryAll();
+        return appInfoDao.queryAll();
     }
 
 
     public AppInfo queryByAppName(String appName) {
-        return appInfoService.queryByAppName(appName);
+        return appInfoDao.queryByAppName(appName);
     }
 
 
     public void deleteByAppName(String appName) {
-        if(appInfoService.deleteByAppName(appName) !=1) {
+        if(appInfoDao.deleteByAppName(appName) !=1) {
             throw new MarsException(RespCode.DELETE_ERROR);
         }
     }

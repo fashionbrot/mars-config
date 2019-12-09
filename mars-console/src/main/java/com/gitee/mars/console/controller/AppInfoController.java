@@ -15,7 +15,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.List;
 
 /**
- * 项目管理 controller
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ *
  */
 
 @Controller
@@ -23,10 +26,7 @@ import java.util.List;
 public class AppInfoController {
     @Autowired
     private AppInfoService appInfoFacade;
-    /**
-     * 项目列表
-     * @return
-     */
+
     @IsMenu
     @GetMapping("/index")
     public String index(){

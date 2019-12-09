@@ -11,6 +11,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ */
 public class HttpClientUtil {
 
     public static final String ENCODE = "UTF-8";
@@ -178,19 +183,11 @@ public class HttpClientUtil {
         final public Map<String, List<String>> headers;
         final public String content;
 
-        public HttpResult(int code, String content) {
-            this.code = code;
-            this.headers = null;
-            this.content = content;
-        }
         public boolean isSuccess(){
-            if (this.code == 200){
-                return true;
-            }
-            return false;
+            return 200 == this.code;
         }
 
-        public HttpResult(int code, Map<String, List<String>> headers, String content) {
+        HttpResult(int code, Map<String, List<String>> headers, String content) {
             this.code = code;
             this.headers = headers;
             this.content = content;

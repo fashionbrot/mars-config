@@ -14,10 +14,9 @@ public class ConfigParseUtils {
 
     static {
         // register  default ConfigParse
-        DEFAULT_CONFIG_PARSE_MAP.put(ConfigTypeEnum.JSON,  new DefaultJsonConfigParse());
+        DEFAULT_CONFIG_PARSE_MAP.put(ConfigTypeEnum.TEXT,  new DefaultPropertiesConfigParse());
         DEFAULT_CONFIG_PARSE_MAP.put(ConfigTypeEnum.PROPERTIES, new DefaultPropertiesConfigParse());
         DEFAULT_CONFIG_PARSE_MAP.put(ConfigTypeEnum.YAML, new DefaultYamlConfigParse());
-        DEFAULT_CONFIG_PARSE_MAP.put(ConfigTypeEnum.XML, new DefaultXmlConfigParse());
         DEFAULT_CONFIG_PARSE_MAP = Collections.unmodifiableMap(DEFAULT_CONFIG_PARSE_MAP);
     }
 

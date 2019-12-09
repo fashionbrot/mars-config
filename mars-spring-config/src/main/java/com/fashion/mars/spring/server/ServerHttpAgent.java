@@ -29,6 +29,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ *
+ */
 @Slf4j
 public class ServerHttpAgent {
 
@@ -111,14 +117,8 @@ public class ServerHttpAgent {
             if (propertiesName.endsWith(".properties")) {
                 return ConfigTypeEnum.PROPERTIES;
             }
-            if (propertiesName.endsWith(".json")) {
-                return ConfigTypeEnum.JSON;
-            }
             if (propertiesName.endsWith(".yaml")) {
                 return ConfigTypeEnum.YAML;
-            }
-            if (propertiesName.endsWith(".html")) {
-                return ConfigTypeEnum.HTML;
             }
         }
         return ConfigTypeEnum.PROPERTIES;

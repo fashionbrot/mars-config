@@ -13,16 +13,10 @@ import java.lang.reflect.Method;
 import static java.lang.reflect.Modifier.*;
 
 /**
- * Listener {@link Method method} Processor
- * <p>
- * The target {@link Method method} must be
- * <ul>
- * <li><code>public</code></li>
- * <li>not <code>static</code></li>
- * <li>not <code>abstract</code></li>
- * <li>not <code>native</code></li>
- * <li><code>void</code></li>
- * </ul>
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ *
  */
 @Slf4j
 public abstract class AnnotationListenerMethodProcessor<A extends Annotation>

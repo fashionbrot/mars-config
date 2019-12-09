@@ -4,6 +4,11 @@ import com.fashion.mars.spring.config.MarsDataConfig;
 import lombok.Data;
 import org.springframework.context.ApplicationEvent;
 
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ */
 @Data
 public class MarsListenerEvent extends ApplicationEvent {
 

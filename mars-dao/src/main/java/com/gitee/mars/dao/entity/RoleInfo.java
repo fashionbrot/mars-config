@@ -9,19 +9,23 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Date;
 
 /**
- * 角色表
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
  */
 @Data
 @TableName("role_info")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoleInfo {
+public class RoleInfo implements Serializable {
 
+    private static final long serialVersionUID = 6016296562322134757L;
 
     @TableId(value = "id",type = IdType.AUTO)
     private Long id;

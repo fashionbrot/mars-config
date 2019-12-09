@@ -36,6 +36,11 @@ import org.springframework.util.CollectionUtils;
 import java.util.*;
 import java.util.concurrent.*;
 
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ */
 @Slf4j
 public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,ApplicationEventPublisherAware,InitializingBean,
         DisposableBean,EnvironmentAware, Ordered {

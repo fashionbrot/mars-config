@@ -22,6 +22,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ *
+ */
 @Slf4j
 public class MarsConfigListenerMethodProcessor extends AnnotationListenerMethodProcessor<MarsConfigListener>
         implements ApplicationListener<MarsListenerEvent>, EnvironmentAware {
@@ -97,17 +103,6 @@ public class MarsConfigListenerMethodProcessor extends AnnotationListenerMethodP
         if(target!=null){
             invokeMethod(target);
         }
-    }
-
-
-
-    protected boolean isCandidateMethod(Object bean, Class<?> beanClass, MarsListenerEvent listener, Method method) {
-        /*if (listener.type()!= ConfigTypeEnum.PROPERTIES || listener.type()!= ConfigTypeEnum.TEXT || listener.type() == ConfigTypeEnum.YAML){
-            log.error("MarsConfigListenerMethodProcessor isCandidateMethod error configType:{}",listener.type());
-            return true;
-        }
-        log.error("MarsConfigListener  nonsupport "+listener.type().getType()+" isCandidateMethod");*/
-        return false;
     }
 
 
