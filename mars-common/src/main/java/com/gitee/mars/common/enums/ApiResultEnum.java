@@ -1,5 +1,6 @@
 package com.gitee.mars.common.enums;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

@@ -1,5 +1,6 @@
 package com.gitee.mars.common.vo;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
