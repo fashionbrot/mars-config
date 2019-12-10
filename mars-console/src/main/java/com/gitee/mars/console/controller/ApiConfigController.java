@@ -11,12 +11,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ */
+
 @RequestMapping("/api")
 @Controller
 public class ApiConfigController {
 
     @Autowired
-    private SystemConfigService systemConfigFacade;
+    private SystemConfigService systemConfigService;
 
     @RequestMapping("/health")
     public RespVo health(){
@@ -28,13 +34,13 @@ public class ApiConfigController {
     @PostMapping("/config/check-for-update")
     @ResponseBody
     public CheckForUpdateVo checkForUpdate(DataConfigReq dataConfig){
-        return systemConfigFacade.checkForUpdate(dataConfig);
+        return systemConfigService.checkForUpdate(dataConfig);
     }
 
     @PostMapping("/config/for-data")
     @ResponseBody
     public ForDataVo forDataVo(DataConfigReq dataConfig){
-        return systemConfigFacade.forDataVo(dataConfig);
+        return systemConfigService.forDataVo(dataConfig);
     }
 
 }

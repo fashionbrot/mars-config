@@ -9,8 +9,14 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ */
 @Service
 public class MenuDao  {
+
     @Autowired
     private MenuMapper menuMapper;
 

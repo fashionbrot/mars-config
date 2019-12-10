@@ -8,6 +8,11 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 
 import java.util.Date;
 
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ */
 @Slf4j
 @SpringBootApplication(scanBasePackages = {"com.gitee.mars"})
 @MapperScan(basePackages = {"com.gitee.mars.dao.mapper"})

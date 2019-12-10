@@ -5,6 +5,15 @@ import org.springframework.stereotype.Component;
 
 import java.lang.annotation.*;
 
+
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ *
+ * An annotation for mars configuration Properties for binding POJO as Properties Object.
+ *
+ */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

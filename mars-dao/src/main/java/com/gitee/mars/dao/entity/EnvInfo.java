@@ -9,14 +9,22 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.Date;
 
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ */
 @TableName("env_info")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EnvInfo {
+public class EnvInfo implements Serializable {
+
+    private static final long serialVersionUID = -2591667314289662950L;
 
     @TableId(value = "id",type = IdType.AUTO)
     private Long id;

@@ -17,6 +17,12 @@ import org.springframework.validation.DataBinder;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 import static org.springframework.util.StringUtils.hasText;
 
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ *
+ */
 @Slf4j
 public class MarsConfigurationPropertiesBinder {
 

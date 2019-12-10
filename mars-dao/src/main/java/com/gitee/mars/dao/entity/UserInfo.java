@@ -5,12 +5,19 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+
+import java.io.Serializable;
 import java.util.Date;
 
-
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ */
 @Data
 @TableName("user_info")
-public class UserInfo {
+public class UserInfo implements Serializable {
+    private static final long serialVersionUID = -6283733291651727199L;
 
     @TableId(value = "id",type = IdType.AUTO)
     private Long id;
@@ -45,7 +52,4 @@ public class UserInfo {
 
     private transient Long roleId;
 
-    public String getCredentialsSalt() {
-        return userName + salt;
-    }
 }

@@ -12,56 +12,60 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 
-
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ */
 @Service
 @Slf4j
 public class AppInfoDao  {
     @Autowired
-    private AppInfoMapper appInfoDao;
+    private AppInfoMapper appInfoMapper;
 
 
     public Integer add(AppInfo appInfo) {
 
-        if(appInfoDao.selectCount(new QueryWrapper<AppInfo>().eq("app_name",appInfo.getAppName())) > 0){
+        if(appInfoMapper.selectCount(new QueryWrapper<AppInfo>().eq("app_name",appInfo.getAppName())) > 0){
             throw new MarsException(RespCode.EXIST_ERROR,"应用");
         }
         appInfo.setCreateDate(new Date());
-        return appInfoDao.insert(appInfo);
+        return appInfoMapper.insert(appInfo);
     }
 
 
     public Integer update(AppInfo appInfo) {
 
         appInfo.setUpdateDate(new Date());
-        return appInfoDao.update(appInfo,new QueryWrapper<AppInfo>().eq("app_name", appInfo.getAppName()));
+        return appInfoMapper.update(appInfo,new QueryWrapper<AppInfo>().eq("app_name", appInfo.getAppName()));
     }
 
 
     public Integer deleteById(Long id) {
-        return appInfoDao.deleteById(id);
+        return appInfoMapper.deleteById(id);
     }
 
 
     public AppInfo queryById(Long id) {
-        return appInfoDao.selectById(id);
+        return appInfoMapper.selectById(id);
     }
 
 
     public List<AppInfo> queryAll() {
-        return appInfoDao.selectList(null);
+        return appInfoMapper.selectList(null);
     }
 
 
     public AppInfo queryByAppName(String appName) {
-        return appInfoDao.selectOne(new QueryWrapper<AppInfo>().eq("app_name", appName));
+        return appInfoMapper.selectOne(new QueryWrapper<AppInfo>().eq("app_name", appName));
     }
 
 
     public int deleteByAppName(String appName) {
-        return appInfoDao.delete(new QueryWrapper<AppInfo>().eq("app_name", appName));
+        return appInfoMapper.delete(new QueryWrapper<AppInfo>().eq("app_name", appName));
     }
 
     public AppInfo selectOne(QueryWrapper<AppInfo> queryWrapper) {
-        return appInfoDao.selectOne(queryWrapper);
+        return appInfoMapper.selectOne(queryWrapper);
     }
 }

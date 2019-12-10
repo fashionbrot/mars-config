@@ -9,6 +9,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ */
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
@@ -27,12 +32,6 @@ public class GlobalExceptionHandler {
         log.error("exception error:",e);
         return RespVo.fail(RespCode.FAIL.getMsg());
     }
-
-    /*@ExceptionHandler(ValidationException.class)
-    @ResponseStatus(HttpStatus.OK)
-    public RespResult validationException(ValidationException e) {
-        return RespResult.fail(e.getMsg());
-    }*/
 
 
 }

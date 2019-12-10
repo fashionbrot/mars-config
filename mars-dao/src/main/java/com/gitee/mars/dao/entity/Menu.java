@@ -9,16 +9,23 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ */
 @TableName("menu")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Menu {
+public class Menu implements Serializable {
 
+    private static final long serialVersionUID = -8331064931930047236L;
 
     @TableId(value = "id",type = IdType.AUTO)
     private Long id;

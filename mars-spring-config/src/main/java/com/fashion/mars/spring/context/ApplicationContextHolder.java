@@ -21,6 +21,11 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
 
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ */
 public class ApplicationContextHolder implements ApplicationContextAware {
 
     public static final String BEAN_NAME = "marsApplicationContextHolder";

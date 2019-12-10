@@ -12,7 +12,11 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Date;
-
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ */
 @Data
 @Builder
 @NoArgsConstructor

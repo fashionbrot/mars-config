@@ -6,19 +6,23 @@ import com.fashion.mars.ribbon.loadbalancer.Server;
 import com.fashion.mars.ribbon.util.HttpClientUtil;
 import lombok.extern.slf4j.Slf4j;
 
-
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ */
 @Slf4j
 public class PingUrl implements IPing {
 
     @Override
     public boolean isAlive(Server server) {
-        boolean isSsl = server.getScheme() == SchemeEnum.HTTPS;
+        boolean isSSL = server.getScheme() == SchemeEnum.HTTPS;
         String url = server.getServer()+"/";
         HttpClientUtil.HttpResult httpResult;
         try {
-            httpResult = HttpClientUtil.httpGet(url,null,null, GlobalConstants.ENCODE,1000,isSsl,1000);
+            httpResult = HttpClientUtil.httpGet(url,null,null, GlobalConstants.ENCODE,1000,isSSL,1000);
         } catch (Exception e) {
-            log.error("isAlive error",e);
+            log.error("isAlive error",e.getMessage());
             return false;
         }
         if (log.isDebugEnabled()){

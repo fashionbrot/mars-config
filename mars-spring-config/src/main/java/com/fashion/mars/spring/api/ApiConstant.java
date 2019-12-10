@@ -1,5 +1,10 @@
 package com.fashion.mars.spring.api;
 
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ */
 public class ApiConstant {
     public static final String HEALTH = "/api/health";
     public static final String VERSION = "1.0.0";

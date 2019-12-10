@@ -22,11 +22,16 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * @author fashionbrot
+ * @version 0.1.0
+ * @date 2019/12/8 22:45
+ */
 @Service
 @Slf4j
 public class SystemConfigService {
     @Autowired
-    private SystemConfigDao systemConfigService;
+    private SystemConfigDao systemConfigDao;
 
     @Autowired
     private SystemConfigHistoryDao systemConfigHistoryDao;
@@ -38,45 +43,44 @@ public class SystemConfigService {
     public void add(SystemConfigInfo systemConfigInfo) {
         try {
             if ("yaml".equalsIgnoreCase(systemConfigInfo.getFileType())) {
-                //TODO 需要验证
-//                ConfigParseUtils.toProperties(systemConfigInfo.getJson(), systemConfigInfo.getFileType());
+                //TODO 需要验证 数据格式
             }
         } catch (Exception e) {
             log.error(" add error", e);
             throw new MarsException("填写格式错误,请检查输入格式（ymal填写时不能有 TAB 换行）");
         }
-        if (systemConfigService.add(systemConfigInfo) != 1) {
+        if (systemConfigDao.add(systemConfigInfo) != 1) {
             throw new MarsException(RespCode.SAVE_ERROR);
         }
     }
 
 
     public void update(SystemConfigInfo systemConfigInfo) {
-        if (systemConfigService.update(systemConfigInfo) != 1) {
+        if (systemConfigDao.update(systemConfigInfo) != 1) {
             throw new MarsException(RespCode.UPDATE_ERROR);
         }
     }
 
 
     public void deleteById(Long id) {
-        if (systemConfigService.deleteById(id) != 1) {
+        if (systemConfigDao.deleteById(id) != 1) {
             throw new MarsException(RespCode.DELETE_ERROR);
         }
     }
 
 
     public SystemConfigInfo queryById(Long id) {
-        return systemConfigService.queryById(id);
+        return systemConfigDao.queryById(id);
     }
 
 
     public List<SystemConfigInfo> queryAll() {
-        return systemConfigService.queryAll(null);
+        return systemConfigDao.queryAll(null);
     }
 
 
     public List<SystemConfigInfo> queryByAppAndEnv(String appName, String envCode) {
-        return systemConfigService.queryByAppAndEnv(appName, envCode);
+        return systemConfigDao.queryByAppAndEnv(appName, envCode);
     }
 
 
@@ -90,14 +94,14 @@ public class SystemConfigService {
 
 
     public void rollBackById(Long id) {
-        if (systemConfigService.rollBackById(id) != 1) {
+        if (systemConfigDao.rollBackById(id) != 1) {
             throw new MarsException(RespCode.ROLL_BACK_ERROR);
         }
     }
 
 
     public RespCode publish(Long id) {
-        systemConfigService.publish(id);
+        systemConfigDao.publish(id);
         return RespCode.SUCCESS;
     }
 
@@ -152,7 +156,7 @@ public class SystemConfigService {
         if (!token.equals(dataConfig.getToken())){
             return null;
         }*/
-        return systemConfigService.checkForUpdate(dataConfig);
+        return systemConfigDao.checkForUpdate(dataConfig);
     }
 
 
@@ -166,6 +170,6 @@ public class SystemConfigService {
             return null;
         }*/
 
-        return systemConfigService.forDataVo(dataConfig);
+        return systemConfigDao.forDataVo(dataConfig);
     }
 }
