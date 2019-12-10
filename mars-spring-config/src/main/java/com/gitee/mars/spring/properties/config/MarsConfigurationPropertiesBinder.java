@@ -44,9 +44,12 @@ public class MarsConfigurationPropertiesBinder {
 
     protected void bind(Object bean, String beanName) {
 
-        MarsConfigurationProperties properties = findAnnotation(bean.getClass(), MarsConfigurationProperties.class);
+        MarsConfigurationProperties marsConfigurationProperties = findAnnotation(bean.getClass(), MarsConfigurationProperties.class);
+        if (marsConfigurationProperties==null){
+            return;
+        }
 
-        bind(bean, beanName, properties);
+        bind(bean, beanName, marsConfigurationProperties);
 
     }
 
@@ -59,18 +62,19 @@ public class MarsConfigurationPropertiesBinder {
         MarsPropertySource marsPropertySource = (MarsPropertySource) environment.getPropertySources().get(ApiConstant.NAME+properties.fileName());
         if (marsPropertySource!=null){
             MarsDataConfig marsDataConfig  = marsPropertySource.getMarsDataConfig();
-            String content = marsDataConfig.getContent();
-            String appId = marsDataConfig.getAppId();
-            String envCode = marsDataConfig.getEnvCode();
-            if (hasText(content)) {
-                doBind(bean, beanName,appId, envCode, properties, content);
+            if (marsDataConfig!=null) {
+                String content = marsDataConfig.getContent();
+                if (hasText(content)) {
+                    doBind(bean, beanName, properties, content);
+                }
             }
         }
     }
 
-    protected void doBind(Object bean, String beanName, String appId, String envCode,MarsConfigurationProperties properties, String content) {
+    protected void doBind(Object bean, String beanName,MarsConfigurationProperties properties, String content) {
 
         PropertyValues propertyValues = MarsUtil.resolvePropertyValues(bean, properties.prefix(), content, properties.type());
+
         doBind(bean, properties, propertyValues);
     }
 

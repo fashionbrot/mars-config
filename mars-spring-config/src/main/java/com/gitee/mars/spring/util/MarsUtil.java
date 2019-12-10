@@ -37,6 +37,11 @@ public class MarsUtil {
     public static PropertyValues resolvePropertyValues(Object bean, final String prefix, String content, ConfigTypeEnum configTypeEnum) {
         final Properties configProperties = PropertiesSourceUtil.toProperties(content, configTypeEnum);
         final MutablePropertyValues propertyValues = new MutablePropertyValues();
+        if (configProperties==null || configProperties.isEmpty()){
+            log.info("bind POJO toProperties is null  bean:{} content:",bean,content );
+            return propertyValues;
+        }
+
         ReflectionUtils.doWithFields(bean.getClass(), new ReflectionUtils.FieldCallback() {
             @Override
             public void doWith(Field field) throws IllegalArgumentException {

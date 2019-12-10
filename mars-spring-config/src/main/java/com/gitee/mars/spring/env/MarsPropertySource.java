@@ -20,6 +20,7 @@ public class MarsPropertySource extends PropertiesPropertySource {
         this.marsDataConfig =  marsDataConfig;
     }
 
+
     public MarsDataConfig getMarsDataConfig() {
         return marsDataConfig;
     }

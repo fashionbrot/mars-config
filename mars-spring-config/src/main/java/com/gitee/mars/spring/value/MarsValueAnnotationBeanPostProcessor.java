@@ -94,11 +94,15 @@ public class MarsValueAnnotationBeanPostProcessor extends AbstractAnnotationInje
     public void onApplicationEvent(MarsListenerEvent event) {
         String content = event.getContent();
 
-        if (!StringUtils.isEmpty(content) && ConfigTypeEnum.YAML == event.getDataConfig().getConfigType() || ConfigTypeEnum.PROPERTIES == event.getDataConfig().getConfigType()) {
+        if (!StringUtils.isEmpty(content) ) {
 
-            Properties configProperties = PropertiesSourceUtil.toProperties( content, event.getDataConfig().getConfigType());
+            Properties properties = PropertiesSourceUtil.toProperties( content, event.getDataConfig().getConfigType());
+            if (properties==null || properties.isEmpty()){
+                log.info("MarsValue onApplicationEvent content toProperties is null content:{}",content);
+                return;
+            }
 
-            for (Object key : configProperties.keySet()) {
+            for (Object key : properties.keySet()) {
                 String propertyKey = (String) key;
 
                 List<MarsValueTarget> beanPropertyList = placeholderValueTargetMap.get(propertyKey);
@@ -106,7 +110,7 @@ public class MarsValueAnnotationBeanPostProcessor extends AbstractAnnotationInje
                     continue;
                 }
 
-                String propertyValue = configProperties.getProperty(propertyKey);
+                String propertyValue = properties.getProperty(propertyKey);
                 for (MarsValueTarget valueTarget : beanPropertyList) {
                     if (valueTarget.method == null) {
                         setField(valueTarget, propertyValue);

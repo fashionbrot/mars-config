@@ -1,6 +1,7 @@
 package com.gitee.mars.spring.properties.config;
 
 import com.alibaba.fastjson.JSON;
+import com.gitee.mars.spring.config.MarsDataConfig;
 import com.gitee.mars.spring.enums.ConfigTypeEnum;
 import com.gitee.mars.spring.event.MarsListenerEvent;
 import com.gitee.mars.spring.properties.annotation.MarsConfigurationProperties;
@@ -93,10 +94,12 @@ public class MarsConfigurationPropertiesBindingPostProcessor implements BeanPost
             log.info("onApplicationEvent event is null ");
             return;
         }
-        if(ConfigTypeEnum.TEXT == event.getDataConfig().getConfigType()){
-            return;
+        MarsDataConfig marsDataConfig = event.getDataConfig();
+        if (marsDataConfig==null){
+            log.info("onApplicationEvent marsDataConfig is null ");
         }
-        String fileName = event.getDataConfig().getFileName();
+        String fileName = marsDataConfig.getFileName();
+
         MarsConfigurationTarget target= configurationTargetMap.get(fileName);
         if (target==null){
             if (log.isDebugEnabled()){
