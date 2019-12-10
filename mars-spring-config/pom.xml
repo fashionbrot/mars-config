@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.fashion.mars</groupId>
+    <groupId>com.gitee.mars</groupId>
     <artifactId>mars-spring-config</artifactId>
     <version>1.0.0</version>
 

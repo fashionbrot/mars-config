@@ -1,9 +1,9 @@
 package com.config.springboot.controller;
 
 import com.config.springboot.config.TestConfig;
-import com.fashion.mars.spring.enums.ConfigTypeEnum;
-import com.fashion.mars.spring.listener.annotation.MarsConfigListener;
-import com.fashion.mars.spring.value.MarsValue;
+import com.gitee.mars.spring.enums.ConfigTypeEnum;
+import com.gitee.mars.spring.listener.annotation.MarsConfigListener;
+import com.gitee.mars.spring.value.MarsValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

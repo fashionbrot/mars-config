@@ -1,8 +1,8 @@
 package com.config.springboot.config;
 
-import com.fashion.mars.spring.properties.annotation.MarsConfigurationProperties;
-import com.fashion.mars.spring.properties.annotation.MarsIgnoreField;
-import com.fashion.mars.spring.properties.annotation.MarsProperty;
+import com.gitee.mars.spring.properties.annotation.MarsConfigurationProperties;
+import com.gitee.mars.spring.properties.annotation.MarsIgnoreField;
+import com.gitee.mars.spring.properties.annotation.MarsProperty;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
