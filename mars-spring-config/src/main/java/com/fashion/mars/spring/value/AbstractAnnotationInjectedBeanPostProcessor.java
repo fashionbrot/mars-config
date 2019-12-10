@@ -42,7 +42,7 @@ import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
  *
  * @param <A> The type of {@link Annotation customized annotation}
  */
-public abstract class AnnotationInjectedBeanPostProcessor<A extends Annotation> extends
+public abstract class AbstractAnnotationInjectedBeanPostProcessor<A extends Annotation> extends
         InstantiationAwareBeanPostProcessorAdapter implements MergedBeanDefinitionPostProcessor, PriorityOrdered,
         BeanFactoryAware, BeanClassLoaderAware, EnvironmentAware, DisposableBean {
 
@@ -64,7 +64,7 @@ public abstract class AnnotationInjectedBeanPostProcessor<A extends Annotation> 
 
     private int order = Ordered.LOWEST_PRECEDENCE;
 
-    protected AnnotationInjectedBeanPostProcessor() {
+    protected AbstractAnnotationInjectedBeanPostProcessor() {
         this.annotationType = resolveGenericType(getClass());
     }
 
@@ -85,6 +85,7 @@ public abstract class AnnotationInjectedBeanPostProcessor<A extends Annotation> 
         return annotationType;
     }
 
+    @Override
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
         Assert.isInstanceOf(ConfigurableListableBeanFactory.class, beanFactory,
                 "AnnotationInjectedBeanPostProcessor requires a ConfigurableListableBeanFactory");
@@ -266,6 +267,7 @@ public abstract class AnnotationInjectedBeanPostProcessor<A extends Annotation> 
         this.classLoader = classLoader;
     }
 
+    @Override
     public void setEnvironment(Environment environment) {
         this.environment = environment;
     }

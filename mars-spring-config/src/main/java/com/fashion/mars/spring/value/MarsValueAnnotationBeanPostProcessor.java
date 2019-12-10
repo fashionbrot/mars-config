@@ -26,7 +26,7 @@ import static com.fashion.mars.spring.util.PropertiesUtil.resolvePlaceholder;
 import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 
 @Slf4j
-public class MarsValueAnnotationBeanPostProcessor extends AnnotationInjectedBeanPostProcessor<MarsValue>
+public class MarsValueAnnotationBeanPostProcessor extends AbstractAnnotationInjectedBeanPostProcessor<MarsValue>
         implements BeanFactoryAware, ApplicationListener<MarsListenerEvent> {
 
     public static final String BEAN_NAME = "marsValueAnnotationBeanPostProcessor";

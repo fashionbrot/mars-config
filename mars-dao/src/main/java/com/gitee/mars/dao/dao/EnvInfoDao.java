@@ -33,7 +33,7 @@ public class EnvInfoDao {
 
     public Integer update(EnvInfo envInfo) {
         EnvInfo envInfoName = envInfoDao.selectOne(new QueryWrapper<EnvInfo>().eq("env_name", envInfo.getEnvName()));
-        if(envInfoName != null && envInfoName.getId() != envInfo.getId()){
+        if(envInfoName != null && envInfoName.getId().equals(envInfo.getId())){
             throw new MarsException(RespCode.EXIST_ERROR,"环境名称");
         }
 

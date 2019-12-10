@@ -1,6 +1,7 @@
 package com.config.springboot.controller;
 
 import com.config.springboot.config.TestConfig;
+import com.fashion.mars.spring.enums.ConfigTypeEnum;
 import com.fashion.mars.spring.listener.annotation.MarsConfigListener;
 import com.fashion.mars.spring.value.MarsValue;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,9 +34,8 @@ public class TestController {
         return testConfig.appName+":"+testConfig.name;
     }
 
-    @MarsConfigListener(fileName = "aaa")
-    public void testP(Properties properties){
-        this.test = properties;
+    @MarsConfigListener(fileName = "aaa",type = ConfigTypeEnum.TEXT)
+    public void testP(String properties){
         System.out.printf(properties.toString());
     }
     /**

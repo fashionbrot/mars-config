@@ -15,7 +15,7 @@ public class MarsApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
         SpringApplication.run(MarsApplication.class,args);
-        log.info("Start to finish:{}", new Date().getTime());
+        log.info("Start to finish:{}", System.currentTimeMillis());
     }
 
 }

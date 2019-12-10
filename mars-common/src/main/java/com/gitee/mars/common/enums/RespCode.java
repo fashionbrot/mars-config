@@ -42,6 +42,7 @@ public enum RespCode {
         this.msg = msg;
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("RespCode:[").append(code).append(":").append(msg).append("]");

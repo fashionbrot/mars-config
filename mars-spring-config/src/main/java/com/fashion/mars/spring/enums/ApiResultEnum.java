@@ -20,16 +20,16 @@ public enum ApiResultEnum {
    private String resultMsg;
 
 
-   private static final Map<String,ApiResultEnum> map=new HashMap<>();
+   private static final Map<String,ApiResultEnum> MAP=new HashMap<>();
 
    static {
        Arrays.stream(ApiResultEnum.values()).forEach((temp)->{
-           map.put(temp.getResultCode(),temp);
+           MAP.put(temp.getResultCode(),temp);
        });
    }
 
    public static ApiResultEnum codeOf(String resultCode){
-       return map.get(resultCode);
+       return MAP.get(resultCode);
    }
 
 }

@@ -25,12 +25,12 @@ import static java.lang.reflect.Modifier.*;
  * </ul>
  */
 @Slf4j
-public abstract class AnnotationListenerMethodProcessor<A extends Annotation>
+public abstract class AbstractAnnotationListenerMethodProcessor<A extends Annotation>
         extends InstantiationAwareBeanPostProcessorAdapter{
 
     private final Class<A> annotationType;
 
-    public AnnotationListenerMethodProcessor() {
+    public AbstractAnnotationListenerMethodProcessor() {
         this.annotationType = MarsUtil.resolveGenericType(getClass());
     }
 

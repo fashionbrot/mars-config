@@ -34,10 +34,10 @@ public class ServerHttpAgent {
 
 
 
-    private static final OkHttpUtil okHttpUtil = OkHttpUtil.getInstance();
+    private static final OkHttpUtil OK_HTTP_UTIL = OkHttpUtil.getInstance();
 
     public static void shutdown(){
-        okHttpUtil.shutdown();
+        OK_HTTP_UTIL.shutdown();
     }
 
 
@@ -167,7 +167,7 @@ public class ServerHttpAgent {
             } else {
                 url = String.format(ApiConstant.HTTPS_CHECK_FOR_UPDATE_PATH_PARAM, server.getServerIp());
             }
-            CheckForUpdateVo vo =  okHttpUtil.requestPost(url,builder, CheckForUpdateVo.class);
+            CheckForUpdateVo vo =  OK_HTTP_UTIL.requestPost(url,builder, CheckForUpdateVo.class);
 
             return vo;
         }
@@ -200,7 +200,7 @@ public class ServerHttpAgent {
                 url = String.format(ApiConstant.HTTPS_LOAD_DATA, server.getServerIp());
             }
             try {
-                return okHttpUtil.requestPost(url,builder,ForDataVo.class);
+                return OK_HTTP_UTIL.requestPost(url,builder,ForDataVo.class);
             }catch (Exception e2) {
                 throwServerException(e2);
             }

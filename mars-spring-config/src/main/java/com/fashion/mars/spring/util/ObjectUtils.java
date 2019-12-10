@@ -7,7 +7,7 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Map;
 
-public abstract class ObjectUtils {
+public  class ObjectUtils {
 
     public static void cleanMapOrCollectionField(final Object bean) {
         ReflectionUtils.doWithFields(bean.getClass(), new ReflectionUtils.FieldCallback() {

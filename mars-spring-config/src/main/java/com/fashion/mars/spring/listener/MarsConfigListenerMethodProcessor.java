@@ -23,7 +23,7 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
-public class MarsConfigListenerMethodProcessor extends AnnotationListenerMethodProcessor<MarsConfigListener>
+public class MarsConfigListenerMethodProcessor extends AbstractAnnotationListenerMethodProcessor<MarsConfigListener>
         implements ApplicationListener<MarsListenerEvent>, EnvironmentAware {
 
     private static Map<String,MarsListenerSourceTarget> targetMap = new ConcurrentHashMap<>();

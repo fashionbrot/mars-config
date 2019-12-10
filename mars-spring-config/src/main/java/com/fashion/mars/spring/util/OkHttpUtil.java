@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class OkHttpUtil {
 
-    private static final Map<String,String> headerMap;
+    private static final Map<String,String> HEADER_MAP;
 
     private static final Headers HEADERS;
 
@@ -31,12 +31,12 @@ public class OkHttpUtil {
 
 
     static{
-        headerMap = new HashMap<>();
-        headerMap.put("Client-Version", ApiConstant.VERSION);
-        headerMap.put("Accept-Encoding", "gzip,deflate,sdch");
-        headerMap.put("Connection", "Keep-Alive");
+        HEADER_MAP = new HashMap<>();
+        HEADER_MAP.put("Client-Version", ApiConstant.VERSION);
+        HEADER_MAP.put("Accept-Encoding", "gzip,deflate,sdch");
+        HEADER_MAP.put("Connection", "Keep-Alive");
 
-        HEADERS= Headers.of(headerMap);
+        HEADERS= Headers.of(HEADER_MAP);
     }
 
     private static OkHttpUtil okHttpUtil;
