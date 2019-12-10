@@ -8,7 +8,7 @@ import java.lang.annotation.*;
  * @version 0.1.0
  * @date 2019/12/8 22:45
  *
- * An annotation for Nacos Property name of  Nacos Configuration to bind a field from
+ * An annotation for mars Property name of  mars Configuration to bind a field from
  * annotated {@link  MarsConfigurationProperties} Properties Object.
  *
  */
