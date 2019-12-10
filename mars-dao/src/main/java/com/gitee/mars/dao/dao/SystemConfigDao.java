@@ -241,7 +241,6 @@ public class SystemConfigDao {
 
     public CheckForUpdateVo checkForUpdate(DataConfigReq dataConfig) {
         QueryWrapper queryWrapper= new QueryWrapper<SystemConfigInfo>().
-
                 eq("env_code",dataConfig.getEnvCode()).
                 eq("app_name",dataConfig.getAppId());
         queryWrapper.select("file_name,version,status");

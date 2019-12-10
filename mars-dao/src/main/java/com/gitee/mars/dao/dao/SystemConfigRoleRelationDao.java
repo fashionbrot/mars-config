@@ -124,6 +124,8 @@ public class SystemConfigRoleRelationDao {
             }else if (configRoleEnum == SystemConfigRoleEnum.DELETE && systemConfigRoleRelation.getDeleteStatus()!=1){
                 throw new MarsException(RespCode.NOT_PERMISSION_ERROR);
             }
+        }else{
+            throw new MarsException(RespCode.NOT_PERMISSION_ERROR);
         }
     }
 

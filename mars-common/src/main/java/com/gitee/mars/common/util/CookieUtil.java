@@ -199,10 +199,10 @@ public final class CookieUtil {
     /**
      * 设置Cookie的值，并使其在指定时间内生效
      *
-     * @param cookieMaxage cookie生效的最大秒数
+     * @param cookieMaxAge cookie生效的最大秒数
      */
     private static final void doSetCookie(HttpServletRequest request, HttpServletResponse response,
-                                          String cookieName, String cookieValue, int cookieMaxage, boolean isEncode) {
+                                          String cookieName, String cookieValue, int cookieMaxAge, boolean isEncode) {
         try {
             if (cookieValue == null) {
                 cookieValue = "";
@@ -210,8 +210,8 @@ public final class CookieUtil {
                 cookieValue = URLEncoder.encode(cookieValue, "utf-8");
             }
             Cookie cookie = new Cookie(cookieName, cookieValue);
-            if (cookieMaxage > 0) {
-                cookie.setMaxAge(cookieMaxage);
+            if (cookieMaxAge > 0) {
+                cookie.setMaxAge(cookieMaxAge);
             }
             if (null != request) {// 设置域名的cookie
                 String domainName = getDomainName(request);
@@ -245,7 +245,6 @@ public final class CookieUtil {
             }
             if (null != request) {// 设置域名的cookie
                 String domainName = getDomainName(request);
-                System.out.println(domainName);
                 if (!"localhost".equals(domainName)) {
                     cookie.setDomain(domainName);
                 }

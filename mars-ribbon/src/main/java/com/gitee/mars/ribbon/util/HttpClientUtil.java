@@ -26,29 +26,35 @@ public class HttpClientUtil {
         url += (null == encodedContent) ? "" : ("?" + encodedContent);
 
         HttpURLConnection conn = null;
-
+        InputStream inputStream = null;
         try {
             conn = (HttpURLConnection)new URL(url).openConnection();
             conn.setRequestMethod("GET");
             conn.setConnectTimeout(connectTimeout);
             conn.setReadTimeout((int)readTimeoutMs);
-            List<String> newHeaders = getHeaders(url, headers, paramValues);
-            setHeaders(conn, newHeaders, encoding);
 
+            setHeaders(conn, headers, encoding);
             conn.connect();
 
             int respCode = conn.getResponseCode();
             String resp = null;
 
             if (HttpURLConnection.HTTP_OK == respCode) {
-                resp = toString(conn.getInputStream(), encoding);
+                inputStream = conn.getInputStream();
             } else {
-                resp = toString(conn.getErrorStream(), encoding);
+                inputStream = conn.getErrorStream();
             }
-            return new HttpResult(respCode, conn.getHeaderFields(), resp);
+
+            if (inputStream!=null){
+                resp = toString(inputStream, encoding);
+            }
+            return new HttpResult(respCode, resp);
         } finally {
             if (conn != null) {
                 conn.disconnect();
+            }
+            if (inputStream!=null){
+                inputStream.close();
             }
         }
     }
@@ -78,6 +84,8 @@ public class HttpClientUtil {
         String encodedContent = encodingParams(paramValues, encoding);
 
         HttpURLConnection conn = null;
+        OutputStream outputStream = null;
+        InputStream inputStream = null;
         try {
             conn = (HttpURLConnection)new URL(url).openConnection();
             conn.setRequestMethod("POST");
@@ -85,23 +93,36 @@ public class HttpClientUtil {
             conn.setReadTimeout((int)readTimeoutMs);
             conn.setDoOutput(true);
             conn.setDoInput(true);
-            List<String> newHeaders = getHeaders(url, headers, paramValues);
-            setHeaders(conn, newHeaders, encoding);
 
-            conn.getOutputStream().write(encodedContent.getBytes(encoding));
+            setHeaders(conn, headers, encoding);
 
+            outputStream = conn.getOutputStream();
+            if (outputStream!=null) {
+                outputStream.write(encodedContent!=null?encodedContent.getBytes(encoding):"?1=1".getBytes());
+                outputStream.flush();
+            }
             int respCode = conn.getResponseCode();
             String resp = null;
 
             if (HttpURLConnection.HTTP_OK == respCode) {
+                inputStream =  conn.getInputStream();
                 resp = toString(conn.getInputStream(), encoding);
             } else {
-                resp = toString(conn.getErrorStream(), encoding);
+                inputStream =  conn.getErrorStream();
             }
-            return new HttpResult(respCode, conn.getHeaderFields(), resp);
+            if (inputStream!= null) {
+                resp = toString(inputStream, encoding);
+            }
+            return new HttpResult(respCode, resp);
         } finally {
             if (null != conn) {
                 conn.disconnect();
+            }
+            if (inputStream!=null){
+                inputStream.close();
+            }
+            if (outputStream!=null){
+                outputStream.close();
             }
         }
     }
@@ -131,7 +152,7 @@ public class HttpClientUtil {
         conn.addRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=" + encoding);
     }
 
-    private static List<String> getHeaders(String url, List<String> headers, List<String> paramValues) {
+    private static List<String> getHeaders( List<String> headers) {
         List<String> newHeaders = new ArrayList<String>();
         if (headers != null) {
             newHeaders.addAll(headers);
@@ -163,7 +184,7 @@ public class HttpClientUtil {
     }
     static public String toString(Reader reader) throws IOException {
         CharArrayWriter sw = new CharArrayWriter();
-        copy(reader, sw);
+        long copy = copy(reader, sw);
         return sw.toString();
     }
 
@@ -180,16 +201,13 @@ public class HttpClientUtil {
     @ToString
     static public class HttpResult {
         final public int code;
-        final public Map<String, List<String>> headers;
         final public String content;
 
         public boolean isSuccess(){
             return 200 == this.code;
         }
-
-        HttpResult(int code, Map<String, List<String>> headers, String content) {
+        HttpResult(int code, String content) {
             this.code = code;
-            this.headers = headers;
             this.content = content;
         }
     }
