@@ -9,7 +9,6 @@ import org.springframework.context.ApplicationEvent;
  * @version 0.1.0
  * @date 2019/12/8 22:45
  */
-@Data
 public class MarsListenerEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 975253233625382817L;
@@ -32,5 +31,21 @@ public class MarsListenerEvent extends ApplicationEvent {
         super(source);
         this.content = content;
         this.dataConfig = dataConfig;
+    }
+
+    public MarsDataConfig getDataConfig() {
+        return dataConfig;
+    }
+
+    public void setDataConfig(MarsDataConfig dataConfig) {
+        this.dataConfig = dataConfig;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 }

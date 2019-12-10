@@ -11,7 +11,6 @@ import java.util.Properties;
  * @version 0.1.0
  * @date 2019/12/8 22:45
  */
-@Data
 public class MarsPropertySource extends PropertiesPropertySource {
 
     private MarsDataConfig marsDataConfig;
@@ -21,4 +20,11 @@ public class MarsPropertySource extends PropertiesPropertySource {
         this.marsDataConfig =  marsDataConfig;
     }
 
+    public MarsDataConfig getMarsDataConfig() {
+        return marsDataConfig;
+    }
+
+    public void setMarsDataConfig(MarsDataConfig marsDataConfig) {
+        this.marsDataConfig = marsDataConfig;
+    }
 }
