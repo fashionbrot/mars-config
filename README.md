@@ -100,6 +100,14 @@ public class TestConfig {
 
 ```
 
+#### 5、在配置文件中添加以下配置
+```properties
 
-#### 5、可通过 mars-test项目中的 springboot-test 参考使用demo 
-#### 6、如有问题请通过 mars-issue 提出 告诉我们。我们非常认真地对待错误和缺陷，在产品面前没有不重要的问题。不过在创建错误报告之前，请检查是否存在报告相同问题的issues。
+mars.config.app-id=app
+mars.config.env-code=betaXX
+mars.config.http.server-address=192.168.0.108:8080
+
+```
+
+#### 6、可通过 mars-test项目中的 springboot-test 参考使用demo 
+#### 7、如有问题请通过 mars-issue 提出 告诉我们。我们非常认真地对待错误和缺陷，在产品面前没有不重要的问题。不过在创建错误报告之前，请检查是否存在报告相同问题的issues。
