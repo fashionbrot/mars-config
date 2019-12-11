@@ -1,4 +1,3 @@
-CREATE SCHEMA mars AUTHORIZATION mars;
 
 CREATE TABLE `user_info` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增ID',
