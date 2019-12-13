@@ -7,7 +7,7 @@ package com.gitee.mars.ribbon.constants;
  */
 public class GlobalConstants {
 
-    public final static String HTTP_SCHEME ="Http://";
+    public final static String HTTP_SCHEME ="http://";
 
     public final static String HTTPS_SCHEME = "https://";
 

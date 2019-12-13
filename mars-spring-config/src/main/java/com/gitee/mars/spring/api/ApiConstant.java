@@ -11,7 +11,7 @@ public class ApiConstant {
 
     public static final String HTTP = "http://";
 
-    public static final String HTTPS = "Https://";
+    public static final String HTTPS = "https://";
 
     public static final String CHECK_FOR_UPDATE_PATH ="/api/config/check-for-update";
 
