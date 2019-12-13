@@ -1,7 +1,7 @@
 # mars-config
 
 #### 介绍
-spring mvc 、springboot 动态配置系统。http 轮训方式 更新 动态配置
+spring mvc 、springboot 动态配置系统。http 轮询方式 更新 动态配置
 
 #### 软件架构
 软件架构说明
