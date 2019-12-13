@@ -11,7 +11,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.gitee.mars.config</groupId>
+    <groupId>com.github.fashionbrot.springboot</groupId>
     <artifactId>springboot-test</artifactId>
 
     <dependencies>
@@ -31,7 +31,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.gitee.mars</groupId>
+            <groupId>com.github.fashionbrot</groupId>
             <artifactId>mars-spring-config</artifactId>
             <version>1.0.0</version>
         </dependency>

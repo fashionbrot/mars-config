@@ -119,6 +119,7 @@ function editCodeMirror(id) {
 }
 
 function changeMode(mode) {
+    console.log(mode)
     if (addEditor){
         addEditor.setOption('autofocus',false);
         addEditor.setOption("mode",mode);
@@ -126,6 +127,7 @@ function changeMode(mode) {
 }
 
 function editChangeMode(mode) {
+    console.log("editChangeMode:"+mode)
     if (editEditor){
         editEditor.setOption('autofocus',false);
         editEditor.setOption("mode",mode);

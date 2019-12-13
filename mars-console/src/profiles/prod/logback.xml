@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration >
-	<property name="destination" value="/data/home/www/gitee/logs/mars-console" />
+	<property name="destination" value="/data/home/www/github/mars-console/logs/" />
 
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<target>System.out</target>

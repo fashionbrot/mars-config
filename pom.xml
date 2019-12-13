@@ -34,7 +34,7 @@
         <module>mars-console</module>
         <module>mars-common</module>
     </modules>
-    <groupId>com.gitee.mars.config</groupId>
+    <groupId>com.github.fashionbrot</groupId>
     <artifactId>mars-config</artifactId>
     <version>0.1.0</version>
     <packaging>pom</packaging>
@@ -90,17 +90,17 @@
         <dependencies>
 
             <dependency>
-                <groupId>com.gitee.mars.config</groupId>
+                <groupId>com.github.fashionbrot</groupId>
                 <artifactId>mars-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.gitee.mars.config</groupId>
+                <groupId>com.github.fashionbrot</groupId>
                 <artifactId>mars-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.gitee.mars.config</groupId>
+                <groupId>com.github.fashionbrot</groupId>
                 <artifactId>mars-dao</artifactId>
                 <version>${project.version}</version>
             </dependency>

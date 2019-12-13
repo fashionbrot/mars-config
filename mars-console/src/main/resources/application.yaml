@@ -21,7 +21,7 @@ pagehelper:
     support-methods-arguments: true
 
 mybatis-plus:
-    mapper-locations: classpath*:com/gitee/mars/dao/mapper/xml/*.xml
-    type-aliases-package: com.gitee.mars.dao.entity
+    mapper-locations: classpath*:com/github/fashionbrot/dao/mapper/xml/*.xml
+    type-aliases-package: com.github.fashionbrot.dao.entity
 
 

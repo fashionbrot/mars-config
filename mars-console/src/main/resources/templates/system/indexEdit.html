@@ -45,19 +45,19 @@
                         </div>-->
                         <div class="col-control-right">
 
-                            <div style="width: 120px;float: left;">
+                            <div style="width: 120px;float: left;" onclick="editChangeMode('properties')">
                                 <div style="float: left;padding-top: 7px;">
-                                    <label><input  type="radio"  class="editFileType" name="editFileType" onchange="changeMode('properties')"  mode="properties"  value="properties" />PROPERTIES </label>
+                                    <label><input  type="radio"  class="editFileType" name="fileType" onchange="editChangeMode('properties')"  mode="properties"  value="properties" />PROPERTIES </label>
                                 </div>
                             </div>
-                            <div style="width: 120px;float: left;">
+                            <div style="width: 120px;float: left;" onclick="editChangeMode('yaml')">
                                 <div style="float: left;padding-top: 7px;">
-                                    <label><input  type="radio"  class="editFileType"  name="editFileType" onchange="changeMode('yaml')" mode="yaml"  value="yaml"/>YAML </label>
+                                    <label><input  type="radio"  class="editFileType"  name="fileType" onchange="editChangeMode('yaml')" mode="yaml"  value="yaml"/>YAML </label>
                                 </div>
                             </div>
-                            <div style="width: 120px;float: left;">
+                            <div style="width: 120px;float: left;" onclick="editChangeMode('textile')">
                                 <div style="float: left;padding-top: 7px;">
-                                    <label><input type="radio"  class="editFileType" name="editFileType" onchange="changeMode('textile')" mode="textile" value="text"  />TEXT </label>
+                                    <label><input type="radio"  class="editFileType" name="fileType" onchange="editChangeMode('textile')" mode="textile" value="text"  />TEXT </label>
                                 </div>
                             </div>
                         </div>

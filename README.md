@@ -34,7 +34,7 @@ spring mvc 、springboot 动态配置系统。http 轮训方式 更新 动态配
 
 #### 1、在启动类上添加 @EnableMarsConfig 开启mars 动态配置
 ```java
-import com.gitee.mars.spring.config.annotation.EnableMarsConfig;
+import EnableMarsConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -65,9 +65,9 @@ public class Main  extends SpringBootServletInitializer {
 
 ```java
 
-import com.gitee.mars.spring.properties.annotation.MarsConfigurationProperties;
-import com.gitee.mars.spring.properties.annotation.MarsIgnoreField;
-import com.gitee.mars.spring.properties.annotation.MarsProperty;
+import MarsConfigurationProperties;
+import MarsIgnoreField;
+import MarsProperty;
 import lombok.Data;
 
 
