@@ -34,4 +34,15 @@ public class StringUtil {
         }
     }
 
+    public static boolean parseBoolean(String str,boolean defaultValue){
+        if (isEmpty(str)){
+            return defaultValue;
+        }
+        try {
+            return Boolean.parseBoolean(str);
+        }catch (Exception e){
+            return defaultValue;
+        }
+    }
+
 }

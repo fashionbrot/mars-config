@@ -17,8 +17,8 @@ import java.util.Map;
 public enum ApiResultEnum {
 
     SUCCESS_UPDATE("1","请求成功，并且需要更新"),
-    SUCCESS("0","请求成功，没有要更新的数据")
-
+    SUCCESS("0","请求成功，没有要更新的数据"),
+    FAILED("-1","网络请求失败,或服务器请求失败")
     ;
    private String resultCode;
 

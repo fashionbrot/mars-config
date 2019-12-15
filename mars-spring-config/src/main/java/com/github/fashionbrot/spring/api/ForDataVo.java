@@ -22,6 +22,8 @@ public class ForDataVo {
 
     private String fileName;
 
+    private String fileType;
+
     private String content;
 
     private String version;

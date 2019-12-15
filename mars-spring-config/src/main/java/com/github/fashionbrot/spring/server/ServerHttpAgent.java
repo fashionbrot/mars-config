@@ -1,9 +1,11 @@
 package com.github.fashionbrot.spring.server;
 
 import com.alibaba.fastjson.JSON;
+import com.github.fashionbrot.ribbon.constants.GlobalConstants;
 import com.github.fashionbrot.ribbon.enums.SchemeEnum;
 import com.github.fashionbrot.ribbon.loadbalancer.ILoadBalancer;
 import com.github.fashionbrot.ribbon.loadbalancer.Server;
+import com.github.fashionbrot.ribbon.util.HttpClientUtil;
 import com.github.fashionbrot.spring.api.ApiConstant;
 import com.github.fashionbrot.spring.api.CheckForUpdateVo;
 import com.github.fashionbrot.spring.api.ForDataVo;
@@ -12,9 +14,7 @@ import com.github.fashionbrot.spring.config.MarsDataConfig;
 import com.github.fashionbrot.spring.enums.ApiResultEnum;
 import com.github.fashionbrot.spring.enums.ConfigTypeEnum;
 import com.github.fashionbrot.spring.env.MarsPropertySource;
-import com.github.fashionbrot.spring.util.PropertiesSourceUtil;
-import com.github.fashionbrot.spring.util.OkHttpUtil;
-import com.github.fashionbrot.spring.util.StringUtil;
+import com.github.fashionbrot.spring.util.*;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.FormBody;
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +22,8 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.util.CollectionUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -49,9 +51,21 @@ public class ServerHttpAgent {
         String envCode = globalMarsProperties.getEnvCode();
 
         CheckForUpdateVo checkForUpdateVo = ServerHttpAgent.checkForUpdate(server, envCode, appId,null);
-        if (checkForUpdateVo != null &&
-                ApiResultEnum.codeOf(checkForUpdateVo.getResultCode()) == ApiResultEnum.SUCCESS_UPDATE) {
-
+        if ((checkForUpdateVo == null ||  ApiResultEnum.codeOf(checkForUpdateVo.getResultCode()) == ApiResultEnum.FAILED)
+            && globalMarsProperties.isEnableLocalCache()) {
+            String keyWord = ApiConstant.NAME+globalMarsProperties.getAppName()+"_"+globalMarsProperties.getEnvCode();
+            List<File> fileList =  FileUtil.searchFiles(new File(globalMarsProperties.getLocalCachePath()),keyWord);
+            if (!CollectionUtils.isEmpty(fileList)){
+                for(File file : fileList){
+                    String context = FileUtil.getFileContent(file);
+                    if (StringUtil.isNotEmpty(context)) {
+                        //TODO fileName configType
+                        buildEnv(environment, globalMarsProperties, "", context, "");
+                    }
+                }
+            }
+        }
+        if (checkForUpdateVo != null && ApiResultEnum.codeOf(checkForUpdateVo.getResultCode()) == ApiResultEnum.SUCCESS_UPDATE){
             List<String> updateFiles = checkForUpdateVo.getUpdateFiles();
             if (!CollectionUtils.isEmpty(updateFiles)) {
                 for (String file : updateFiles) {
@@ -61,13 +75,13 @@ public class ServerHttpAgent {
                             .appId(appId)
                             .fileName(file)
                             .build();
-                    buildMarsPropertySource(server,dataConfig,environment);
+                    buildMarsPropertySource(server,globalMarsProperties,dataConfig,environment);
                 }
             }
         }
     }
 
-    private static void buildMarsPropertySource(final Server server,MarsDataConfig dataConfig,ConfigurableEnvironment environment){
+    private static void buildMarsPropertySource(final Server server,GlobalMarsProperties globalMarsProperties,MarsDataConfig dataConfig,ConfigurableEnvironment environment){
         ForDataVo forDataVo = ServerHttpAgent.getData(server, dataConfig);
 
         if (forDataVo == null) {
@@ -82,29 +96,45 @@ public class ServerHttpAgent {
             }
             return;
         }
-        ConfigTypeEnum configTypeEnum = match(dataConfig.getFileName());
-        Properties properties;
-        if (configTypeEnum == ConfigTypeEnum.YAML || configTypeEnum == ConfigTypeEnum.PROPERTIES || configTypeEnum == ConfigTypeEnum.TEXT) {
-             properties = PropertiesSourceUtil.toProperties(forDataVo.getContent(), configTypeEnum);
-        }else{
-            properties = new Properties();
-        }
 
+        buildEnv(environment,globalMarsProperties,forDataVo.getFileName(),forDataVo.getContent(),forDataVo.getFileType());
+    }
 
+    public static void buildEnv(ConfigurableEnvironment environment,GlobalMarsProperties globalProperties,String fileName,String content,String configType){
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
         if (mutablePropertySources==null){
             log.error("environment get property sources is null");
             return;
         }
-        String environmentFileName =  ApiConstant.NAME+dataConfig.getFileName();
-        if (properties!=null) {
-            dataConfig.setContent(forDataVo.getContent());
-            dataConfig.setConfigType(configTypeEnum);
-            MarsPropertySource marsPropertySource = new MarsPropertySource(environmentFileName,properties,dataConfig);
-            mutablePropertySources.addLast(marsPropertySource);
+        String environmentFileName =  ApiConstant.NAME+fileName;
+        if (globalProperties!=null) {
+            Boolean writeFlag = false;
+            if (globalProperties.isEnableLocalCache()){
+                StringBuilder path = new StringBuilder();
+                path.append(globalProperties.getLocalCachePath()).append(ApiConstant.NAME);
+                path.append(globalProperties.getAppName()).append("_");
+                path.append(globalProperties.getEnvCode()).append("_");
+                path.append(fileName);
+                FileUtil.writeFile(new File(path.toString()),content);
+            }else{
+                writeFlag = true;
+            }
+            ConfigTypeEnum configTypeEnum = match(fileName);
+            Properties properties;
+            if (configTypeEnum == ConfigTypeEnum.YAML || configTypeEnum == ConfigTypeEnum.PROPERTIES || configTypeEnum == ConfigTypeEnum.TEXT) {
+                properties = PropertiesSourceUtil.toProperties(content, configTypeEnum);
+            }else{
+                properties = new Properties();
+            }
+            if (writeFlag!=null && writeFlag.booleanValue()) {
+                MarsDataConfig dataConfig = new MarsDataConfig();
+                dataConfig.setContent(content);
+                dataConfig.setConfigType(ConfigTypeEnum.valueTypeOf(configType));
+                MarsPropertySource marsPropertySource = new MarsPropertySource(environmentFileName, properties, dataConfig);
+                mutablePropertySources.addLast(marsPropertySource);
+            }
         }
     }
-
 
     public static ConfigTypeEnum match (String propertiesName){
         if (StringUtils.isNotEmpty(propertiesName)) {
@@ -152,20 +182,28 @@ public class ServerHttpAgent {
         if (StringUtils.isNotEmpty(serverAddress)) {
             String url ;
 
-            FormBody.Builder builder = new FormBody.Builder();
-            builder.add("envCode",env);
-            builder.add("appId",appId);
+            List<String> params =new ArrayList<>(3);
+            params.add("envCode="+env);
+            params.add("appId="+appId);
             if(StringUtil.isNotEmpty(versions)) {
-                builder.add("version", versions);
+                params.add("version="+ versions);
             }
-
             if (server.getScheme() == SchemeEnum.HTTP) {
                 url = String.format(ApiConstant.HTTP_CHECK_FOR_UPDATE_PATH_PARAM, server.getServerIp());
             } else {
                 url = String.format(ApiConstant.HTTPS_CHECK_FOR_UPDATE_PATH_PARAM, server.getServerIp());
             }
-
-            return OK_HTTP_UTIL.requestPost(url,builder, CheckForUpdateVo.class);
+            HttpClientUtil.HttpResult httpResult  = null;
+            try {
+                httpResult  = HttpClientUtil.httpPost(url,null,params,GlobalConstants.ENCODE,5000L,5000);
+                if (httpResult.isSuccess()){
+                    return JsonUtil.parseObject(httpResult.content,CheckForUpdateVo.class);
+                }
+                return CheckForUpdateVo.builder().resultCode(ApiResultEnum.FAILED.getResultCode()).build();
+            } catch (Exception e) {
+                log.error("checkForUpdate error url:{} httpCode:{} error:{}",url,httpResult!=null?httpResult.getCode():"未知",e.getMessage());
+                return CheckForUpdateVo.builder().resultCode(ApiResultEnum.FAILED.getResultCode()).build();
+            }
         }
         return null;
     }

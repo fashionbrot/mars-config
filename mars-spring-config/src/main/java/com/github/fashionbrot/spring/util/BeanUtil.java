@@ -42,6 +42,8 @@ public class BeanUtil {
                 .serverAddress(getProperties(globalProperties, "serverAddress"))
                 .listenLongPollMs(StringUtil.parseLong(getProperties(globalProperties, "listenLongPollMs"), 30000L))
                 .listenLongPollLogEnabled(attributes.getBoolean("listenLongPollLogEnabled"))
+                .enableLocalCache(StringUtil.parseBoolean(getProperties(globalProperties,"enableLocalCache"),false))
+                .localCachePath(getProperties(globalProperties,"localCachePath"))
                 .build();
         registerSingleton(registry, GlobalMarsProperties.BEAN_NAME, globalMarsProperties);
     }

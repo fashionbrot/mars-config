@@ -1,5 +1,6 @@
 package com.github.fashionbrot.ribbon.util;
 
+import lombok.Data;
 import lombok.ToString;
 
 import java.io.*;
@@ -9,7 +10,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author fashionbrot
@@ -62,7 +62,7 @@ public class HttpClientUtil {
     /**
      * 发送GET请求。
      */
-    static public HttpResult httpGet(String url, List<String> headers, List<String> paramValues, String encoding,
+    public static  HttpResult httpGet(String url, List<String> headers, List<String> paramValues, String encoding,
                                      long readTimeoutMs,int connectTimeout) throws Exception {
         return httpGet(url, headers, paramValues, encoding, readTimeoutMs, false,connectTimeout);
     }
@@ -160,7 +160,7 @@ public class HttpClientUtil {
         return newHeaders;
     }
 
-    static private String encodingParams(List<String> paramValues, String encoding)
+    private static  String encodingParams(List<String> paramValues, String encoding)
             throws UnsupportedEncodingException {
         StringBuilder sb = new StringBuilder();
         if (null == paramValues) {
@@ -178,33 +178,27 @@ public class HttpClientUtil {
     }
 
 
-    static public String toString(InputStream input, String encoding) throws Exception {
-        return (null == encoding) ? toString(new InputStreamReader(input, ENCODE))
-                : toString(new InputStreamReader(input, encoding));
-    }
-    static public String toString(Reader reader) throws IOException {
-        CharArrayWriter sw = new CharArrayWriter();
-        long copy = copy(reader, sw);
-        return sw.toString();
+    public static  String toString(InputStream input, String encoding) throws Exception {
+        return CharStreamUtil.toString(new InputStreamReader(input,encoding==null?ENCODE:encoding));
     }
 
-    static public long copy(Reader input, Writer output) throws IOException {
-        char[] buffer = new char[1 << 12];
-        long count = 0;
-        for (int n = 0; (n = input.read(buffer)) >= 0; ) {
-            output.write(buffer, 0, n);
-            count += n;
-        }
-        return count;
-    }
 
-    @ToString
-    static public class HttpResult {
+    @Data
+    public static class HttpResult {
         final public int code;
         final public String content;
 
         public boolean isSuccess(){
             return 200 == this.code;
+        }
+        public boolean isFail(){
+            if (200 == this.code){
+                return false;
+            }
+            if (404 == this.code || 500 == this.code){
+                return true;
+            }
+            return true;
         }
         HttpResult(int code, String content) {
             this.code = code;

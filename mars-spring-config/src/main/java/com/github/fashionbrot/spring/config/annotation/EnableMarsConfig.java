@@ -21,6 +21,14 @@ public @interface EnableMarsConfig {
     String ENV_CODE = "${mars.config.env-code}";
 
     String SERVER_ADDRESS = "${mars.config.http.server-address}";
+    /**
+     * Whether to enable local caching
+     */
+    String ENABLE_LOCAL_CACHE = "${mars.config.enable-local-cache}";
+    /**
+     * Local cache file path
+     */
+    String LOCAL_CACHE_PATH = "${mars.config.local-cache-path}";
 
     /**
      * project name
@@ -49,4 +57,16 @@ public @interface EnableMarsConfig {
      * listen long poll log enabled
      */
     boolean listenLongPollLogEnabled() default false;
+
+    /**
+     * Whether to enable local caching
+     * @return
+     */
+    boolean enableLocalCache() default false;
+
+    /**
+     * Local cache file path
+     * @return
+     */
+    String localCachePath() default LOCAL_CACHE_PATH;
 }

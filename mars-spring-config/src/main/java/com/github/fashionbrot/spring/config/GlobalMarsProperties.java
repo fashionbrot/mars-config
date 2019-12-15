@@ -28,14 +28,18 @@ public class GlobalMarsProperties {
     /**
      * server ip:port  separator[,]
      */
-    String serverAddress;
+    private String serverAddress;
 
     /**
      * listen long poll timeout
      */
-    long listenLongPollMs;
+    private long listenLongPollMs;
     /**
      * listen long poll enabled
      */
     boolean listenLongPollLogEnabled;
+
+    private boolean enableLocalCache;
+
+    private String localCachePath;
 }
