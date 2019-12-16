@@ -59,26 +59,13 @@ public class HttpClientUtil {
         }
     }
 
-    /**
-     * 发送GET请求。
-     */
+
     static public HttpResult httpGet(String url, List<String> headers, List<String> paramValues, String encoding,
                                      long readTimeoutMs,int connectTimeout) throws Exception {
         return httpGet(url, headers, paramValues, encoding, readTimeoutMs, false,connectTimeout);
     }
 
-    /**
-     * 发送POST请求。
-     *
-     * @param url
-     * @param headers       请求Header，可以为null
-     * @param paramValues   参数，可以为null
-     * @param encoding      URL编码使用的字符集
-     * @param readTimeoutMs 响应超时
-     * @param isSSL         是否https
-     * @return
-     * @throws IOException
-     */
+
     static public HttpResult httpPost(String url, List<String> headers, List<String> paramValues,
                                       String encoding, long readTimeoutMs, boolean isSSL,int connectTimeout) throws Exception {
         String encodedContent = encodingParams(paramValues, encoding);
@@ -127,17 +114,7 @@ public class HttpClientUtil {
         }
     }
 
-    /**
-     * 发送POST请求。
-     *
-     * @param url
-     * @param headers       请求Header，可以为null
-     * @param paramValues   参数，可以为null
-     * @param encoding      URL编码使用的字符集
-     * @param readTimeoutMs 响应超时
-     * @return
-     * @throws IOException
-     */
+
     static public HttpResult httpPost(String url, List<String> headers, List<String> paramValues, String encoding,
                                       long readTimeoutMs,int connectTimeout) throws Exception {
         return httpPost(url, headers, paramValues, encoding, readTimeoutMs, false,connectTimeout);
