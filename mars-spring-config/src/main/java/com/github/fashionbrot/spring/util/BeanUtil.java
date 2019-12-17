@@ -1,5 +1,6 @@
 package com.github.fashionbrot.spring.util;
 
+import com.github.fashionbrot.ribbon.util.StringUtil;
 import com.github.fashionbrot.spring.config.GlobalMarsProperties;
 import com.github.fashionbrot.spring.context.ApplicationContextHolder;
 import com.github.fashionbrot.spring.env.MarsPropertySourcePostProcessor;
@@ -28,8 +29,6 @@ import static org.springframework.util.SystemPropertyUtils.PLACEHOLDER_SUFFIX;
 
 @Slf4j
 public class BeanUtil {
-
-    private static final String[] EMPTY_BEAN_NAMES = new String[0];
 
 
     public static void registerGlobalMarsProperties(AnnotationAttributes attributes, BeanDefinitionRegistry registry, PropertyResolver environment, ConfigurableListableBeanFactory beanFactory) {

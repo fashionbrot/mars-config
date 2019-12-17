@@ -121,17 +121,19 @@ public class HttpClientUtil {
                 outputStream.flush();
             }
             int respCode = conn.getResponseCode();
-            String resp = null;
+
 
             if (HttpURLConnection.HTTP_OK == respCode) {
                 inputStream = conn.getInputStream();
-                resp = toString(conn.getInputStream(), encoding);
             } else {
                 inputStream = conn.getErrorStream();
             }
+
+            String resp = null;
             if (inputStream != null) {
                 resp = toString(inputStream, encoding);
             }
+
             return new HttpResult(respCode, resp);
         }catch (Exception e){
             log.error("httpPost error url:{} msg:{}",url,e.getMessage());
@@ -180,7 +182,7 @@ public class HttpClientUtil {
 
     private static String encodingParams(List<String> paramValues, String encoding) {
         StringBuilder sb = new StringBuilder();
-        if (CollectionUtils.isEmpty(paramValues)) {
+        if (CollectionUtil.isEmpty(paramValues)) {
             return null;
         }
         for (Iterator<String> iter = paramValues.iterator(); iter.hasNext(); ) {

@@ -1,4 +1,4 @@
-package com.github.fashionbrot.spring.util;
+package com.github.fashionbrot.ribbon.util;
 
 public class StringUtil {
 

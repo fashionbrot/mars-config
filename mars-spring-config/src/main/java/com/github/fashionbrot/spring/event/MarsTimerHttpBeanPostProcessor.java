@@ -15,7 +15,7 @@ import com.github.fashionbrot.spring.env.MarsPropertySource;
 import com.github.fashionbrot.spring.server.ServerHttpAgent;
 import com.github.fashionbrot.spring.util.BeanUtil;
 import com.github.fashionbrot.spring.util.PropertiesSourceUtil;
-import com.github.fashionbrot.spring.util.StringUtil;
+import com.github.fashionbrot.ribbon.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;

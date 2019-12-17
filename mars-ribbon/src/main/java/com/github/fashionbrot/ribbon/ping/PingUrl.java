@@ -4,6 +4,7 @@ import com.github.fashionbrot.ribbon.constants.GlobalConstants;
 import com.github.fashionbrot.ribbon.enums.SchemeEnum;
 import com.github.fashionbrot.ribbon.loadbalancer.Server;
 import com.github.fashionbrot.ribbon.util.HttpClientUtil;
+import com.github.fashionbrot.ribbon.util.HttpResult;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -16,11 +17,10 @@ public class PingUrl implements IPing {
 
     @Override
     public boolean isAlive(Server server) {
-        boolean isSSL = server.getScheme() == SchemeEnum.HTTPS;
-        String url = server.getServer()+"/";
-        HttpClientUtil.HttpResult httpResult;
+        String url = server.getServer();
+        HttpResult httpResult;
         try {
-            httpResult = HttpClientUtil.httpGet(url,null,null, GlobalConstants.ENCODE,1000,isSSL,1000);
+            httpResult = HttpClientUtil.httpGet(url,null,null, GlobalConstants.ENCODE_UTF8,2000,2000);
         } catch (Exception e) {
             log.error("isAlive error",e.getMessage());
             return false;

@@ -5,9 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +22,6 @@ import java.util.List;
 @Slf4j
 public class FileUtil {
 
-    private static final Charset FILE_CHARSET = Charset.forName("UTF-8");
 
     private static final int LOCK_COUNT = 10;
 
@@ -32,10 +33,7 @@ public class FileUtil {
         File[] subFolders = folder.listFiles(new FileFilter() {
             @Override
             public boolean accept(File file) {
-                if (file.isDirectory()) {
-                    return true;
-                }
-                if (file.getName().toLowerCase().contains(keyword)) {
+                if (file.getName().contains(keyword)) {
                     return true;
                 }
                 return false;
@@ -46,9 +44,6 @@ public class FileUtil {
                 if (file.isFile()) {
                     // 如果是文件则将文件添加到结果列表中
                     result.add(file);
-                } else {
-                    // 如果是文件夹，则递归调用本方法，然后把所有的文件加到结果列表中
-                    //result.addAll(searchFiles(file, keyword));
                 }
             }
         }
@@ -77,33 +72,25 @@ public class FileUtil {
                 }
             } while (null == fileLock);
 
-            int fileSize = (int) fileChannel.size();
-            ByteBuffer byteBuffer = ByteBuffer.allocate(fileSize);
+
+            ByteBuffer byteBuffer = ByteBuffer.allocate((int) fileChannel.size());
             fileChannel.read(byteBuffer);
             byteBuffer.flip();
-
             Charset charset = Charset.forName("UTF-8");
-            return charset.decode(byteBuffer).toString();
+//            CharsetDecoder decoder = charset.newDecoder();
+            String content =  charset.decode(byteBuffer.asReadOnlyBuffer()).toString();
+//            byte[] str = content.getBytes("UTF-8");
+//            return new String(str,"ISO-8859-1");
+            return content;
         } catch (Exception e) {
             log.error("getFileContent error", e);
         } finally {
-            if (fileLock != null) {
-                try {
-                    fileLock.release();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (randomAccessFile != null) {
-                try {
-                    randomAccessFile.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            close(fileLock,randomAccessFile,null);
         }
         return "";
     }
+
+
 
 
     public static void writeFile(File file, String content) {
@@ -126,7 +113,7 @@ public class FileUtil {
                 }
             } while (null == fileLock);
 
-            ByteBuffer sendBuffer = ByteBuffer.wrap(content.getBytes(GlobalConstants.ENCODE));
+            ByteBuffer sendBuffer = ByteBuffer.wrap(content.getBytes(Charset.forName("UTF-8")));
             while (sendBuffer.hasRemaining()) {
                 fileChannel.write(sendBuffer);
             }
@@ -134,31 +121,36 @@ public class FileUtil {
         } catch (Exception e) {
             log.error("writeFile error",e);
         } finally {
-            if (fileLock != null) {
-                try {
-                    fileLock.release();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (fileChannel != null) {
-                try {
-                    fileChannel.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (randomAccessFile != null) {
-                try {
-                    randomAccessFile.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
+            close(fileLock,randomAccessFile,fileChannel);
         }
     }
 
+    private static void close(FileLock fileLock,RandomAccessFile randomAccessFile,FileChannel fileChannel){
+        if (fileLock != null) {
+            try {
+                fileLock.release();
+                fileLock = null;
+            } catch (IOException e) {
+                log.error("fileLock release error");
+            }
+        }
+        if (randomAccessFile != null) {
+            try {
+                randomAccessFile.close();
+                randomAccessFile = null;
+            } catch (IOException e) {
+                log.error("randomAccessFile close error");
+            }
+        }
+        if (fileChannel != null) {
+            try {
+                fileChannel.close();
+                fileChannel=null;
+            } catch (IOException e) {
+                log.error("fileChannel close error");
+            }
+        }
+    }
 
 
 }

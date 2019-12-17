@@ -62,7 +62,7 @@ public @interface EnableMarsConfig {
      * Whether to enable local caching
      * @return
      */
-    boolean enableLocalCache() default false;
+    String enableLocalCache() default ENABLE_LOCAL_CACHE;
 
     /**
      * Local cache file path

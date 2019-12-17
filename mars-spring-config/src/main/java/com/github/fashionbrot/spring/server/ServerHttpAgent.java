@@ -5,7 +5,10 @@ import com.github.fashionbrot.ribbon.constants.GlobalConstants;
 import com.github.fashionbrot.ribbon.enums.SchemeEnum;
 import com.github.fashionbrot.ribbon.loadbalancer.ILoadBalancer;
 import com.github.fashionbrot.ribbon.loadbalancer.Server;
+import com.github.fashionbrot.ribbon.util.CollectionUtil;
 import com.github.fashionbrot.ribbon.util.HttpClientUtil;
+import com.github.fashionbrot.ribbon.util.HttpResult;
+import com.github.fashionbrot.ribbon.util.StringUtil;
 import com.github.fashionbrot.spring.api.ApiConstant;
 import com.github.fashionbrot.spring.api.CheckForUpdateVo;
 import com.github.fashionbrot.spring.api.ForDataVo;
@@ -14,16 +17,15 @@ import com.github.fashionbrot.spring.config.MarsDataConfig;
 import com.github.fashionbrot.spring.enums.ApiResultEnum;
 import com.github.fashionbrot.spring.enums.ConfigTypeEnum;
 import com.github.fashionbrot.spring.env.MarsPropertySource;
+import com.github.fashionbrot.spring.exception.MarsException;
 import com.github.fashionbrot.spring.util.*;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.FormBody;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MutablePropertySources;
-import org.springframework.util.CollectionUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -53,21 +55,29 @@ public class ServerHttpAgent {
         CheckForUpdateVo checkForUpdateVo = ServerHttpAgent.checkForUpdate(server, envCode, appId,null);
         if ((checkForUpdateVo == null ||  ApiResultEnum.codeOf(checkForUpdateVo.getResultCode()) == ApiResultEnum.FAILED)
             && globalMarsProperties.isEnableLocalCache()) {
+
+            if (StringUtil.isEmpty(globalMarsProperties.getLocalCachePath())){
+                log.error("localCachePath is null");
+                return;
+            }
             String keyWord = ApiConstant.NAME+globalMarsProperties.getAppName()+"_"+globalMarsProperties.getEnvCode();
             List<File> fileList =  FileUtil.searchFiles(new File(globalMarsProperties.getLocalCachePath()),keyWord);
-            if (!CollectionUtils.isEmpty(fileList)){
+            if (CollectionUtil.isNotEmpty(fileList)){
                 for(File file : fileList){
+                    String[] fileNames = file.getName().split("_");
                     String context = FileUtil.getFileContent(file);
                     if (StringUtil.isNotEmpty(context)) {
-                        //TODO fileName configType
-                        buildEnv(environment, globalMarsProperties, "", context, "");
+
+                        buildEnv(environment, globalMarsProperties, fileNames[3], context, ConfigTypeEnum.PROPERTIES.getType());
                     }
                 }
+            }else{
+                log.warn("search path:{} No file found ",globalMarsProperties.getLocalCachePath() );
             }
         }
         if (checkForUpdateVo != null && ApiResultEnum.codeOf(checkForUpdateVo.getResultCode()) == ApiResultEnum.SUCCESS_UPDATE){
             List<String> updateFiles = checkForUpdateVo.getUpdateFiles();
-            if (!CollectionUtils.isEmpty(updateFiles)) {
+            if (CollectionUtil.isNotEmpty(updateFiles)) {
                 for (String file : updateFiles) {
 
                     MarsDataConfig dataConfig = MarsDataConfig.builder()
@@ -110,12 +120,17 @@ public class ServerHttpAgent {
         if (globalProperties!=null) {
             Boolean writeFlag = false;
             if (globalProperties.isEnableLocalCache()){
+                if (StringUtil.isEmpty(globalProperties.getLocalCachePath())){
+                    log.error("localCachePath is null Please check the configuration  ${mars.config.local-cache-path} ");
+                    throw new MarsException("localCachePath is null Please check the configuration  ${mars.config.local-cache-path} ");
+                }
                 StringBuilder path = new StringBuilder();
-                path.append(globalProperties.getLocalCachePath()).append(ApiConstant.NAME);
+                path.append(globalProperties.getLocalCachePath()).append(File.separator).append(ApiConstant.NAME);
                 path.append(globalProperties.getAppName()).append("_");
                 path.append(globalProperties.getEnvCode()).append("_");
                 path.append(fileName);
                 FileUtil.writeFile(new File(path.toString()),content);
+                writeFlag = true;
             }else{
                 writeFlag = true;
             }
@@ -182,22 +197,25 @@ public class ServerHttpAgent {
         if (StringUtils.isNotEmpty(serverAddress)) {
             String url ;
 
-            List<String> params =new ArrayList<>(3);
-            params.add("envCode="+env);
-            params.add("appId="+appId);
+            List<String> params =new ArrayList<>(6);
+            params.add("envCode");
+            params.add(env);
+            params.add("appId");
+            params.add(appId);
             if(StringUtil.isNotEmpty(versions)) {
-                params.add("version="+ versions);
+                params.add("version");
+                params.add(versions);
             }
             if (server.getScheme() == SchemeEnum.HTTP) {
                 url = String.format(ApiConstant.HTTP_CHECK_FOR_UPDATE_PATH_PARAM, server.getServerIp());
             } else {
                 url = String.format(ApiConstant.HTTPS_CHECK_FOR_UPDATE_PATH_PARAM, server.getServerIp());
             }
-            HttpClientUtil.HttpResult httpResult  = null;
+            HttpResult httpResult  = null;
             try {
-                httpResult  = HttpClientUtil.httpPost(url,null,params,GlobalConstants.ENCODE,5000L,5000);
+                httpResult  = HttpClientUtil.httpPost(url,null,params,GlobalConstants.ENCODE_UTF8,5000,5000);
                 if (httpResult.isSuccess()){
-                    return JsonUtil.parseObject(httpResult.content,CheckForUpdateVo.class);
+                    return JsonUtil.parseObject(httpResult.getContent(),CheckForUpdateVo.class);
                 }
                 return CheckForUpdateVo.builder().resultCode(ApiResultEnum.FAILED.getResultCode()).build();
             } catch (Exception e) {

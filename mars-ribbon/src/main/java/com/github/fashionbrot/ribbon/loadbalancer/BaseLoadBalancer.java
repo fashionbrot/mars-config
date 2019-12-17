@@ -4,7 +4,7 @@ import com.github.fashionbrot.ribbon.ping.IPing;
 import com.github.fashionbrot.ribbon.ping.PingUrl;
 import com.github.fashionbrot.ribbon.rule.IRule;
 import com.github.fashionbrot.ribbon.rule.RoundRobinRule;
-import com.github.fashionbrot.ribbon.util.CollectionUtils;
+import com.github.fashionbrot.ribbon.util.CollectionUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ public class BaseLoadBalancer  implements ILoadBalancer {
 
     @Override
     public void addServers(List<Server> newServers) {
-        if (CollectionUtils.isNotEmpty(newServers)){
+        if (CollectionUtil.isNotEmpty(newServers)){
             ArrayList<Server> newList = new ArrayList<Server>();
             newList.addAll(allServerList);
             newList.addAll(newServers);
