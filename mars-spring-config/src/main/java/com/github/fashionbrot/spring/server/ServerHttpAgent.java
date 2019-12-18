@@ -173,13 +173,15 @@ public class ServerHttpAgent {
                 int port = 80;
                 if (svr.length == 2) {
                     port = StringUtil.parseInteger(svr[1], 80);
+
+                    serverList.add(Server.builder()
+                            .host(svr[0])
+                            .scheme(svr[0].startsWith("https") ? SchemeEnum.HTTPS : SchemeEnum.HTTP)
+                            .port(port)
+                            .path(ApiConstant.HEALTH)
+                            .build());
                 }
-                serverList.add(Server.builder()
-                        .host(svr[0])
-                        .scheme(svr[0].startsWith("https") ? SchemeEnum.HTTPS : SchemeEnum.HTTP)
-                        .port(port)
-                        .path(ApiConstant.HEALTH)
-                        .build());
+
             }
             loadBalancer.addServers(serverList);
         }
