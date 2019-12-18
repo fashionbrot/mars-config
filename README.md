@@ -21,10 +21,17 @@ spring mvc 、springboot 动态配置系统。http 轮询方式 更新 动态配
 
 #### 使用说明
 
+|配置参数|配置说明|是否必填|
+|---|---|---|
+|mars.config.app-id|应用名称|必填|
+|mars.config.env-code|环境code|必填|
+|mars.config.http.server-address|server地址多个逗号分隔|必填|
+|mars.config.enable-local-cache|是否开启本地缓存默认false|否|
+|mars.config.local-cache-path|本地缓存路径(默认user.home)|否|
+|mars.config.enable-error-log|是否开启http轮询访问日志|否|
+
 1. 在启动类上使用 @EnableMarsConfig 开启功能使用
-    ##### 1、mars.config.app-id 服务名 和 后端appName 一致
-    ##### 2、mars.config.env-code  环境Code 和 后端envCode 一致
-    ##### 3、mars.config.http.server-address 服务Ip，多个服务地址已逗号分隔
+
     
 2. 在后端管理操作
     ##### 1、应用环境管理 菜单 创建 应用、环境

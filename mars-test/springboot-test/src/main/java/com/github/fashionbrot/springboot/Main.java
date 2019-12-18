@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
-@EnableMarsConfig(enableErrorLog ="false",enableLocalCache = "true")
+@EnableMarsConfig
 public class Main  extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
