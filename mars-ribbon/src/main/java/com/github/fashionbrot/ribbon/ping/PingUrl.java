@@ -9,20 +9,24 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author fashionbrot
- * @version 0.1.0
+ * @version 0.1.1
  * @date 2019/12/8 22:45
  */
 @Slf4j
 public class PingUrl implements IPing {
 
+
+
     @Override
-    public boolean isAlive(Server server) {
+    public boolean isAlive(Server server,boolean enableLog) {
         String url = server.getServer();
         HttpResult httpResult;
         try {
-            httpResult = HttpClientUtil.httpGet(url,null,null, GlobalConstants.ENCODE_UTF8,2000,2000);
+            httpResult = HttpClientUtil.httpGet(url,null,null, GlobalConstants.ENCODE_UTF8,2000,2000,enableLog);
         } catch (Exception e) {
-            log.error("isAlive error",e.getMessage());
+            if (enableLog) {
+                log.error("pingUrl alive error:", e.getMessage());
+            }
             return false;
         }
         if (log.isDebugEnabled()){

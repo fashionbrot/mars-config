@@ -7,7 +7,7 @@ import java.lang.annotation.*;
 
 /**
  * @author fashionbrot
- * @version 0.1.0
+ * @version 0.1.1
  * @date 2019/12/8 22:45
  *
  * Annotation that marks a method as a listener for mars Config change.
@@ -25,9 +25,15 @@ public @interface MarsConfigListener {
     String fileName();
 
     /**
-     * support properties yml text
+     * support properties text
      * @see ConfigTypeEnum
      * @return
      */
     ConfigTypeEnum type() default ConfigTypeEnum.PROPERTIES;
+
+    /**
+     * It indicates that the currently bound property is auto-refreshed when mars configuration is changed.
+     * @return
+     */
+    boolean autoRefreshed() default false;
 }

@@ -17,10 +17,8 @@ import com.github.fashionbrot.spring.config.MarsDataConfig;
 import com.github.fashionbrot.spring.enums.ApiResultEnum;
 import com.github.fashionbrot.spring.enums.ConfigTypeEnum;
 import com.github.fashionbrot.spring.env.MarsPropertySource;
-import com.github.fashionbrot.spring.exception.MarsException;
 import com.github.fashionbrot.spring.util.*;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.FormBody;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MutablePropertySources;
@@ -32,7 +30,7 @@ import java.util.Properties;
 
 /**
  * @author fashionbrot
- * @version 0.1.0
+ * @version 0.1.1
  * @date 2019/12/8 22:45
  *
  */
@@ -40,11 +38,25 @@ import java.util.Properties;
 public class ServerHttpAgent {
 
 
+    public static void loadLocalConfig(GlobalMarsProperties globalMarsProperties, ConfigurableEnvironment environment){
+        String appId = globalMarsProperties.getAppName();
+        if (StringUtil.isEmpty(globalMarsProperties.getLocalCachePath())){
+            globalMarsProperties.setLocalCachePath(FileUtil.getUserHome(appId));
+        }
+        String keyWord = ApiConstant.NAME+globalMarsProperties.getAppName()+"_"+globalMarsProperties.getEnvCode();
+        List<File> fileList =  FileUtil.searchFiles(new File(globalMarsProperties.getLocalCachePath()),keyWord);
+        if (CollectionUtil.isNotEmpty(fileList)){
+            for(File file : fileList){
+                String[] fileNames = file.getName().split("_");
+                String context = FileUtil.getFileContent(file);
+                if (StringUtil.isNotEmpty(context)) {
 
-    private static final OkHttpUtil OK_HTTP_UTIL = OkHttpUtil.getInstance();
-
-    public static void shutdown(){
-        OK_HTTP_UTIL.shutdown();
+                    buildEnv(environment, globalMarsProperties, fileNames[3], context, ConfigTypeEnum.PROPERTIES.getType(),false);
+                }
+            }
+        }else{
+            log.warn("search path:{} No file found ",globalMarsProperties.getLocalCachePath() );
+        }
     }
 
 
@@ -52,28 +64,11 @@ public class ServerHttpAgent {
         String appId = globalMarsProperties.getAppName();
         String envCode = globalMarsProperties.getEnvCode();
 
-        CheckForUpdateVo checkForUpdateVo = ServerHttpAgent.checkForUpdate(server, envCode, appId,null);
+        CheckForUpdateVo checkForUpdateVo = ServerHttpAgent.checkForUpdate(server, envCode, appId,null,globalMarsProperties.isEnableErrorLog());
         if ((checkForUpdateVo == null ||  ApiResultEnum.codeOf(checkForUpdateVo.getResultCode()) == ApiResultEnum.FAILED)
             && globalMarsProperties.isEnableLocalCache()) {
 
-            if (StringUtil.isEmpty(globalMarsProperties.getLocalCachePath())){
-                log.error("localCachePath is null");
-                return;
-            }
-            String keyWord = ApiConstant.NAME+globalMarsProperties.getAppName()+"_"+globalMarsProperties.getEnvCode();
-            List<File> fileList =  FileUtil.searchFiles(new File(globalMarsProperties.getLocalCachePath()),keyWord);
-            if (CollectionUtil.isNotEmpty(fileList)){
-                for(File file : fileList){
-                    String[] fileNames = file.getName().split("_");
-                    String context = FileUtil.getFileContent(file);
-                    if (StringUtil.isNotEmpty(context)) {
-
-                        buildEnv(environment, globalMarsProperties, fileNames[3], context, ConfigTypeEnum.PROPERTIES.getType());
-                    }
-                }
-            }else{
-                log.warn("search path:{} No file found ",globalMarsProperties.getLocalCachePath() );
-            }
+            loadLocalConfig(globalMarsProperties,environment);
         }
         if (checkForUpdateVo != null && ApiResultEnum.codeOf(checkForUpdateVo.getResultCode()) == ApiResultEnum.SUCCESS_UPDATE){
             List<String> updateFiles = checkForUpdateVo.getUpdateFiles();
@@ -92,7 +87,7 @@ public class ServerHttpAgent {
     }
 
     private static void buildMarsPropertySource(final Server server,GlobalMarsProperties globalMarsProperties,MarsDataConfig dataConfig,ConfigurableEnvironment environment){
-        ForDataVo forDataVo = ServerHttpAgent.getData(server, dataConfig);
+        ForDataVo forDataVo = ServerHttpAgent.getData(server, dataConfig,globalMarsProperties.isEnableErrorLog());
 
         if (forDataVo == null) {
             if (log.isDebugEnabled()) {
@@ -107,10 +102,10 @@ public class ServerHttpAgent {
             return;
         }
 
-        buildEnv(environment,globalMarsProperties,forDataVo.getFileName(),forDataVo.getContent(),forDataVo.getFileType());
+        buildEnv(environment,globalMarsProperties,forDataVo.getFileName(),forDataVo.getContent(),forDataVo.getFileType(),true);
     }
 
-    public static void buildEnv(ConfigurableEnvironment environment,GlobalMarsProperties globalProperties,String fileName,String content,String configType){
+    public static void buildEnv(ConfigurableEnvironment environment,GlobalMarsProperties globalProperties,String fileName,String content,String configType,boolean writeLocal){
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
         if (mutablePropertySources==null){
             log.error("environment get property sources is null");
@@ -119,11 +114,12 @@ public class ServerHttpAgent {
         String environmentFileName =  ApiConstant.NAME+fileName;
         if (globalProperties!=null) {
             Boolean writeFlag = false;
-            if (globalProperties.isEnableLocalCache()){
+            if (globalProperties.isEnableLocalCache() && writeLocal){
+
                 if (StringUtil.isEmpty(globalProperties.getLocalCachePath())){
-                    log.error("localCachePath is null Please check the configuration  ${mars.config.local-cache-path} ");
-                    throw new MarsException("localCachePath is null Please check the configuration  ${mars.config.local-cache-path} ");
+                    globalProperties.setLocalCachePath(FileUtil.getUserHome(globalProperties.getAppName())) ;
                 }
+
                 StringBuilder path = new StringBuilder();
                 path.append(globalProperties.getLocalCachePath()).append(File.separator).append(ApiConstant.NAME);
                 path.append(globalProperties.getAppName()).append("_");
@@ -171,7 +167,7 @@ public class ServerHttpAgent {
         serverAddress = serverAddress.replaceAll("https://", "").replaceAll("http://", "");
         String[] server = serverAddress.split(",");
         List<Server> serverList = new ArrayList<>(server.length);
-        if (server != null && server.length != 0) {
+        if (StringUtil.isNotEmpty(serverAddress)) {
             for (String s : server) {
                 String[] svr = s.split(":");
                 int port = 80;
@@ -190,7 +186,7 @@ public class ServerHttpAgent {
     }
 
 
-    public static CheckForUpdateVo checkForUpdate(Server server, String env, String appId,String versions) {
+    public static CheckForUpdateVo checkForUpdate(Server server, String env, String appId,String versions,boolean enableLog) {
 
 
         String serverAddress =server.getServer();
@@ -213,13 +209,15 @@ public class ServerHttpAgent {
             }
             HttpResult httpResult  = null;
             try {
-                httpResult  = HttpClientUtil.httpPost(url,null,params,GlobalConstants.ENCODE_UTF8,5000,5000);
+                httpResult  = HttpClientUtil.httpPost(url,null,params,GlobalConstants.ENCODE_UTF8,5000,5000,enableLog);
                 if (httpResult.isSuccess()){
                     return JsonUtil.parseObject(httpResult.getContent(),CheckForUpdateVo.class);
                 }
                 return CheckForUpdateVo.builder().resultCode(ApiResultEnum.FAILED.getResultCode()).build();
             } catch (Exception e) {
-                log.error("checkForUpdate error url:{} httpCode:{} error:{}",url,httpResult!=null?httpResult.getCode():"未知",e.getMessage());
+                if (enableLog) {
+                    log.error("checkForUpdate error url:{} httpCode:{} error:{}", url, httpResult != null ? httpResult.getCode() : "未知", e.getMessage());
+                }
                 return CheckForUpdateVo.builder().resultCode(ApiResultEnum.FAILED.getResultCode()).build();
             }
         }
@@ -228,21 +226,22 @@ public class ServerHttpAgent {
 
 
 
-    private static void throwServerException(Exception e){
-        log.error("check-for-update error http message:{}",e.getMessage());
-    }
-
-    public static ForDataVo getData(Server server, MarsDataConfig dataConfig){
+    public static ForDataVo getData(Server server, MarsDataConfig dataConfig,boolean enableLog){
         if (server==null){
             log.warn(" for data server is null");
             return null;
         }
 
         if (dataConfig!=null){
-            FormBody.Builder builder = new FormBody.Builder();
-            builder.add("envCode",dataConfig.getEnvCode());
-            builder.add("appId",dataConfig.getAppId());
-            builder.add("fileName",dataConfig.getFileName());
+
+            List<String> params =new ArrayList<>(6);
+            params.add("envCode");
+            params.add(dataConfig.getEnvCode());
+            params.add("appId");
+            params.add(dataConfig.getAppId());
+            params.add("fileName");
+            params.add(dataConfig.getFileName());
+
 
             String url ;
             if (server.getScheme() == SchemeEnum.HTTP) {
@@ -251,9 +250,15 @@ public class ServerHttpAgent {
                 url = String.format(ApiConstant.HTTPS_LOAD_DATA, server.getServerIp());
             }
             try {
-                return OK_HTTP_UTIL.requestPost(url,builder,ForDataVo.class);
-            }catch (Exception e2) {
-                throwServerException(e2);
+                HttpResult httpResult =  HttpClientUtil.httpPost(url,null,params,enableLog);
+                if (httpResult!=null && httpResult.isSuccess()){
+                    return JsonUtil.parseObject(httpResult.getContent(),ForDataVo.class);
+                }
+                return null;
+            }catch (Exception e) {
+                if (enableLog) {
+                    log.error("for-data error  message:{}", e.getMessage());
+                }
             }
         }
         return null;

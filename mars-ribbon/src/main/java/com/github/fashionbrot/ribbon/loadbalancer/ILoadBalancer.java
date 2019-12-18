@@ -37,4 +37,12 @@ public interface ILoadBalancer {
     void setPing(IPing ping);
 
     IPing getPing();
+
+    /**
+     *  enable log
+     * @return
+     */
+    boolean enableLog();
+
+    void setEnableLog(boolean enableLog);
 }

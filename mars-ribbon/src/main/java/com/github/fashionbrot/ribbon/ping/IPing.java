@@ -5,7 +5,7 @@ import com.github.fashionbrot.ribbon.loadbalancer.Server;
 
 /**
  * @author fashionbrot
- * @version 0.1.0
+ * @version 0.1.1
  * @date 2019/12/8 22:45
  * Interface that defines how we "ping" a server to check if its alive
  */
@@ -16,6 +16,8 @@ public interface IPing {
      * considered a candidate while loadbalancing
      *
      */
-    boolean isAlive(Server server);
+    boolean isAlive(Server server,boolean enableLog);
+
+
 
 }

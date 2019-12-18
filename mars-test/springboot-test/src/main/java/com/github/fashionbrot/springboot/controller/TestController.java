@@ -34,7 +34,7 @@ public class TestController {
         return testConfig.appName+":"+testConfig.name;
     }
 
-    @MarsConfigListener(fileName = "aaa",type = ConfigTypeEnum.TEXT)
+    @MarsConfigListener(fileName = "aaa",type = ConfigTypeEnum.TEXT,autoRefreshed = false)
     public void testP(String properties){
         System.out.println(properties.toString());
     }

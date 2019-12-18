@@ -36,14 +36,14 @@ public class RoundRobinRule extends AbstractLoadBalancerRule {
             int serverCount = allServers.size();
 
             if ( serverCount == 0) {
-                log.warn("No up servers available from load balancer: " + lb);
+                log.warn("No up servers available from load balancer allServers size: " + lb.getAllServers().size());
                 return null;
             }
 
             int nextServerIndex = incrementAndGetModulo(serverCount);
             server = allServers.get(nextServerIndex);
 
-            if (server!=null && lb.getPing().isAlive(server)){
+            if (server!=null && lb.getPing().isAlive(server,lb.enableLog())){
                 return server;
             }
         }

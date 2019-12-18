@@ -30,6 +30,8 @@ public class BaseLoadBalancer  implements ILoadBalancer {
 
     protected IPing ping = new PingUrl();
 
+    protected boolean enableLog = false;
+
 
     @Override
     public void addServers(List<Server> newServers) {
@@ -81,6 +83,16 @@ public class BaseLoadBalancer  implements ILoadBalancer {
     @Override
     public IPing getPing() {
         return this.ping;
+    }
+
+    @Override
+    public boolean enableLog() {
+        return this.enableLog;
+    }
+
+    @Override
+    public void setEnableLog(boolean enableLog) {
+        this.enableLog = enableLog;
     }
 
 

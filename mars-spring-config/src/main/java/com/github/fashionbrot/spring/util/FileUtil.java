@@ -3,24 +3,33 @@ package com.github.fashionbrot.spring.util;
 import com.github.fashionbrot.ribbon.constants.GlobalConstants;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author fashionbrot
- * @version 0.1.0
+ * @version 0.1.1
  * @date 2019/12/16 0:20
  */
 
 @Slf4j
 public class FileUtil {
+
+    private static final String USER_HOME;
+
+    static {
+        USER_HOME = System.getProperty("user.home");
+    }
+
+    public static String getUserHome(String appId) {
+        return USER_HOME + File.separator + GlobalConstants.NAME + File.separator + appId + File.separator;
+    }
 
 
     private static final int LOCK_COUNT = 10;
@@ -73,27 +82,36 @@ public class FileUtil {
             } while (null == fileLock);
 
 
-            ByteBuffer byteBuffer = ByteBuffer.allocate((int) fileChannel.size());
-            fileChannel.read(byteBuffer);
-            byteBuffer.flip();
-            Charset charset = Charset.forName("UTF-8");
-//            CharsetDecoder decoder = charset.newDecoder();
-            String content =  charset.decode(byteBuffer.asReadOnlyBuffer()).toString();
-//            byte[] str = content.getBytes("UTF-8");
-//            return new String(str,"ISO-8859-1");
-            return content;
+            byte[] buf = new byte[1024];
+            StringBuffer sb = new StringBuffer();
+            while ((randomAccessFile.read(buf)) != -1) {
+                sb.append(new String(buf, GlobalConstants.ENCODE_UTF8));
+                buf = new byte[1024];
+            }
+
+            return sb.toString();
         } catch (Exception e) {
             log.error("getFileContent error", e);
         } finally {
-            close(fileLock,randomAccessFile,null);
+            close(fileLock, randomAccessFile, null);
         }
         return "";
     }
 
 
-
-
     public static void writeFile(File file, String content) {
+        try {
+            if (!file.exists()) {
+                if (!file.getParentFile().exists()) {
+                    file.getParentFile().mkdirs();
+                }
+                file.createNewFile();
+            }
+        } catch (Exception e) {
+            log.error("writeFile error", e);
+            return;
+        }
+
 
         FileChannel fileChannel = null;
         FileLock fileLock = null;
@@ -108,24 +126,21 @@ public class FileUtil {
                 } catch (Exception e) {
                     ++i;
                     if (i > LOCK_COUNT) {
-                        log.error("writeFile  get lock count error filePath:{}",file.getAbsolutePath(),e);
+                        log.error("writeFile  get lock count error filePath:{}", file.getAbsolutePath(), e);
                     }
                 }
             } while (null == fileLock);
 
-            ByteBuffer sendBuffer = ByteBuffer.wrap(content.getBytes(Charset.forName("UTF-8")));
-            while (sendBuffer.hasRemaining()) {
-                fileChannel.write(sendBuffer);
-            }
-            fileChannel.truncate(content.length());
+            randomAccessFile.write(content.getBytes(GlobalConstants.ENCODE_UTF8));
         } catch (Exception e) {
-            log.error("writeFile error",e);
+            log.error("writeFile error", e);
         } finally {
-            close(fileLock,randomAccessFile,fileChannel);
+            close(fileLock, randomAccessFile, fileChannel);
         }
     }
 
-    private static void close(FileLock fileLock,RandomAccessFile randomAccessFile,FileChannel fileChannel){
+
+    private static void close(FileLock fileLock, RandomAccessFile randomAccessFile, FileChannel fileChannel) {
         if (fileLock != null) {
             try {
                 fileLock.release();
@@ -145,7 +160,7 @@ public class FileUtil {
         if (fileChannel != null) {
             try {
                 fileChannel.close();
-                fileChannel=null;
+                fileChannel = null;
             } catch (IOException e) {
                 log.error("fileChannel close error");
             }

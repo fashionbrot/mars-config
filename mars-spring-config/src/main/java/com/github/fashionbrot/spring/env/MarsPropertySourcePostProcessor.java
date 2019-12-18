@@ -25,7 +25,7 @@ import org.springframework.core.env.Environment;
 
 /**
  * @author fashionbrot
- * @version 0.1.0
+ * @version 0.1.1
  * @date 2019/12/8 22:45
  */
 @Slf4j
@@ -65,9 +65,10 @@ public class MarsPropertySourcePostProcessor implements BeanDefinitionRegistryPo
         }
         ILoadBalancer loadBalancer = new BaseLoadBalancer();
         ServerHttpAgent.setServer(serverAddress, loadBalancer);
+        loadBalancer.setEnableLog(globalMarsProperties.isEnableErrorLog());
         Server server = loadBalancer.chooseServer();
         if (server == null) {
-            log.error("MarsPropertySourcePostProcessor next server is null serverList:" + JSONObject.toJSONString(loadBalancer.getAllServers()));
+            ServerHttpAgent.loadLocalConfig(globalMarsProperties,environment);
             return;
         }
         ServerHttpAgent.checkForUpdate(server, globalMarsProperties, environment);
@@ -95,6 +96,6 @@ public class MarsPropertySourcePostProcessor implements BeanDefinitionRegistryPo
 
     @Override
     public void destroy() throws Exception {
-        ServerHttpAgent.shutdown();
+
     }
 }

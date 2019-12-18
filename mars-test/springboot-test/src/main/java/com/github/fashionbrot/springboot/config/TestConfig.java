@@ -14,7 +14,7 @@ public class TestConfig {
     @MarsProperty("abc")
     public String name ;
 
-//    @MarsProperty("name")
+    @MarsProperty("abc")
     public String appName ;
 
     @MarsIgnoreField

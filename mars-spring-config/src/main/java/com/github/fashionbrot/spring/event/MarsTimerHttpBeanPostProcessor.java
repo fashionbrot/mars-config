@@ -38,7 +38,7 @@ import java.util.concurrent.*;
 
 /**
  * @author fashionbrot
- * @version 0.1.0
+ * @version 0.1.1
  * @date 2019/12/8 22:45
  */
 @Slf4j
@@ -104,7 +104,9 @@ public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,Applicat
                 try{
                     Server server = loadBalancer.chooseServer();
                     if (server==null){
-                        log.error("loadBalancer is null  rule:{} ping:{}",loadBalancer.getRule(),loadBalancer.getPing());
+                        if (globalMarsProperties.isEnableErrorLog()) {
+                            log.error("loadBalancer is null  rule:{} ping:{}", loadBalancer.getRule().getClass().getName(), loadBalancer.getPing().getClass().getName());
+                        }
                         return;
                     }
                     checkForUpdate(server,globalMarsProperties);
@@ -120,12 +122,12 @@ public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,Applicat
     public  void checkForUpdate(Server server, GlobalMarsProperties globalMarsProperties){
         String appId = globalMarsProperties.getAppName();
         String envCode = globalMarsProperties.getEnvCode();
-        if (globalMarsProperties.isListenLongPollLogEnabled()){
+        if (globalMarsProperties.isEnableErrorLog()){
             log.info("mars long pull server:{} appId:{} envCode:{}",server.getServerIp(),appId,envCode );
         }
         String versions = getVersion();
 
-        CheckForUpdateVo checkForUpdateVo = ServerHttpAgent.checkForUpdate(server, envCode, appId,versions);
+        CheckForUpdateVo checkForUpdateVo = ServerHttpAgent.checkForUpdate(server, envCode, appId,versions,globalMarsProperties.isEnableErrorLog());
         if (checkForUpdateVo != null &&
                 ApiResultEnum.codeOf(checkForUpdateVo.getResultCode()) == ApiResultEnum.SUCCESS_UPDATE) {
 
@@ -138,7 +140,7 @@ public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,Applicat
                             .appId(appId)
                             .fileName(file)
                             .build();
-                    buildMarsPropertySource(server,dataConfig);
+                    buildMarsPropertySource(server,dataConfig,globalMarsProperties.isEnableErrorLog());
                     versionMap.put(file,dataConfig.getVersion());
                 }
             }
@@ -160,8 +162,8 @@ public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,Applicat
         return null;
     }
 
-    private  void buildMarsPropertySource(final Server server,MarsDataConfig dataConfig){
-        ForDataVo forDataVo = ServerHttpAgent.getData(server, dataConfig);
+    private  void buildMarsPropertySource(final Server server,MarsDataConfig dataConfig,boolean enableLog){
+        ForDataVo forDataVo = ServerHttpAgent.getData(server, dataConfig,enableLog);
 
         if (forDataVo == null) {
             if (log.isDebugEnabled()) {
@@ -212,7 +214,6 @@ public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,Applicat
         if (executorService!=null){
             executorService.shutdown();
         }
-        ServerHttpAgent.shutdown();
     }
 
 

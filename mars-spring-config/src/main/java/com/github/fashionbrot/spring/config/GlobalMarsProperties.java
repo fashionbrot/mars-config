@@ -37,7 +37,7 @@ public class GlobalMarsProperties {
     /**
      * listen long poll enabled
      */
-    boolean listenLongPollLogEnabled;
+    boolean enableErrorLog;
 
     private boolean enableLocalCache;
 

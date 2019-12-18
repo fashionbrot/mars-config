@@ -40,7 +40,7 @@ public class BeanUtil {
                 .envCode(getProperties(globalProperties, "envCode"))
                 .serverAddress(getProperties(globalProperties, "serverAddress"))
                 .listenLongPollMs(StringUtil.parseLong(getProperties(globalProperties, "listenLongPollMs"), 30000L))
-                .listenLongPollLogEnabled(attributes.getBoolean("listenLongPollLogEnabled"))
+                .enableErrorLog(StringUtil.parseBoolean(getProperties(globalProperties,"enableErrorLog"),false))
                 .enableLocalCache(StringUtil.parseBoolean(getProperties(globalProperties,"enableLocalCache"),false))
                 .localCachePath(getProperties(globalProperties,"localCachePath"))
                 .build();

@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author fashionbrot
- * @version 0.1.0
+ * @version 0.1.1
  * @date 2019/12/8 22:45
  *
  */
@@ -100,7 +100,7 @@ public class MarsConfigListenerMethodProcessor extends AbstractAnnotationListene
     @Override
     public void onApplicationEvent(MarsListenerEvent marsListenerEvent) {
         MarsListenerSourceTarget target =targetMap.get(marsListenerEvent.getDataConfig().getFileName());
-        if(target!=null){
+        if (target!=null && target.getListener().autoRefreshed()){
             invokeMethod(target);
         }
     }

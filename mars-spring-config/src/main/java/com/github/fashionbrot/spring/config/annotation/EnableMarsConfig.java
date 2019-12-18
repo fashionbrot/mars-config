@@ -7,7 +7,7 @@ import java.lang.annotation.*;
 
 /**
  * @author fashionbrot
- * @version 0.1.0
+ * @version 0.1.1
  * @date 2019/12/8 22:45
  */
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
@@ -29,6 +29,11 @@ public @interface EnableMarsConfig {
      * Local cache file path
      */
     String LOCAL_CACHE_PATH = "${mars.config.local-cache-path}";
+
+    /**
+     * listen long poll log enabled
+     */
+    String ENABLE_ERROR_LOG = "${mars.config.enable-error-log}";
 
     /**
      * project name
@@ -56,7 +61,7 @@ public @interface EnableMarsConfig {
     /**
      * listen long poll log enabled
      */
-    boolean listenLongPollLogEnabled() default false;
+    String enableErrorLog() default ENABLE_ERROR_LOG;
 
     /**
      * Whether to enable local caching
