@@ -2,6 +2,40 @@
 
 #### 介绍
 spring mvc 、springboot 动态配置系统。http 轮询方式 更新 动态配置
+#####登录也
+![Image](https://github.com/fashionbrot/mars-config/blob/master/document/login.png)
+
+##### 首页
+![Image](https://github.com/fashionbrot/mars-config/blob/master/document/111.png)
+
+##### 用户管理页
+![Image](https://github.com/fashionbrot/mars-config/blob/master/document/userInfo.png)
+##### 用户编辑页
+![Image](https://github.com/fashionbrot/mars-config/blob/master/document/userInfoEdit.png)
+
+##### 应用列表页
+![Image](https://github.com/fashionbrot/mars-config/blob/master/document/appInfo.png)
+
+##### 环境列表页
+![Image](https://github.com/fashionbrot/mars-config/blob/master/document/envInfo.png)
+
+##### 权限列表页
+![Image](https://github.com/fashionbrot/mars-config/blob/master/document/roleInfo.png)
+
+##### 权限编辑窗口
+![Image](https://github.com/fashionbrot/mars-config/blob/master/document/roleInfoSystemConfig.png)
+
+##### 配置列表页
+![Image](https://github.com/fashionbrot/mars-config/blob/master/document/systemConfig.png)
+
+##### 配置编辑窗口
+![Image](https://github.com/fashionbrot/mars-config/blob/master/document/systemConfigEdit.png)
+
+##### 配置历史记录
+![Image](https://github.com/fashionbrot/mars-config/blob/master/document/systemConfigHistory.png)
+
+##### 配置历史回滚页
+![Image](https://github.com/fashionbrot/mars-config/blob/master/document/historyDiff.png)
 
 #### 软件架构
 软件架构说明
