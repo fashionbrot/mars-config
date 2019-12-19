@@ -293,6 +293,7 @@ function publishById(id) {
                 $("#editFileName").val(data.fileName);
                 $("#editFileName").attr("readonly", "readonly");
                 $("#editFileDesc").val(data.fileDesc);
+                $("#nowUpdateDate").val(data.nowUpdateDate);
                 var radioList = $(".editFileType");
                 for (var i = 0; i < radioList.length; i++) {
                     if (radioList[i].value == data.fileType) {

@@ -15,6 +15,7 @@ public enum RespCode {
     SAVE_ERROR(100,"保存失败,请稍后再试"),
     UPDATE_ERROR(101,"更新失败,请稍后再试"),
     DELETE_ERROR(102,"删除失败,请稍后再试"),
+    UPDATE_REFRESH_ERROR(103,"更新失败,配置已被修改，请刷新后重新填写"),
 
     EXIST_ERROR(200,"已存在"),
 
@@ -24,6 +25,7 @@ public enum RespCode {
     ENV_NOT_EXIST(303,"环境不存在"),
     PUBLISH_ERROR(304,"发布失败"),
     ROLL_BACK_ERROR(305,"回滚失败，请稍后再试"),
+    EXIST_SYSTEM_CONFIG_ERROR(306,"配置已不存在，请刷新重试"),
     ;
 
     private int code;

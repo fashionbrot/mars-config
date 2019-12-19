@@ -70,7 +70,11 @@ public class SystemConfigService {
 
 
     public SystemConfigInfo queryById(Long id) {
-        return systemConfigDao.queryById(id);
+        SystemConfigInfo systemConfigInfo =  systemConfigDao.queryById(id);
+        if (systemConfigInfo!=null){
+            systemConfigInfo.setNowUpdateDate(systemConfigInfo.getUpdateDate()!=null?systemConfigInfo.getUpdateDate().getTime():null);
+        }
+        return systemConfigInfo;
     }
 
 

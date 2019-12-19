@@ -51,8 +51,7 @@ public class SystemConfigDao {
     @Autowired
     private SystemConfigRoleRelationDao systemConfigRoleRelationDao;
 
-    private SnowflakeIdWorkerUtil snowflakeIdWorkerUtil = new SnowflakeIdWorkerUtil(SystemUtil.IP_LAST_POINT,1);
-
+    private SnowflakeIdWorkerUtil snowflakeIdWorkerUtil = new SnowflakeIdWorkerUtil(SystemUtil.IP_LAST_POINT, 1);
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -62,18 +61,18 @@ public class SystemConfigDao {
             throw new MarsException("文件名不能以 "+systemConfigInfo.getFileName() +"为后缀");
         }*/
 
-        if(isFileHasExisted(systemConfigInfo)){
-            throw new MarsException(RespCode.EXIST_ERROR,"配置文件");
+        if (isFileHasExisted(systemConfigInfo)) {
+            throw new MarsException(RespCode.EXIST_ERROR, "配置文件");
         }
 
 
         UserInfo userInfo = userInfoDao.getUser();
-        if (userInfo!=null) {
+        if (userInfo != null) {
             systemConfigInfo.setCreator(userInfo.getRealName());
             systemConfigInfo.setModifier(userInfo.getRealName());
         }
 
-        systemConfigInfo.setVersion(snowflakeIdWorkerUtil.nextId()+"");
+        systemConfigInfo.setVersion(snowflakeIdWorkerUtil.nextId() + "");
         systemConfigInfo.setFileName(systemConfigInfo.getFileName());
 
         systemConfigInfo.setCreateDate(new Date());
@@ -84,56 +83,69 @@ public class SystemConfigDao {
     @Transactional(rollbackFor = Exception.class)
     public int update(SystemConfigInfo systemConfigInfo) {
 
-         return updateConfig(systemConfigInfo,null, OperationTypeEnum.UPDATE);
+        return updateConfig(systemConfigInfo, null, OperationTypeEnum.UPDATE);
     }
 
-    public int updateConfig(SystemConfigInfo systemConfigInfo,String json,OperationTypeEnum operationTypeEnum){
+    public int updateConfig(SystemConfigInfo systemConfigInfo, String json, OperationTypeEnum operationTypeEnum) {
 
-            systemConfigRoleRelationDao.checkRole(systemConfigInfo.getId(), SystemConfigRoleEnum.EDIT);
+        systemConfigRoleRelationDao.checkRole(systemConfigInfo.getId(), SystemConfigRoleEnum.EDIT);
 
-            SystemConfigInfo systemConfigInfoPre = systemConfigMapper.selectById(systemConfigInfo.getId());
-            //TODO 需要验证
-            /*try {
-                if ("yaml".equalsIgnoreCase(systemConfigInfo.getFileType())) {
-                }
-            }catch (Exception e){
-                log.error(" update parse content error",e);
-                throw new MarsException("填写格式错误,请检查输入格式（ymal填写时不能有 TAB 换行）");
-            }*/
-            int flag =0;
-            String preFileJson = systemConfigInfoPre.getJson();
-            if (operationTypeEnum == OperationTypeEnum.ROLLBACK){
-                flag = systemConfigInfoPre.getJson().compareTo(json);
-                preFileJson = json;
-            }else{
-                flag = systemConfigInfoPre.getJson().compareTo(systemConfigInfo.getJson());
+        SystemConfigInfo systemConfigInfoPre = systemConfigMapper.selectById(systemConfigInfo.getId());
+        if (systemConfigInfoPre == null) {
+            throw new MarsException(RespCode.EXIST_SYSTEM_CONFIG_ERROR);
+        }
+
+        //TODO 需要验证
+         /*try {
+         if ("yaml".equalsIgnoreCase(systemConfigInfo.getFileType())) {
+         }
+         }catch (Exception e){
+         log.error(" update parse content error",e);
+         throw new MarsException("填写格式错误,请检查输入格式（ymal填写时不能有 TAB 换行）");
+         }*/
+        int flag = 0;
+        String preFileJson = systemConfigInfoPre.getJson();
+        if (operationTypeEnum == OperationTypeEnum.ROLLBACK) {
+            flag = systemConfigInfoPre.getJson().compareTo(json);
+            preFileJson = json;
+        } else {
+            flag = systemConfigInfoPre.getJson().compareTo(systemConfigInfo.getJson());
+        }
+
+        if (flag != 0) {
+            systemConfigInfoPre.setStatus(Byte.parseByte("0"));
+        }
+
+
+        UserInfo userInfo = userInfoDao.getUser();
+        if (userInfo != null) {
+            systemConfigInfoPre.setModifier(userInfo.getRealName());
+        }
+
+
+        systemConfigInfoPre.setUpdateDate(new Date());
+        systemConfigInfoPre.setFileDesc(systemConfigInfo.getFileDesc());
+        systemConfigInfoPre.setJson(systemConfigInfo.getJson());
+        systemConfigInfoPre.setFileType(systemConfigInfo.getFileType());
+
+        QueryWrapper updateWrapper = new QueryWrapper<SystemConfigInfo>();
+        updateWrapper.eq("id",systemConfigInfoPre.getId());
+        if (systemConfigInfo.getNowUpdateDate()!=null){
+            updateWrapper.eq("update_date",new Date(systemConfigInfo.getNowUpdateDate().longValue()));
+        }
+
+        int result = systemConfigMapper.update(systemConfigInfoPre,updateWrapper);
+        //判断乐观锁
+        if (result==0){
+            Integer count = systemConfigMapper.selectCount(updateWrapper);
+            if (count==null || count==0){
+                throw new MarsException(RespCode.UPDATE_REFRESH_ERROR);
             }
-
-            if (flag!=0){
-                systemConfigInfoPre.setStatus(Byte.parseByte("0"));
-            }
-
-
-
-            UserInfo userInfo = userInfoDao.getUser();
-            if (userInfo!=null) {
-                systemConfigInfoPre.setModifier(userInfo.getRealName());
-            }
-
-
-
-
-            systemConfigInfoPre.setUpdateDate(new Date());
-            systemConfigInfoPre.setFileDesc(systemConfigInfo.getFileDesc());
-            systemConfigInfoPre.setJson(systemConfigInfo.getJson());
-            systemConfigInfoPre.setFileType(systemConfigInfo.getFileType());
-
-            int result = systemConfigMapper.updateById(systemConfigInfoPre);
-
-            if (flag!=0){
-                systemConfigHistoryDao.insert(generateHistoryInfo(systemConfigInfoPre, preFileJson,operationTypeEnum));
-            }
-            return result;
+        }
+        if (flag != 0) {
+            systemConfigHistoryDao.insert(generateHistoryInfo(systemConfigInfoPre, preFileJson, operationTypeEnum));
+        }
+        return result;
     }
 
 
@@ -148,9 +160,9 @@ public class SystemConfigDao {
         systemConfigInfo.setUpdateDate(new Date());
         systemConfigInfo.setJson("");
 
-        systemConfigHistoryDao.insert(generateHistoryInfo(systemConfigInfo, preJson,OperationTypeEnum.DELETE));
+        systemConfigHistoryDao.insert(generateHistoryInfo(systemConfigInfo, preJson, OperationTypeEnum.DELETE));
 
-        systemConfigRoleRelationDao.delete(new QueryWrapper<SystemConfigRoleRelation>().eq("system_config_id",id));
+        systemConfigRoleRelationDao.delete(new QueryWrapper<SystemConfigRoleRelation>().eq("system_config_id", id));
         return systemConfigMapper.deleteById(id);
 
     }
@@ -186,19 +198,19 @@ public class SystemConfigDao {
     public int rollBackById(Long id) {
 
         SystemConfigHistoryInfo systemConfigHistoryInfo = systemConfigHistoryDao.selectById(id);
-        if(systemConfigHistoryInfo == null){
+        if (systemConfigHistoryInfo == null) {
             throw new MarsException(RespCode.HISTORY_CONFIG_NOT_EXIST);
         }
         SystemConfigInfo systemConfigInfo = systemConfigMapper.selectById(systemConfigHistoryInfo.getFileId());
-        if (systemConfigInfo!=null){
+        if (systemConfigInfo != null) {
 
             systemConfigRoleRelationDao.checkRole(systemConfigHistoryInfo.getFileId(), SystemConfigRoleEnum.EDIT);
             systemConfigInfo.setJson(systemConfigHistoryInfo.getPreJson());
-            return updateConfig(systemConfigInfo,systemConfigHistoryInfo.getJson(),OperationTypeEnum.ROLLBACK);
+            return updateConfig(systemConfigInfo, systemConfigHistoryInfo.getJson(), OperationTypeEnum.ROLLBACK);
 
-        }else{
+        } else {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            String[] file= systemConfigHistoryInfo.getFileName().split("\\.");
+            String[] file = systemConfigHistoryInfo.getFileName().split("\\.");
             SystemConfigInfo configInfo = SystemConfigInfo.builder()
                     .appName(systemConfigHistoryInfo.getAppName())
                     .envCode(systemConfigHistoryInfo.getEnvCode())
@@ -219,43 +231,43 @@ public class SystemConfigDao {
     public void publish(Long id) {
         systemConfigRoleRelationDao.checkRole(id, SystemConfigRoleEnum.PUSH);
         SystemConfigInfo systemConfigInfo = systemConfigMapper.selectById(id);
-        if (systemConfigInfo!=null && systemConfigInfo.getStatus() ==1){
+        if (systemConfigInfo != null && systemConfigInfo.getStatus() == 1) {
             return;
         }
         systemConfigInfo.setStatus(1);
 
 
-        AppInfo appInfo =appInfoDao.selectOne(new QueryWrapper<AppInfo>().eq("app_name",systemConfigInfo.getAppName()));
-        if (appInfo==null) {
+        AppInfo appInfo = appInfoDao.selectOne(new QueryWrapper<AppInfo>().eq("app_name", systemConfigInfo.getAppName()));
+        if (appInfo == null) {
             throw new MarsException(RespCode.ENV_NOT_EXIST);
         }
-        systemConfigInfo.setVersion(snowflakeIdWorkerUtil.nextId()+"");
+        systemConfigInfo.setVersion(snowflakeIdWorkerUtil.nextId() + "");
 
-        int  result = systemConfigMapper.updateById(systemConfigInfo);
-        if (result!=1){
+        int result = systemConfigMapper.updateById(systemConfigInfo);
+        if (result != 1) {
             throw new MarsException(RespCode.PUBLISH_ERROR);
         }
     }
 
 
     public CheckForUpdateVo checkForUpdate(DataConfigReq dataConfig) {
-        QueryWrapper queryWrapper= new QueryWrapper<SystemConfigInfo>().
-                eq("env_code",dataConfig.getEnvCode()).
-                eq("app_name",dataConfig.getAppId());
+        QueryWrapper queryWrapper = new QueryWrapper<SystemConfigInfo>().
+                eq("env_code", dataConfig.getEnvCode()).
+                eq("app_name", dataConfig.getAppId());
         queryWrapper.select("file_name,version,status");
-        if (StringUtils.isNotEmpty(dataConfig.getVersion())){
-            List<String> versionList =Arrays.stream(dataConfig.getVersion().split(",")).map( v -> {
+        if (StringUtils.isNotEmpty(dataConfig.getVersion())) {
+            List<String> versionList = Arrays.stream(dataConfig.getVersion().split(",")).map(v -> {
                 return v;
             }).collect(Collectors.toList());
-            queryWrapper.notIn("version",versionList);
+            queryWrapper.notIn("version", versionList);
 
-            List<SystemConfigInfo> systemConfigInfos =systemConfigMapper.selectList(queryWrapper);
-            if (!CollectionUtils.isEmpty(systemConfigInfos)){
+            List<SystemConfigInfo> systemConfigInfos = systemConfigMapper.selectList(queryWrapper);
+            if (!CollectionUtils.isEmpty(systemConfigInfos)) {
                 List<String> fileNames = systemConfigInfos.stream()
-                        .filter(info ->{
-                            if (info.getStatus()==1){
+                        .filter(info -> {
+                            if (info.getStatus() == 1) {
                                 return true;
-                            }else{
+                            } else {
                                 return false;
                             }
                         })
@@ -267,12 +279,12 @@ public class SystemConfigDao {
                         .resultCode(ApiResultEnum.SUCCESS_UPDATE.getResultCode())
                         .updateFiles(fileNames)
                         .build();
-            }else{
+            } else {
                 return null;
             }
-        }else{
-            List<SystemConfigInfo> systemConfigInfos =systemConfigMapper.selectList(queryWrapper);
-            if (!CollectionUtils.isEmpty(systemConfigInfos)){
+        } else {
+            List<SystemConfigInfo> systemConfigInfos = systemConfigMapper.selectList(queryWrapper);
+            if (!CollectionUtils.isEmpty(systemConfigInfos)) {
                 List<String> fileNames = systemConfigInfos.stream().map(config -> {
                     return config.getFileName();
                 }).collect(Collectors.toList());
@@ -280,7 +292,7 @@ public class SystemConfigDao {
                         .resultCode(ApiResultEnum.SUCCESS_UPDATE.getResultCode())
                         .updateFiles(fileNames)
                         .build();
-            }else{
+            } else {
                 return null;
             }
         }
@@ -289,18 +301,18 @@ public class SystemConfigDao {
 
 
     public ForDataVo forDataVo(DataConfigReq dataConfig) {
-        if (StringUtils.isEmpty(dataConfig.getEnvCode()) || StringUtils.isEmpty(dataConfig.getAppId()) || StringUtils.isEmpty(dataConfig.getFileName())){
-            log.info("forDataVo error dataConfig:{}",dataConfig);
+        if (StringUtils.isEmpty(dataConfig.getEnvCode()) || StringUtils.isEmpty(dataConfig.getAppId()) || StringUtils.isEmpty(dataConfig.getFileName())) {
+            log.info("forDataVo error dataConfig:{}", dataConfig);
             return null;
         }
-        QueryWrapper queryWrapper= new QueryWrapper<SystemConfigInfo>().
-                eq("env_code",dataConfig.getEnvCode()).
-                eq("app_name",dataConfig.getAppId()).
-                eq("file_name",dataConfig.getFileName());
+        QueryWrapper queryWrapper = new QueryWrapper<SystemConfigInfo>().
+                eq("env_code", dataConfig.getEnvCode()).
+                eq("app_name", dataConfig.getAppId()).
+                eq("file_name", dataConfig.getFileName());
         queryWrapper.select("file_name,json,version");
 
-        SystemConfigInfo configInfo =systemConfigMapper.selectOne(queryWrapper);
-        if (configInfo!=null){
+        SystemConfigInfo configInfo = systemConfigMapper.selectOne(queryWrapper);
+        if (configInfo != null) {
             return ForDataVo.builder()
                     .fileName(configInfo.getFileName())
                     .content(configInfo.getJson())
@@ -310,23 +322,23 @@ public class SystemConfigDao {
         return null;
     }
 
-    private boolean isFileHasExisted(SystemConfigInfo systemConfigInfo){
+    private boolean isFileHasExisted(SystemConfigInfo systemConfigInfo) {
         Integer count = systemConfigMapper.selectCount(new QueryWrapper<SystemConfigInfo>().
-                eq("env_code",systemConfigInfo.getEnvCode()).
-                eq("app_name",systemConfigInfo.getAppName()).
-                eq("file_name", systemConfigInfo.getFileName()+"."+systemConfigInfo.getFileType()));
-        if(count>0){
+                eq("env_code", systemConfigInfo.getEnvCode()).
+                eq("app_name", systemConfigInfo.getAppName()).
+                eq("file_name", systemConfigInfo.getFileName() + "." + systemConfigInfo.getFileType()));
+        if (count > 0) {
             return true;
         }
         return false;
     }
 
-    private SystemConfigHistoryInfo generateHistoryInfo(SystemConfigInfo systemConfigInfo, String preFileJson, OperationTypeEnum operationTypeEnum){
+    private SystemConfigHistoryInfo generateHistoryInfo(SystemConfigInfo systemConfigInfo, String preFileJson, OperationTypeEnum operationTypeEnum) {
         SystemConfigHistoryInfo systemConfigHistoryInfo = new SystemConfigHistoryInfo();
         BeanUtils.copyProperties(systemConfigInfo, systemConfigHistoryInfo, "id");
         systemConfigHistoryInfo.setFileId(systemConfigInfo.getId());
         systemConfigHistoryInfo.setPreJson(preFileJson);
-        systemConfigHistoryInfo.setOperationType( operationTypeEnum.getCode());
+        systemConfigHistoryInfo.setOperationType(operationTypeEnum.getCode());
         return systemConfigHistoryInfo;
     }
 }

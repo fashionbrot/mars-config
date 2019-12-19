@@ -68,4 +68,6 @@ public class SystemConfigInfo implements Serializable {
     private String version;
 
     private transient Long roleId;
+
+    private transient Long nowUpdateDate;
 }
