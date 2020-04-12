@@ -119,13 +119,11 @@ public class ServerHttpAgent {
                 if (StringUtil.isEmpty(globalProperties.getLocalCachePath())){
                     globalProperties.setLocalCachePath(FileUtil.getUserHome(globalProperties.getAppName())) ;
                 }
+                /**
+                 * 写入本地缓存文件
+                 */
+                ServerHttpAgent.writePathFile(globalProperties.getLocalCachePath(),globalProperties.getAppName(),globalProperties.getEnvCode(),fileName,content);
 
-                StringBuilder path = new StringBuilder();
-                path.append(globalProperties.getLocalCachePath()).append(File.separator).append(ApiConstant.NAME);
-                path.append(globalProperties.getAppName()).append("_");
-                path.append(globalProperties.getEnvCode()).append("_");
-                path.append(fileName);
-                FileUtil.writeFile(new File(path.toString()),content);
                 writeFlag = true;
             }else{
                 writeFlag = true;
@@ -264,6 +262,31 @@ public class ServerHttpAgent {
             }
         }
         return null;
+    }
+
+
+    /**
+     * 写入本地指定位置缓存文件
+     * @param localCachePath
+     * @param appName
+     * @param envCode
+     * @param fileName
+     * @param content
+     */
+    public static void writePathFile(String localCachePath,String appName,String envCode,String fileName,String content){
+        StringBuilder path = new StringBuilder();
+        path.append(localCachePath).append(File.separator).append(ApiConstant.NAME);
+        path.append(appName).append("_");
+        path.append(envCode).append("_");
+        path.append(fileName);
+        if (log.isDebugEnabled()){
+            log.debug("writePathFile path:{} content:{}",path,content);
+        }
+        File file =  new File(path.toString());
+        if (file.exists()){
+            FileUtil.deleteFile(file);
+        }
+        FileUtil.writeFile(new File(path.toString()),content);
     }
 
 

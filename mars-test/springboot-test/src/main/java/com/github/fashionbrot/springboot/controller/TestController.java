@@ -14,10 +14,11 @@ import java.util.Properties;
 @Controller
 public class TestController {
 
+    /**
+     * 方式1 获取 abc 配置
+     */
     @MarsValue(value = "${abc}",autoRefreshed = true)
     private String abc;
-
-    private Properties test;
 
     @RequestMapping("/test")
     @ResponseBody
@@ -25,8 +26,13 @@ public class TestController {
         return abc;
     }
 
+
+    /**
+     * 方式2 根据类获取 配置
+     */
     @Autowired
     private TestConfig testConfig;
+
 
     @RequestMapping("/test2")
     @ResponseBody
@@ -34,7 +40,12 @@ public class TestController {
         return testConfig.appName+":"+testConfig.name;
     }
 
-    @MarsConfigListener(fileName = "aaa",type = ConfigTypeEnum.TEXT,autoRefreshed = false)
+
+    /**
+     * 方式三根据 配置发生变化获取到监听
+     * @param properties
+     */
+    @MarsConfigListener(fileName = "test",type = ConfigTypeEnum.TEXT,autoRefreshed = false)
     public void testP(String properties){
         System.out.println(properties.toString());
     }
@@ -43,8 +54,6 @@ public class TestController {
     public void testT(String  properties){
         System.out.printf(properties.toString());
     }
-
-
     @MarsConfigListener(fileName = "app.yaml",type = ConfigTypeEnum.YAML)
     public void testY(Properties  properties){
         System.out.printf(properties.toString());

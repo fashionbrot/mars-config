@@ -1,6 +1,5 @@
 package com.github.fashionbrot.spring.env;
 
-import com.alibaba.fastjson.JSONObject;
 import com.github.fashionbrot.ribbon.loadbalancer.BaseLoadBalancer;
 import com.github.fashionbrot.ribbon.loadbalancer.ILoadBalancer;
 import com.github.fashionbrot.ribbon.loadbalancer.Server;

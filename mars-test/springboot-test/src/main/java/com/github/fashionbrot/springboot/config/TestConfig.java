@@ -6,15 +6,14 @@ import com.github.fashionbrot.spring.properties.annotation.MarsProperty;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
-@MarsConfigurationProperties(fileName = "aaa",autoRefreshed = true)
+@MarsConfigurationProperties(fileName = "test",autoRefreshed = true)
 @Data
-@Component
 public class TestConfig {
 
     @MarsProperty("abc")
     public String name ;
 
-    @MarsProperty("abc")
+    @MarsProperty("test")
     public String appName ;
 
     @MarsIgnoreField
