@@ -260,8 +260,6 @@ function submitMenuRole() {
                 ids+=","+$(inputs[i]).attr("data-id");
             }
         }
-
-
     }
     var roleId= $("#roleId").val();
     $.ajax({
@@ -311,6 +309,7 @@ function loadSystemConfigRole() {
     if (appName==null || appName==''){
         return;
     }
+    syncSystemConfigRole();
     $.ajax({
         url: "./system-config-role-relation/selectBy?v="+new Date().getTime(),
         type: "post",
@@ -359,7 +358,7 @@ function syncSystemConfigRole(){
         success: function (data) {
             loaded();
             if (data.code==0){
-                alert("同步成功")
+                //alert("同步成功")
             } else{
                 alert(data.msg);
             }

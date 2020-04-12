@@ -98,6 +98,13 @@ public class FileUtil {
         return "";
     }
 
+    public static void deleteFile(File file){
+        try {
+            file.delete();
+        }catch (Exception e){
+            log.error("deleteFile error ",e);
+        }
+    }
 
     public static void writeFile(File file, String content) {
         try {

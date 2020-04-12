@@ -8,7 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.fashionbrot</groupId>
     <artifactId>mars-spring-config</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.2</version>
     <description>mars-spring-config api</description>
     <name>mars-spring-config</name>
 
@@ -84,54 +84,10 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot</artifactId>
-            <version>1.5.8.RELEASE</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.curator</groupId>
-            <artifactId>curator-framework</artifactId>
-            <version>4.0.0</version>
-            <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>org.apache.zookeeper</artifactId>
-                    <groupId>zookeeper</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.curator</groupId>
-            <artifactId>curator-recipes</artifactId>
-            <version>4.0.0</version>
-            <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>org.apache.zookeeper</artifactId>
-                    <groupId>zookeeper</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
             <version>1.2.58</version>
             <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <version>1.5.0.RELEASE</version>
-            <optional>true</optional>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-test-support</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
@@ -189,8 +145,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.0.0</version>
                 <configuration>
-                    <excludePackageNames>com.facebook.thrift:com.facebook.thrift.*</excludePackageNames>
+                    <encoding>UTF-8</encoding>
+                    <charset>UTF-8</charset>
+                    <docencoding>UTF-8</docencoding>
                 </configuration>
                 <executions>
                     <execution>
@@ -201,6 +160,7 @@
                         </goals>
                         <configuration>
                             <doclint>none</doclint>
+                            <encoding>UTF-8</encoding>
                         </configuration>
                     </execution>
                 </executions>
