@@ -14,11 +14,10 @@ import com.github.fashionbrot.spring.enums.ConfigTypeEnum;
 import com.github.fashionbrot.spring.env.MarsPropertySource;
 import com.github.fashionbrot.spring.server.ServerHttpAgent;
 import com.github.fashionbrot.spring.util.BeanUtil;
-import com.github.fashionbrot.spring.util.FileUtil;
+import com.github.fashionbrot.spring.util.ObjectUtils;
 import com.github.fashionbrot.spring.util.PropertiesSourceUtil;
 import com.github.fashionbrot.ribbon.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -73,7 +72,7 @@ public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,Applicat
         String appId = globalMarsProperties.getAppName();
         String envCode = globalMarsProperties.getEnvCode();
         long listenLongPollMs = globalMarsProperties.getListenLongPollMs();
-        if (StringUtils.isEmpty(appId) || StringUtils.isEmpty(envCode)) {
+        if (ObjectUtils.isEmpty(appId) || ObjectUtils.isEmpty(envCode)) {
             if (log.isInfoEnabled()) {
                 log.info(" MarsHttpConfigBeanDefinitionRegistrar init appId is null or envCode is null");
             }
@@ -141,7 +140,7 @@ public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,Applicat
                             .appId(appId)
                             .fileName(file)
                             .build();
-                    buildMarsPropertySource(server,dataConfig,globalMarsProperties);
+                    buildMarsPropertySource(server,dataConfig,globalMarsProperties.isEnableErrorLog());
                     versionMap.put(file,dataConfig.getVersion());
                 }
             }
@@ -163,8 +162,8 @@ public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,Applicat
         return null;
     }
 
-    private  void buildMarsPropertySource(final Server server,MarsDataConfig dataConfig,GlobalMarsProperties globalProperties){
-        ForDataVo forDataVo = ServerHttpAgent.getData(server, dataConfig,globalProperties.isEnableErrorLog());
+    private  void buildMarsPropertySource(final Server server,MarsDataConfig dataConfig,boolean enableLog){
+        ForDataVo forDataVo = ServerHttpAgent.getData(server, dataConfig,enableLog);
 
         if (forDataVo == null) {
             if (log.isDebugEnabled()) {
@@ -172,7 +171,7 @@ public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,Applicat
             }
             return;
         }
-        if (StringUtils.isEmpty(forDataVo.getContent())) {
+        if (ObjectUtils.isEmpty(forDataVo.getContent())) {
             if (log.isDebugEnabled()) {
                 log.debug(" triggerEvent  content is null dataConfig:{} ", JSON.toJSONString(dataConfig));
             }
@@ -202,18 +201,6 @@ public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,Applicat
             MarsPropertySource marsPropertySource = new MarsPropertySource(environmentFileName,properties,dataConfig);
             mutablePropertySources.addLast(marsPropertySource);
         }
-
-        if (StringUtil.isEmpty(globalProperties.getLocalCachePath())){
-            globalProperties.setLocalCachePath(FileUtil.getUserHome(globalProperties.getAppName())) ;
-        }
-
-        /**
-         * 如果配置发生变化则更新本地配置
-         */
-        if (globalProperties.isEnableLocalCache()) {
-            ServerHttpAgent.writePathFile(globalProperties.getLocalCachePath(), globalProperties.getAppName(), globalProperties.getEnvCode(), dataConfig.getFileName(), forDataVo.getContent());
-        }
-
         MarsListenerEvent marsListenerEvent = new MarsListenerEvent(this, forDataVo.getContent(), dataConfig);
         applicationEventPublisher.publishEvent(marsListenerEvent);
     }

@@ -163,10 +163,10 @@ public class BeanUtil {
     public static String getProperties(Properties properties, String key) {
 
         String value = properties.containsKey(key) ? properties.getProperty(key) : "";
-        if (org.apache.commons.lang3.StringUtils.isNotEmpty(value) && value.startsWith(PLACEHOLDER_PREFIX)) {
+        if (ObjectUtils.isNotEmpty(value) && value.startsWith(PLACEHOLDER_PREFIX)) {
             return null;
         }
-        if (org.apache.commons.lang3.StringUtils.isNotEmpty(value) && value.endsWith(PLACEHOLDER_SUFFIX)) {
+        if (ObjectUtils.isNotEmpty(value) && value.endsWith(PLACEHOLDER_SUFFIX)) {
             return null;
         }
         return value;

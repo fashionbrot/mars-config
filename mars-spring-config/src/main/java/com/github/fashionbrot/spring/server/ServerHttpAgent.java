@@ -19,7 +19,6 @@ import com.github.fashionbrot.spring.enums.ConfigTypeEnum;
 import com.github.fashionbrot.spring.env.MarsPropertySource;
 import com.github.fashionbrot.spring.util.*;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MutablePropertySources;
 
@@ -95,7 +94,7 @@ public class ServerHttpAgent {
             }
             return;
         }
-        if (StringUtils.isEmpty(forDataVo.getContent())) {
+        if (ObjectUtils.isEmpty(forDataVo.getContent())) {
             if (log.isDebugEnabled()) {
                 log.debug(" triggerEvent  content is null dataConfig:{} ", JSON.toJSONString(dataConfig));
             }
@@ -146,7 +145,7 @@ public class ServerHttpAgent {
     }
 
     public static ConfigTypeEnum match (String propertiesName){
-        if (StringUtils.isNotEmpty(propertiesName)) {
+        if (ObjectUtils.isNotEmpty(propertiesName)) {
             if (propertiesName.endsWith(".text")) {
                 return ConfigTypeEnum.TEXT;
             }
@@ -190,7 +189,7 @@ public class ServerHttpAgent {
 
 
         String serverAddress =server.getServer();
-        if (StringUtils.isNotEmpty(serverAddress)) {
+        if (ObjectUtils.isNotEmpty(serverAddress)) {
             String url ;
 
             List<String> params =new ArrayList<>(6);

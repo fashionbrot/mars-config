@@ -3,8 +3,8 @@ package com.github.fashionbrot.spring.support;
 
 import com.github.fashionbrot.spring.enums.ConfigTypeEnum;
 import com.github.fashionbrot.spring.exception.CreatePropertySourceException;
+import com.github.fashionbrot.spring.util.ObjectUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.nodes.MappingNode;
@@ -111,7 +111,7 @@ public class DefaultYamlSourceFactory implements MarsPropertySourceFactory {
     protected static void buildFlattenedMap(Map<String, Object> result, Map<String, Object> source, String path) {
         for (Map.Entry<String, Object> entry : source.entrySet()) {
             String key = entry.getKey();
-            if (StringUtils.isNotBlank(path)) {
+            if (ObjectUtils.isNotBlank(path)) {
                 if (key.startsWith("[")) {
                     key = path + key;
                 } else {

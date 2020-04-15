@@ -7,8 +7,8 @@ import com.github.fashionbrot.spring.config.GlobalMarsProperties;
 import com.github.fashionbrot.spring.server.ServerHttpAgent;
 import com.github.fashionbrot.spring.util.BeanUtil;
 import com.github.fashionbrot.ribbon.util.StringUtil;
+import com.github.fashionbrot.spring.util.ObjectUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -51,7 +51,7 @@ public class MarsPropertySourcePostProcessor implements BeanDefinitionRegistryPo
         }
         String appId = globalMarsProperties.getAppName();
         String envCode = globalMarsProperties.getEnvCode();
-        if (StringUtils.isEmpty(appId) || StringUtils.isEmpty(envCode)) {
+        if (ObjectUtils.isEmpty(appId) || ObjectUtils.isEmpty(envCode)) {
             if (log.isInfoEnabled()) {
                 log.info(" mars init appId is null or envCode is null");
             }

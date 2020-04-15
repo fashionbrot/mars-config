@@ -6,7 +6,6 @@ import com.github.fashionbrot.spring.enums.ConfigTypeEnum;
 import com.github.fashionbrot.spring.properties.annotation.MarsIgnoreField;
 import com.github.fashionbrot.spring.properties.annotation.MarsProperty;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValues;
 import org.springframework.core.env.Environment;
@@ -46,7 +45,7 @@ public class MarsUtil {
             @Override
             public void doWith(Field field) throws IllegalArgumentException {
                 String propertyName = resolvePropertyName(field);
-                propertyName = StringUtils.isEmpty(prefix) ? propertyName : prefix + "." + propertyName;
+                propertyName = ObjectUtils.isEmpty(prefix) ? propertyName : prefix + "." + propertyName;
                 if (hasText(propertyName)) {
                     // If it is a map, the data will not be fetched
                     if (Collection.class.isAssignableFrom(field.getType()) ||
