@@ -23,15 +23,15 @@ public interface UserInfoMapper extends BaseMapper<UserInfo>{
     @Update("UPDATE user_info SET last_login_time=#{lastLoginTime} WHERE id=#{id}")
     int updateLastLoginTime(@Param("id") Long id, @Param("lastLoginTime") Date timestamp);
 
-    @Select("SELECT a.id,a.user_name,a.real_name,a.`password`,a.create_date,a.`status`,a.last_login_time,a.update_date,c.role_name,c.id as roleId " +
+    @Select("SELECT a.super_admin,a.id,a.user_name,a.real_name,a.`password`,a.create_date,a.`status`,a.last_login_time,a.update_date,c.role_name,c.id as roleId " +
             " from user_info a " +
             " left JOIN user_role_relation b on a.id=b.user_id" +
-            " left JOIN role_info c on c.id=b.role_id")
+            " left JOIN role_info c on c.id=b.role_id where a.del_flag=0")
     List<UserInfo> queryAll();
 
     @Select("select r.role_name " +
             "from user_info u " +
             "inner join user_role_relation ur on ur.user_id = u.id " +
-            "INNER JOIN role_info r on r.id= ur.role_id  where u.id = #{userId}")
+            "INNER JOIN role_info r on r.id= ur.role_id  where  a.del_flag=0 and u.id = #{userId}")
     RoleInfo findByUserId(@Param("userId") Long userId);
 }

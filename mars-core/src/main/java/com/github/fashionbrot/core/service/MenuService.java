@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.github.fashionbrot.common.annotation.IsMenu;
 import com.github.fashionbrot.common.enums.RespCode;
 import com.github.fashionbrot.common.exception.MarsException;
+import com.github.fashionbrot.common.model.LoginModel;
 import com.github.fashionbrot.common.vo.RespVo;
+import com.github.fashionbrot.core.UserLoginService;
 import com.github.fashionbrot.dao.dao.MenuDao;
 import com.github.fashionbrot.dao.dao.MenuRoleRelationDao;
 import com.github.fashionbrot.dao.entity.Menu;
@@ -38,6 +40,9 @@ public class MenuService {
     @Autowired
     private UserInfoService userInfoService;
 
+    @Autowired
+    private UserLoginService userLoginService;
+
     private static Map<Long, List<Menu>> MENU_LIST_MAP = new ConcurrentHashMap<Long, List<Menu>>();
 
 
@@ -57,12 +62,13 @@ public class MenuService {
             // 判断接口是否需要登录
             IsMenu methodAnnotation = method.getAnnotation(IsMenu.class);
             if (methodAnnotation != null && methodAnnotation.checkMenuUrlPermission()) {
-                Long userId = userInfoService.getSessionUser();
-                if (userId == null) {
-                    log.info(" checkPermissionUrl userInfo is null");
+                LoginModel model = userLoginService.getLogin();
+                if (model.isSuperAdmin()) {
+                    log.info(" checkPermissionUrl user isSuperAdmin :{}",model.getUserName());
                     return true;
                 }
-                List<Menu> menuBarList = getMenus(userId);
+
+                List<Menu> menuBarList = getMenus(model);
 
                 if (CollectionUtils.isNotEmpty(menuBarList)) {
                     for (Menu m : menuBarList) {
@@ -149,8 +155,8 @@ public class MenuService {
     public void loadMenuList(Object handler, HttpServletRequest request) {
 
         if (handler instanceof HandlerMethod) {
-            Long userId = userInfoService.getSessionUser();
-            if (userId == null) {
+            LoginModel model = userLoginService.getLogin();
+            if (model == null) {
                 log.info(" loadMenuList userInfo is null");
                 return;
             }
@@ -161,7 +167,7 @@ public class MenuService {
             IsMenu methodAnnotation = method.getAnnotation(IsMenu.class);
 
             Optional.ofNullable(methodAnnotation).ifPresent(mm -> {
-                List<Menu> menuBarList = getMenus(userId);
+                List<Menu> menuBarList = getMenus(model);
                 if (CollectionUtils.isNotEmpty(menuBarList)) {
                     menuBarList = searchChildMenu(menuBarList, requestUrl);
                 }
@@ -170,16 +176,21 @@ public class MenuService {
         }
     }
 
-    private List<Menu> getMenus(Long userId) {
+    public List<Menu> getMenus(LoginModel model) {
+        Long userId = model.getUserId();
         List<Menu> menuBarList;
-        /*if (CollectionUtils.isNotEmpty(MENU_LIST_MAP) && MENU_LIST_MAP.containsKey(userId)) {
+        if (CollectionUtils.isNotEmpty(MENU_LIST_MAP) && MENU_LIST_MAP.containsKey(userId)) {
             menuBarList = MENU_LIST_MAP.get(userId);
-        } else {*/
-        menuBarList = menuDao.selectMenuRoleByUser(userId);
-            /*if (CollectionUtils.isNotEmpty(menuBarList)) {
-                MENU_LIST_MAP.put(userId, menuBarList);
-            }*/
-        /*}*/
+        } else {
+            if (model.isSuperAdmin()){
+                menuBarList = menuDao.queryAll(null);
+            }else{
+                menuBarList = menuDao.selectMenuRoleByUser(userId);
+                if (CollectionUtils.isNotEmpty(menuBarList)) {
+                    MENU_LIST_MAP.put(userId, menuBarList);
+                }
+            }
+        }
         return menuBarList;
     }
 

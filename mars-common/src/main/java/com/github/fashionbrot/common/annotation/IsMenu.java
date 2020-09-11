@@ -13,4 +13,9 @@ public @interface IsMenu {
      */
     boolean checkMenuUrlPermission() default true;
 
+    /**
+     * 权限code
+     * @return
+     */
+    String permCode() default "";
 }

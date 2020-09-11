@@ -5,8 +5,10 @@ import com.github.fashionbrot.common.annotation.IsMenu;
 import com.github.fashionbrot.common.constant.MarsConst;
 import com.github.fashionbrot.common.enums.RespCode;
 import com.github.fashionbrot.common.exception.MarsException;
+import com.github.fashionbrot.common.model.LoginModel;
 import com.github.fashionbrot.common.util.CookieUtil;
 import com.github.fashionbrot.common.util.JwtTokenUtil;
+import com.github.fashionbrot.core.UserLoginService;
 import com.github.fashionbrot.core.service.MenuService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,22 +32,25 @@ public class Interceptor implements HandlerInterceptor {
 
     @Autowired
     private MenuService menuService;
+    @Autowired
+    private UserLoginService userLoginService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
-
-        String  authValue  = CookieUtil.getCookieValue(request,MarsConst.AUTH_KEY,false);
-        if (!StringUtils.isEmpty(authValue)){
-            Long userId  = JwtTokenUtil.verifyTokenAndGetUser(authValue);
-            if (userId==null){
+        if (log.isDebugEnabled()){
+            log.debug("request url:{}",request.getRequestURI());
+        }
+        String  authValue  = CookieUtil.getCookieValue(request, MarsConst.AUTH_KEY,false);
+        if (!StringUtils.isEmpty(authValue)) {
+            LoginModel model = userLoginService.getLogin();
+            if (model == null) {
                 throw new MarsException(RespCode.SIGNATURE_MISMATCH);
             }
-            if(!menuService.checkPermissionUrl(handler,request)){
-                response.sendRedirect(url(request)+"/401?requestUrl="+request.getRequestURI());
+            if (!menuService.checkPermissionUrl(handler, request)) {
+                response.sendRedirect(url(request) + "/401?requestUrl=" + request.getRequestURI());
             }
             return true;
         }
-
         String header=request.getHeader("X-Requested-With");
         if ("XMLHttpRequest".equals(header)) {
             response.setHeader("REQUIRE_AUTH","true");

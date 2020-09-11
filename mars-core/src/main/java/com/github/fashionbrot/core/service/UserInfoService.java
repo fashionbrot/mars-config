@@ -5,11 +5,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.fashionbrot.common.constant.MarsConst;
 import com.github.fashionbrot.common.enums.RespCode;
 import com.github.fashionbrot.common.exception.MarsException;
+import com.github.fashionbrot.common.model.LoginModel;
 import com.github.fashionbrot.common.util.CookieUtil;
 import com.github.fashionbrot.common.util.JwtTokenUtil;
 import com.github.fashionbrot.common.util.PasswordUtils;
 import com.github.fashionbrot.common.vo.PageDataVo;
 import com.github.fashionbrot.common.vo.RespVo;
+import com.github.fashionbrot.core.UserLoginService;
 import com.github.fashionbrot.dao.dao.RoleInfoDao;
 import com.github.fashionbrot.dao.dao.UserInfoDao;
 import com.github.fashionbrot.dao.entity.RoleInfo;
@@ -47,9 +49,8 @@ public class UserInfoService {
     private RoleInfoDao roleInfoDao;
     @Autowired
     private MenuService menuService;
-
     @Autowired
-    private HttpServletRequest request;
+    private UserLoginService userLoginService;
 
 
     public RespVo login(String userName, String password, HttpServletRequest request, HttpServletResponse response) {
@@ -73,7 +74,7 @@ public class UserInfoService {
         if (roleInfo!=null){
             roleName =roleInfo.getRoleName();
         }
-        String token = JwtTokenUtil.createToken(userInfo.getId(),userInfo.getRealName(),roleName);
+        String token = JwtTokenUtil.createToken(userInfo.getId(),userInfo.getRealName(),roleName,userInfo.getSuperAdmin()==1);
 
         CookieUtil.setCookie(request,response,userInfo.getRealName(),roleName,token,true);
 
@@ -82,6 +83,10 @@ public class UserInfoService {
 
 
     public void add(UserInfo userInfo) {
+        LoginModel login = userLoginService.getLogin();
+        if (!login.isSuperAdmin()){
+            userInfo.setSuperAdmin(0);
+        }
         if (userInfoDao.add(userInfo) != 1) {
             throw new MarsException(RespCode.SAVE_ERROR);
         }
@@ -89,6 +94,10 @@ public class UserInfoService {
 
 
     public void update(UserInfo userInfo) {
+        LoginModel login = userLoginService.getLogin();
+        if (!login.isSuperAdmin()){
+            userInfo.setSuperAdmin(0);
+        }
         UserInfo oldUser = queryById(userInfo.getId());
         if (oldUser != null && !oldUser.getPassword().equals(userInfo.getPassword())) {
             String salt = PasswordUtils.getSalt();
@@ -106,6 +115,13 @@ public class UserInfoService {
 
 
     public void deleteById(Long id) {
+        UserInfo userInfo=userInfoDao.queryById(id);
+        if (userInfo!=null && userInfo.getSuperAdmin()==1){
+            LoginModel login = userLoginService.getLogin();
+            if (!login.isSuperAdmin()){
+                throw new MarsException("不是管理员，无法操作");
+            }
+        }
         if (userInfoDao.deleteById(id) !=1) {
             throw new MarsException(RespCode.DELETE_ERROR);
         }
@@ -139,11 +155,8 @@ public class UserInfoService {
         if (pwd.equals(newPwd)) {
             throw new MarsException("新密码和原密码一致，请修改");
         }
-        Long  userId = getSessionUser();
-        if (userId == null) {
-            throw new MarsException("请刷新重试");
-        }
-        UserInfo user = userInfoDao.queryById(userId);
+        LoginModel login = userLoginService.getLogin();
+        UserInfo user = userInfoDao.queryById(login.getUserId());
         if (user != null) {
             String salt =user.getSalt();
             String encryptPassword = PasswordUtils.encryptPassword(pwd, salt);
@@ -160,37 +173,11 @@ public class UserInfoService {
             }
         }
 
-        return RespVo.builder().build();
+        return RespVo.success();
     }
 
 
-    public Long getSessionUser() {
-        String  authValue  = CookieUtil.getCookieValue(request,MarsConst.AUTH_KEY,false);
-        if (!StringUtils.isEmpty(authValue)){
-            Long userId  = JwtTokenUtil.verifyTokenAndGetUser(authValue);
-            if (userId==null){
-                throw new MarsException(RespCode.SIGNATURE_MISMATCH);
-            }
-            return userId;
-        }
-        return null;
-    }
 
-
-    public String getSessionUsername() {
-        HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
-        if (request != null) {
-            HttpSession session = request.getSession();
-            if (session != null) {
-                Object object = session.getAttribute("user");
-                if (object != null) {
-                    UserInfo userInfo = (UserInfo) object;
-                    return userInfo.getRealName();
-                }
-            }
-        }
-        return "";
-    }
 
 
 }

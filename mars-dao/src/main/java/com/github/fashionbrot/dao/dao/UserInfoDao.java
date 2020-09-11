@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.fashionbrot.common.constant.MarsConst;
 import com.github.fashionbrot.common.enums.RespCode;
 import com.github.fashionbrot.common.exception.MarsException;
+import com.github.fashionbrot.common.model.LoginModel;
 import com.github.fashionbrot.common.util.CookieUtil;
 import com.github.fashionbrot.common.util.JwtTokenUtil;
 import com.github.fashionbrot.common.util.PasswordUtils;
@@ -61,15 +62,17 @@ public class UserInfoDao  {
         }
         int result= userInfoMapper.insert(userInfo);
         if (userInfo.getId()!=null && userInfo.getId().intValue()!=0) {
-            RoleInfo roleInfo=roleInfoMapper.selectById(userInfo.getRoleId());
-            if (roleInfo==null){
-                throw new MarsException("当前角色不存在，请刷新重试");
+            if (userInfo.getSuperAdmin()==0){
+                RoleInfo roleInfo=roleInfoMapper.selectById(userInfo.getRoleId());
+                if (roleInfo==null){
+                    throw new MarsException("当前角色不存在，请刷新重试");
+                }
+                userRoleRelationMapper.insert(UserRoleRelation.builder()
+                        .createDate(date)
+                        .roleId(userInfo.getRoleId())
+                        .userId(userInfo.getId())
+                        .build());
             }
-            userRoleRelationMapper.insert(UserRoleRelation.builder()
-                    .createDate(date)
-                    .roleId(userInfo.getRoleId())
-                    .userId(userInfo.getId())
-                    .build());
         }
 
         return result;
@@ -86,23 +89,25 @@ public class UserInfoDao  {
     public Integer update(UserInfo userInfo) {
         Date date =new Date();
         userInfo.setUpdateDate(date);
+        if (userInfo.getSuperAdmin()==0){
+            RoleInfo roleInfo=roleInfoMapper.selectById(userInfo.getRoleId());
+            if (roleInfo==null){
+                throw new MarsException("当前角色不存在，请刷新重试");
+            }
 
-        RoleInfo roleInfo=roleInfoMapper.selectById(userInfo.getRoleId());
-        if (roleInfo==null){
-            throw new MarsException("当前角色不存在，请刷新重试");
+            UserRoleRelation userRoleRelation=userRoleRelationMapper.selectOne(new QueryWrapper<UserRoleRelation>().eq("user_id",userInfo.getId()));
+            if (userRoleRelation==null){
+                userRoleRelationMapper.insert(UserRoleRelation.builder()
+                        .createDate(date)
+                        .roleId(userInfo.getRoleId())
+                        .userId(userInfo.getId())
+                        .build());
+            }else{
+                userRoleRelation.setRoleId(userInfo.getRoleId());
+                userRoleRelationMapper.updateById(userRoleRelation);
+            }
         }
 
-        UserRoleRelation userRoleRelation=userRoleRelationMapper.selectOne(new QueryWrapper<UserRoleRelation>().eq("user_id",userInfo.getId()));
-        if (userRoleRelation==null){
-            userRoleRelationMapper.insert(UserRoleRelation.builder()
-                    .createDate(date)
-                    .roleId(userInfo.getRoleId())
-                    .userId(userInfo.getId())
-                    .build());
-        }else{
-            userRoleRelation.setRoleId(userInfo.getRoleId());
-            userRoleRelationMapper.updateById(userRoleRelation);
-        }
 
         UserInfo user= userInfoMapper.selectOne(new QueryWrapper<UserInfo>().eq("user_name",userInfo.getUserName()));
         if (user!=null && !userInfo.getUserName().equals(user.getUserName())){
@@ -154,11 +159,11 @@ public class UserInfoDao  {
     public Long getUserId() {
         String  authValue  = CookieUtil.getCookieValue(request, MarsConst.AUTH_KEY,false);
         if (!StringUtils.isEmpty(authValue)){
-            Long userId  = JwtTokenUtil.verifyTokenAndGetUser(authValue);
-            if (userId==null){
+            LoginModel model  = JwtTokenUtil.getLogin(authValue);
+            if (model==null){
                 throw new MarsException(RespCode.SIGNATURE_MISMATCH);
             }
-            return userId;
+            return model.getUserId();
         }
         return null;
     }
@@ -166,11 +171,11 @@ public class UserInfoDao  {
     public UserInfo getUser() {
         String  authValue  = CookieUtil.getCookieValue(request, MarsConst.AUTH_KEY,false);
         if (!StringUtils.isEmpty(authValue)){
-            Long userId  = JwtTokenUtil.verifyTokenAndGetUser(authValue);
-            if (userId==null){
+            LoginModel model  = JwtTokenUtil.getLogin(authValue);
+            if (model==null){
                 throw new MarsException(RespCode.SIGNATURE_MISMATCH);
             }
-            UserInfo userInfo = queryById(userId);
+            UserInfo userInfo = queryById(model.getUserId());
             if (userInfo==null){
                 throw new MarsException(RespCode.USER_NOT_EXIST);
             }

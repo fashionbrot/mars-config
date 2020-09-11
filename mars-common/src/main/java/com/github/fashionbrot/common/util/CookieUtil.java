@@ -1,6 +1,7 @@
 package com.github.fashionbrot.common.util;
 
 import com.github.fashionbrot.common.constant.MarsConst;
+import com.github.fashionbrot.common.model.LoginModel;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Base64Utils;
 
@@ -40,9 +41,9 @@ public final class CookieUtil {
             String realName = getCookieValue(cookieList, MarsConst.REAL_NAME, true);
             String roleName = getCookieValue(cookieList, MarsConst.ROLE_NAME, true);
             if (StringUtils.isNotEmpty(token)) {
-                Long userId = JwtTokenUtil.verifyTokenAndGetUser(token);
-                if (userId != null) {
-                    token = JwtTokenUtil.createToken(userId, realName, roleName);
+                LoginModel model = JwtTokenUtil.getLogin(token);
+                if (model != null) {
+                    token = JwtTokenUtil.createToken(model.getUserId(), realName, roleName,model.isSuperAdmin());
                     if (StringUtils.isNotEmpty(token)) {
                         setCookie(request, response, realName, roleName, token,false);
                     }

@@ -3,12 +3,16 @@
 
 //添加用户
 var userInfoAdd = function () {
+    var superAdmin=$("#superAdmin").val();
 
-    var roleId=$("#addRoleId").val();
-    if(roleId=='' || roleId==null){
-        alert("请选择角色");
-        return false;
+    if (superAdmin==0 || superAdmin=="0"){
+        var roleId=$("#addRoleId").val();
+        if(roleId=='' || roleId==null){
+            alert("请选择角色");
+            return false;
+        }
     }
+
 
     var a = $("#userInfoAddForm").serializeJson();
     loading();
@@ -132,6 +136,9 @@ function loadData() {
                     dataType: "json",
                     data:{}
                 },
+                dom: '<fB<t>ip>',
+                stripeClasses: ["odd", "even"],
+                paginationType: "full_numbers",
                 serverSide:true,
                 language: dataTable.language(),
                 stateSave: true,
@@ -171,7 +178,15 @@ function loadData() {
                     },
                     {
                         targets: 4, render: function (data, type, full, meta) {
-                            return full.roleName;
+                            if (full.roleName!=null){
+                                return full.roleName;
+                            }else{
+                                if (full.superAdmin == "1") {
+                                    return "超级管理员";
+                                } else {
+                                    return "普通管理员";
+                                }
+                            }
                         }
                     },
                     {

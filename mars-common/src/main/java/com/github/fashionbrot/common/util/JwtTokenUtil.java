@@ -8,6 +8,7 @@ import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.github.fashionbrot.common.enums.RespCode;
 import com.github.fashionbrot.common.exception.MarsException;
+import com.github.fashionbrot.common.model.LoginModel;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Calendar;
@@ -70,7 +71,7 @@ public class JwtTokenUtil {
      *
      * @return token
      */
-    public static String createToken(long userId,String realName,String roleName) {
+    public static String createToken(long userId,String realName,String roleName,boolean superAdmin) {
         Date iatDate = new Date();
         // expire time
         Calendar nowTime = Calendar.getInstance();
@@ -97,6 +98,7 @@ public class JwtTokenUtil {
                 .withClaim(USER_ID, userId)
                 .withClaim(REAL_NAME,realName)
                 .withClaim(ROLE_NAME, roleName)
+                .withClaim("superAdmin",superAdmin)
                 // sign time
                 .withIssuedAt(iatDate)
                 // expire time
@@ -112,13 +114,33 @@ public class JwtTokenUtil {
      * @param token token
      * @return user
      */
-    public static Long verifyTokenAndGetUser(String token) {
+    public static LoginModel getLogin(String token) {
         Map<String, Claim> claimMap = verifyToken(token);
         Claim userIdClaim = claimMap.get(USER_ID);
         if (userIdClaim == null || userIdClaim.asInt() == null) {
             // token 校验失败, 抛出Token验证非法异常
             throw new MarsException(RespCode.SIGNATURE_MISMATCH);
         }
-        return userIdClaim.asLong();
+        Claim roleName = claimMap.get(REAL_NAME);
+
+        Claim realName = claimMap.get(REAL_NAME);
+        if (realName == null || realName.asString() == null) {
+            // token 校验失败, 抛出Token验证非法异常
+            throw new MarsException(RespCode.SIGNATURE_MISMATCH);
+        }
+        Claim superAdmin = claimMap.get("superAdmin");
+        if (superAdmin == null || superAdmin.asBoolean() == null) {
+            // token 校验失败, 抛出Token验证非法异常
+            throw new MarsException(RespCode.SIGNATURE_MISMATCH);
+        }
+        LoginModel model= LoginModel.builder()
+                .userId(userIdClaim.asLong())
+                .userName(realName.asString())
+                .superAdmin(superAdmin.asBoolean())
+                .build();
+        if (roleName!=null){
+            model.setRoleName(roleName.asString());
+        }
+        return model;
     }
 }

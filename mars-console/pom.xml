@@ -29,42 +29,33 @@
             <groupId>com.github.fashionbrot</groupId>
             <artifactId>mars-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
 
-    <profiles>
-        <profile>
-            <id>local</id>
-            <build>
-                <resources>
-                    <resource>
-                        <directory>${profiles.dir}/local</directory>
-                    </resource>
-                </resources>
-            </build>
-        </profile>
-        <profile>
-            <id>prod</id>
-            <build>
-                <resources>
-                    <resource>
-                        <directory>${profiles.dir}/prod</directory>
-                    </resource>
-                </resources>
-            </build>
-        </profile>
-    </profiles>
-
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-            </resource>
-        </resources>
         <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <fork>true</fork>
+                    <addResources>true</addResources>
+                    <mainClass>com.github.fashionbrot.console.MarsApplication</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -74,7 +65,22 @@
                 </configuration>
             </plugin>
         </plugins>
-    </build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*Mapper.xml</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
 
+    </build>
 
 </project>
