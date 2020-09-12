@@ -26,7 +26,7 @@ public interface UserInfoMapper extends BaseMapper<UserInfo>{
     @Select("SELECT a.super_admin,a.id,a.user_name,a.real_name,a.`password`,a.create_date,a.`status`,a.last_login_time,a.update_date,c.role_name,c.id as roleId " +
             " from user_info a " +
             " left JOIN user_role_relation b on a.id=b.user_id" +
-            " left JOIN role_info c on c.id=b.role_id where a.del_flag=0")
+            " left JOIN role_info c on c.id=b.role_id where a.del_flag=0 ")
     List<UserInfo> queryAll();
 
     @Select("select r.role_name " +

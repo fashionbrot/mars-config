@@ -2,6 +2,7 @@ package com.github.fashionbrot.console.controller;
 
 
 import com.github.fashionbrot.common.annotation.IsMenu;
+import com.github.fashionbrot.common.annotation.MarsPermission;
 import com.github.fashionbrot.common.vo.RespVo;
 import com.github.fashionbrot.core.service.AppInfoService;
 import com.github.fashionbrot.dao.entity.AppInfo;
@@ -36,6 +37,7 @@ public class AppInfoController {
 
     @RequestMapping(value = "add")
     @ResponseBody
+    @MarsPermission("app:list:add")
     public RespVo add(@RequestBody AppInfo appInfo) {
         appInfoFacade.add(appInfo);
         return RespVo.success();
@@ -43,6 +45,7 @@ public class AppInfoController {
 
     @RequestMapping(value = "update")
     @ResponseBody
+    @MarsPermission("app:list:edit")
     public RespVo update(@RequestBody AppInfo appInfo) {
         appInfoFacade.update(appInfo);
         return RespVo.success();
@@ -50,6 +53,7 @@ public class AppInfoController {
 
     @RequestMapping(value = "deleteById")
     @ResponseBody
+    @MarsPermission("app:list:del")
     public RespVo deleteById(Long id) {
         appInfoFacade.deleteById(id);
         return RespVo.success();
@@ -57,6 +61,7 @@ public class AppInfoController {
 
     @RequestMapping(value = "deleteByAppName")
     @ResponseBody
+    @MarsPermission("app:list:del")
     public RespVo deleteByAppName(String appName) {
         appInfoFacade.deleteByAppName(appName);
         return RespVo.success();
@@ -65,8 +70,16 @@ public class AppInfoController {
 
     @RequestMapping(value = "/queryById")
     @ResponseBody
-    public AppInfo queryById(String appName) {
-        return appInfoFacade.queryByAppName(appName);
+    @MarsPermission("app:list:info")
+    public RespVo queryById(String appName) {
+        return RespVo.success(appInfoFacade.queryByAppName(appName));
+    }
+
+    @RequestMapping(value = "queryAllList")
+    @ResponseBody
+    @MarsPermission("app:list:list")
+    public RespVo queryAllList() {
+        return RespVo.success(appInfoFacade.queryAll());
     }
 
     @RequestMapping(value = "queryAll")

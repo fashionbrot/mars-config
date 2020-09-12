@@ -21,18 +21,9 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SystemConfigInfo implements Serializable {
+public class SystemConfigInfo extends BaseEntity {
 
-    private static final long serialVersionUID = 5109704606150311695L;
 
-    @TableId(value = "id",type = IdType.AUTO)
-    private Long id;
-
-    @TableField("create_date")
-    private Date createDate;
-
-    @TableField("update_date")
-    private Date updateDate;
 
     @TableField(value = "env_code")
     private String envCode;

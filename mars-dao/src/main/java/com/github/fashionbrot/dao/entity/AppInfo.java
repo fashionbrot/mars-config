@@ -21,8 +21,7 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AppInfo implements Serializable{
-    private static final long serialVersionUID = 6900049095288795420L;
+public class AppInfo extends BaseEntity{
 
     @TableField(value = "app_name")
     private String appName;
@@ -30,10 +29,4 @@ public class AppInfo implements Serializable{
     @TableField(value = "app_desc")
     private String appDesc;
 
-
-    @TableField(value = "create_date")
-    private Date createDate;
-
-    @TableField(value = "update_date")
-    private Date updateDate;
 }

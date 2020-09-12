@@ -15,7 +15,6 @@ var userInfoAdd = function () {
     }
 
 
-
     loading();
     var a = $("#userInfoAddForm").serializeJson();
     $.ajax({
@@ -33,6 +32,9 @@ var userInfoAdd = function () {
             } else {
                 alert(data.msg);
             }
+        },error: function (e) {
+            loaded();
+            alert("网络错误,请重试!");
         }
     });
 }
@@ -57,6 +59,9 @@ var userInfoDel = function (appName) {
             } else {
                 alert(data.msg);
             }
+        },error: function (e) {
+            loaded();
+            alert("网络错误,请重试!");
         }
     });
 
@@ -79,10 +84,9 @@ var userInfoEdit = function () {
             } else {
                 alert(data.msg);
             }
-        },
-        error: function (e) {
+        },error: function (e) {
             loaded();
-            alert("网络错误，请重试！！");
+            alert("网络错误,请重试!");
         }
     });
 }
@@ -98,13 +102,21 @@ var queryByUserId = function (appName) {
         type: "post",
         data: {"appName": appName},
         dataType: "json",
-        success: function (data) {
+        success: function (result) {
             loaded();
+            if (result.code!=0){
+                alert(result.msg);
+                return false;
+            }
+            var data = result.data;
             $("#editAppName").attr("readonly","readonly");
             $("#editAppName").val(data.appName);
             $("#editAppDesc").val(data.appDesc);
             $("#editReleaseType").val(data.releaseType);
             $("#userInfoEditModal").modal("show");
+        },error: function (e) {
+            loaded();
+            alert("网络错误,请重试!");
         }
     });
 }
@@ -127,11 +139,15 @@ $(document).ready(function () {
 function loadData() {
     loading();
     $.ajax({
-        url: "./app/queryAll?v="+new Date().getTime(),
+        url: "./app/queryAllList?v="+new Date().getTime(),
         type: "post",
         dataType: "json",
         success: function (data) {
             loaded();
+            if (data.code!=0){
+                alert(data.msg);
+                return false;
+            }
             $('#dataTables-userInfo').dataTable().fnDestroy();
             var table = $('#dataTables-userInfo').DataTable({
                 language: dataTable.language(),
@@ -141,7 +157,10 @@ function loadData() {
                 info: true,
                 bAutoWidth: false,
                 lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
-                data: data,
+                data: data.data,
+                dom: '<fB<t>ip>',
+                stripeClasses: ["odd", "even"],
+                paginationType: "full_numbers",
                 columnDefs: [
 
                     {
@@ -167,6 +186,9 @@ function loadData() {
                     }
                 ]
             });
+        },error: function (e) {
+            loaded();
+            alert("网络错误，请重试！！");
         }
     });
 }

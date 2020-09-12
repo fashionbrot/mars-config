@@ -1,7 +1,10 @@
 package com.github.fashionbrot.console.config;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
+import com.github.fashionbrot.common.model.LoginModel;
+import com.github.fashionbrot.core.UserLoginService;
 import org.apache.ibatis.reflection.MetaObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -16,6 +19,8 @@ public class FieldMetaObjectHandler  implements MetaObjectHandler {
     private final static String DEL_FLAG = "delFlag"; //删除标志位 1删除 0未删除
 
 
+    @Autowired
+    private UserLoginService userLoginService;
 
 
     /**
@@ -59,8 +64,9 @@ public class FieldMetaObjectHandler  implements MetaObjectHandler {
     }
 
     private Long getUserId(){
+        LoginModel login = userLoginService.getLogin();
 
-        return 0L;
+        return login.getUserId();
     }
 
 }

@@ -125,6 +125,9 @@ function loadData() {
                 bAutoWidth: false,
                 lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
                 data: data,
+                dom: '<fB<t>ip>',
+                stripeClasses: ["odd", "even"],
+                paginationType: "full_numbers",
                 columnDefs: [
                     {
                         targets: 0, render: function (data, type, full, meta) {
@@ -147,11 +150,16 @@ function loadData() {
                     },
                     {
                         targets: 3, render: function (data, type, full, meta) {
-                        return '<a class="btn btn-success btn-" onclick="queryByUserId(\'' + full.id + '\')"><i class="fa fa-edit">编辑</i> </a>'
-                            + '&nbsp;&nbsp;<a class="btn btn-success" onclick="showRoleMenu(\'' + full.id + '\')"> <i class="fa fa-edit">菜单权限</i></a>'
-                            +'&nbsp;&nbsp;<a class="btn btn-success" onclick="showSystemConfigRoleTemplate(\'' + full.id + '\')"> <i class="fa fa-edit">动态配置权限</i></a>'
-                            +'&nbsp;&nbsp;<a class="btn btn-warning btn-circle" onclick="showModal(\'' + full.id + '\')"> <i class="glyphicon glyphicon-trash"></i>删除</a>';
-                    }
+                            if (full.roleCode=='chaojiguanliyuan'){
+                                return "";
+                            }else{
+                                return '<a class="btn btn-success btn-" onclick="queryByUserId(\'' + full.id + '\')"><i class="fa fa-edit">编辑</i> </a>'
+                                    + '&nbsp;&nbsp;<a class="btn btn-success" onclick="showRoleMenuTree(\'' + full.id + '\')"> <i class="fa fa-edit">菜单权限</i></a>'
+                                    +'&nbsp;&nbsp;<a class="btn btn-success" onclick="showSystemConfigRoleTemplate(\'' + full.id + '\')"> <i class="fa fa-edit">动态配置权限</i></a>'
+                                    +'&nbsp;&nbsp;<a class="btn btn-warning btn-circle" onclick="showModal(\'' + full.id + '\')"> <i class="glyphicon glyphicon-trash"></i>删除</a>';
+                            }
+
+                        }
                     }
                 ]
             });
@@ -250,7 +258,7 @@ function treeOnChanger(obj) {
 }
 
 function submitMenuRole() {
-    var inputs=$("#roleMenuForm").find("input[type=checkbox]:checked");
+    /*var inputs=$("#roleMenuForm").find("input[type=checkbox]:checked");
     var ids="";
     if(inputs.length>0){
         for(var i=0;i<inputs.length;i++){
@@ -260,7 +268,20 @@ function submitMenuRole() {
                 ids+=","+$(inputs[i]).attr("data-id");
             }
         }
+    }*/
+    var treeObj = $.fn.zTree.getZTreeObj("tree");
+    var nodes = treeObj.getCheckedNodes(true);
+    var ids="";
+    if(nodes.length>0){
+        for(var i=0;i<nodes.length;i++){
+            if(ids==""){
+                ids+=nodes[i].id;
+            }else{
+                ids+=","+nodes[i].id;
+            }
+        }
     }
+    console.log("roleIds:"+ids);
     var roleId= $("#roleId").val();
     $.ajax({
         url: "./admin/menu/updateRoleMenu?v="+new Date().getTime(),
@@ -415,21 +436,21 @@ $("#envCode").on("change",function () {
 });
 
 $("#roleQuanxuan").on("click",function () {
-    var inputs=$("#roleMenuForm").find("input");
+   /* var inputs=$("#roleMenuForm").find("input");
     //console.log(inputs)
     if(inputs.length>0) {
         for (var i = 0; i < inputs.length; i++) {
             inputs[i].checked=true;
         }
-    }
+    }*/
 });
 $("#roleQuanquxiao").on("click",function () {
-    var inputs=$("#roleMenuForm").find("input");
+    /*var inputs=$("#roleMenuForm").find("input");
     if(inputs.length>0) {
         for (var i = 0; i < inputs.length; i++) {
             inputs[i].checked=false;
         }
-    }
+    }*/
 })
 
 $("#quanxuan").on("click",function () {
@@ -449,3 +470,60 @@ $("#quanquxiao").on("click",function () {
         }
     }
 })
+
+
+
+var setting = {
+    check: {
+        enable: true
+        ,chkboxType:{ "Y":"s", "N":"s"}
+    },
+    data: {
+        simpleData: {
+            enable: true,
+            idKey: "id",
+            pIdKey: "parentMenuId",
+            rootPId: ""
+        }
+    }
+};
+
+
+function showRoleMenuTree(id) {
+    loading();
+    $("#roleId").val(id);
+    $.ajax({
+        url: "./admin/menu/loadAllMenu?v="+new Date().getTime(),
+        type: "post",
+        dataType: "json",
+        async:false,
+        data:{"roleId":id},
+        success: function (data) {
+            loaded();
+            if(data!=null){
+
+                $.fn.zTree.init($("#tree"), setting, data);
+                $("#roleQuanxuan").bind("click", { type: "checkAllTrue" }, checkNode);
+                $("#roleQuanquxiao").bind("click", { type: "checkAllFalse" }, checkNode);
+            }
+        }
+    });
+    $("#roleMenuModal").modal("show");
+}
+
+
+
+function checkNode(e) {
+    var zTree = $.fn.zTree.getZTreeObj("tree"),
+        type = e.data.type,
+        nodes = zTree.getSelectedNodes();
+    console.log(type.indexOf("All"));
+    if (type.indexOf("All") < 0 && nodes.length == 0) {
+        alert("请先选择一个节点");
+    }
+    if (type == "checkAllTrue") {
+        zTree.checkAllNodes(true);
+    } else if (type == "checkAllFalse") {
+        zTree.checkAllNodes(false);
+    }
+}

@@ -1,6 +1,7 @@
 package com.github.fashionbrot.console.controller;
 
 import com.github.fashionbrot.common.annotation.IsMenu;
+import com.github.fashionbrot.common.annotation.MarsPermission;
 import com.github.fashionbrot.common.vo.RespVo;
 import com.github.fashionbrot.core.service.MenuService;
 import com.github.fashionbrot.dao.entity.Menu;
@@ -32,6 +33,7 @@ public class MenuController {
 
     @RequestMapping(value = "add")
     @ResponseBody
+    @MarsPermission("menu:list:add")
     public RespVo add(@RequestBody Menu envInfo) {
         envInfoFacade.add(envInfo);
         return RespVo.success();
@@ -39,6 +41,7 @@ public class MenuController {
 
     @RequestMapping(value = "update")
     @ResponseBody
+    @MarsPermission("menu:list:edit")
     public RespVo update(@RequestBody Menu envInfo) {
         envInfoFacade.update(envInfo);
         return RespVo.success();
@@ -46,6 +49,7 @@ public class MenuController {
 
     @RequestMapping(value = "deleteById")
     @ResponseBody
+    @MarsPermission("menu:list:del")
     public RespVo deleteById(Long id) {
         envInfoFacade.deleteById(id);
         return RespVo.success();
@@ -53,8 +57,16 @@ public class MenuController {
 
     @RequestMapping(value = "queryById")
     @ResponseBody
-    public Menu queryById(Long id) {
-        return envInfoFacade.queryById(id);
+    @MarsPermission("menu:list:info")
+    public RespVo queryById(Long id) {
+        return RespVo.success(envInfoFacade.queryById(id));
+    }
+
+    @RequestMapping(value = "queryAllList")
+    @ResponseBody
+    @MarsPermission("menu:list:list")
+    public RespVo queryAllList() {
+        return RespVo.success(envInfoFacade.queryAll());
     }
 
     @RequestMapping(value = "queryAll")

@@ -68,7 +68,6 @@ public class UserInfoDao  {
                     throw new MarsException("当前角色不存在，请刷新重试");
                 }
                 userRoleRelationMapper.insert(UserRoleRelation.builder()
-                        .createDate(date)
                         .roleId(userInfo.getRoleId())
                         .userId(userInfo.getId())
                         .build());
@@ -98,7 +97,6 @@ public class UserInfoDao  {
             UserRoleRelation userRoleRelation=userRoleRelationMapper.selectOne(new QueryWrapper<UserRoleRelation>().eq("user_id",userInfo.getId()));
             if (userRoleRelation==null){
                 userRoleRelationMapper.insert(UserRoleRelation.builder()
-                        .createDate(date)
                         .roleId(userInfo.getRoleId())
                         .userId(userInfo.getId())
                         .build());
@@ -156,14 +154,14 @@ public class UserInfoDao  {
         return userInfo;
     }
 
-    public Long getUserId() {
+    public LoginModel getLogin() {
         String  authValue  = CookieUtil.getCookieValue(request, MarsConst.AUTH_KEY,false);
         if (!StringUtils.isEmpty(authValue)){
             LoginModel model  = JwtTokenUtil.getLogin(authValue);
             if (model==null){
                 throw new MarsException(RespCode.SIGNATURE_MISMATCH);
             }
-            return model.getUserId();
+            return model;
         }
         return null;
     }

@@ -2,6 +2,7 @@ package com.github.fashionbrot.console.controller;
 
 
 import com.github.fashionbrot.common.annotation.IsMenu;
+import com.github.fashionbrot.common.annotation.MarsPermission;
 import com.github.fashionbrot.common.annotation.NoReturnValue;
 import com.github.fashionbrot.common.util.CookieUtil;
 import com.github.fashionbrot.common.vo.PageDataVo;
@@ -71,12 +72,14 @@ public class UserInfoController {
 
     @RequestMapping("/resetPwd")
     @ResponseBody
+    @MarsPermission("user:reset:pwd")
     public RespVo resetPwd(String pwd,String newPwd){
         return userInfoService.resetPwd(pwd,newPwd);
     }
 
     @RequestMapping("/add")
     @ResponseBody
+    @MarsPermission("user:list:add")
     public RespVo add(@RequestBody UserInfo userInfo) {
         userInfoService.add(userInfo);
         return RespVo.success();
@@ -84,6 +87,7 @@ public class UserInfoController {
 
     @RequestMapping("/update")
     @ResponseBody
+    @MarsPermission("user:list:edit")
     public RespVo update(@RequestBody UserInfo userInfo) {
         userInfoService.update(userInfo);
         return RespVo.success();
@@ -91,6 +95,7 @@ public class UserInfoController {
 
     @RequestMapping("/deleteById")
     @ResponseBody
+    @MarsPermission("user:list:del")
     public RespVo deleteById(@RequestParam("id") Long id) {
         userInfoService.deleteById(id);
         return RespVo.success();
@@ -98,15 +103,17 @@ public class UserInfoController {
 
     @RequestMapping("/queryById")
     @ResponseBody
-    public UserInfo queryById(@RequestParam("id") Long id) {
-        return userInfoService.queryById(id);
+    @MarsPermission("user:list:info")
+    public RespVo queryById(@RequestParam("id") Long id) {
+        return RespVo.success(userInfoService.queryById(id));
     }
 
     @RequestMapping("queryAll")
     @ResponseBody
-    public PageDataVo<UserInfo> queryAll(@RequestParam(defaultValue = "0") Integer start,
+    @MarsPermission("user:list:list")
+    public RespVo queryAll(@RequestParam(defaultValue = "0") Integer start,
                                          @RequestParam(defaultValue = "20") Integer length) {
-        return userInfoService.queryAll(start,length);
+        return RespVo.success(userInfoService.queryAll(start,length));
     }
 
     @RequestMapping("queryRoleAll")

@@ -134,6 +134,9 @@ function loadData() {
                 bAutoWidth: false,
                 lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
                 data: data,
+                dom: '<fB<t>ip>',
+                stripeClasses: ["odd", "even"],
+                paginationType: "full_numbers",
                 columnDefs: [
 
                     {

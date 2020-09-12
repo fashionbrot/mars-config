@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.fashionbrot.common.enums.RespCode;
 import com.github.fashionbrot.common.enums.SystemConfigRoleEnum;
 import com.github.fashionbrot.common.exception.MarsException;
+import com.github.fashionbrot.common.model.LoginModel;
 import com.github.fashionbrot.dao.entity.SystemConfigInfo;
 import com.github.fashionbrot.dao.entity.SystemConfigRoleRelation;
 import com.github.fashionbrot.dao.mapper.SystemConfigRoleRelationMapper;
@@ -79,13 +80,11 @@ public class SystemConfigRoleRelationDao {
         if (CollectionUtils.isEmpty(list)){
             return 1;
         }
-        Date date = new Date();
         for (SystemConfigInfo info  : list){
             systemConfigRoleRelationMapper.insert(SystemConfigRoleRelation.builder()
                     .roleId(systemConfigInfo.getRoleId())
                     .systemConfigId(info.getId())
                     .viewStatus((byte) 1)
-                    .createDate(date)
                     .build());
         }
 
@@ -109,11 +108,11 @@ public class SystemConfigRoleRelationDao {
     }
 
     public void checkRole(Long systemConfigId, SystemConfigRoleEnum configRoleEnum){
-        Long  userId  =userInfoDao.getUserId();
-        if (userId==null){
+        LoginModel model  =userInfoDao.getLogin();
+        if (model!=null && model.isSuperAdmin()){
             return;
         }
-        SystemConfigRoleRelation systemConfigRoleRelation = systemConfigRoleRelationMapper.selectByRole(systemConfigId,userId);
+        SystemConfigRoleRelation systemConfigRoleRelation = systemConfigRoleRelationMapper.selectByRole(systemConfigId,model.getUserId());
         if (systemConfigRoleRelation!=null){
             if (configRoleEnum == SystemConfigRoleEnum.VIEW && systemConfigRoleRelation.getViewStatus()!=1){
                 throw new MarsException(RespCode.NOT_PERMISSION_ERROR);

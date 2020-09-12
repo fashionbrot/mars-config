@@ -23,17 +23,8 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @TableName("menu_role_relation")
-public class MenuRoleRelation implements Serializable{
-    private static final long serialVersionUID = 6099317626818127004L;
+public class MenuRoleRelation extends BaseEntity{
 
-    @TableId(value = "id",type = IdType.AUTO)
-    private Long id;
-
-    @TableField("create_date")
-    private Date createDate;
-
-    @TableField("update_date")
-    private Date updateDate;
 
     @TableField("menu_id")
     private Long menuId;

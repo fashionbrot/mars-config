@@ -4,8 +4,9 @@ $(function () {
     manager.loadApp("appName");
     loadNoSearchSelect("envCode");
     loadNoSearchSelect("appName");
-    $("#dataTables_length").hide();
-    $("#dataTables_filter").hide();
+    /*$("#dataTables_length").hide();
+    $("#dataTables_filter").hide();*/
+    loadData();
 })
 var oldContent;
 var editMode;
@@ -407,6 +408,9 @@ function loadData() {
                 bAutoWidth: false,
                 lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
                 data: data,
+                dom: '<fB<t>ip>',
+                stripeClasses: ["odd", "even"],
+                paginationType: "full_numbers",
                 columnDefs: [
 
                     {

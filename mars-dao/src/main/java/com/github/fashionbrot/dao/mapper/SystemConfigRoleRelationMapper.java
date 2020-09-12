@@ -18,12 +18,12 @@ public interface SystemConfigRoleRelationMapper  extends BaseMapper<SystemConfig
 
     @Select("SELECT b.id,b.system_config_id,a.file_name,b.view_status,b.edit_status,b.delete_status,b.push_status from system_config_info a " +
             "INNER JOIN system_config_role_relation b on a.id = b.system_config_id " +
-            "where a.env_code =#{envCode} and a.app_name=#{appName}  and b.role_id = #{roleId} ")
+            "where a.env_code =#{envCode} and a.app_name=#{appName}  and b.role_id = #{roleId} and a.del_flag=0   and b.del_flag=0 ")
     List<SystemConfigRoleRelation> selectBy(@Param("envCode")String envCode, @Param("appName")String appName, @Param("roleId")Long roleId);
 
     @Select("SELECT b.id,b.view_status,b.edit_status,b.delete_status,b.push_status from user_role_relation a " +
             "INNER JOIN system_config_role_relation b on a.role_id = b.role_id " +
-            "where b.system_config_id =#{systemConfigId} and a.user_id =#{userId}")
+            "where b.system_config_id =#{systemConfigId} and a.user_id =#{userId} and a.del_flag=0   and b.del_flag=0 ")
     SystemConfigRoleRelation selectByRole(@Param("systemConfigId")Long systemConfigId,@Param("userId") Long userId);
 
 

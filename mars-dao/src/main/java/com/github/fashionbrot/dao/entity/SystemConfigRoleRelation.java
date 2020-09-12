@@ -23,18 +23,8 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @TableName("system_config_role_relation")
-public class SystemConfigRoleRelation implements Serializable {
-    private static final long serialVersionUID = 6099317626818127004L;
+public class SystemConfigRoleRelation extends BaseEntity {
 
-
-    @TableId(value = "id",type = IdType.AUTO)
-    private Long id;
-
-    @TableField("create_date")
-    private Date createDate;
-
-    @TableField("update_date")
-    private Date updateDate;
 
     @TableField("system_config_id")
     private Long systemConfigId;

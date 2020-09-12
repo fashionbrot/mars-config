@@ -22,17 +22,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @TableName("user_role_relation")
-public class UserRoleRelation implements Serializable{
-    private static final long serialVersionUID = 6099317626818127004L;
-
-    @TableId(value = "id",type = IdType.AUTO)
-    private Long id;
-
-    @TableField("create_date")
-    private Date createDate;
-
-    @TableField("update_date")
-    private Date updateDate;
+public class UserRoleRelation extends BaseEntity{
 
     @TableField("user_id")
     private Long userId;

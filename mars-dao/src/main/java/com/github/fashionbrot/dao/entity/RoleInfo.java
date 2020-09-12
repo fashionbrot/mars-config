@@ -23,18 +23,7 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoleInfo implements Serializable {
-
-    private static final long serialVersionUID = 6016296562322134757L;
-
-    @TableId(value = "id",type = IdType.AUTO)
-    private Long id;
-
-    @TableField("create_date")
-    private Date createDate;
-
-    @TableField("update_date")
-    private Date updateDate;
+public class RoleInfo extends BaseEntity {
 
     @TableField(value = "status")
     private int status;

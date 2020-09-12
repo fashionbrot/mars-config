@@ -61,11 +61,12 @@
                                     <thead>
                                     <tr>
                                         <th width="5%">ID</th>
-                                        <th width="10%">菜单级别</th>
+                                        <th width="8%">菜单级别</th>
                                         <th width="10%">菜单名称</th>
                                         <th width="10%">菜单地址</th>
-                                        <th width="10%">菜单显示优先级</th>
-                                        <th width="15%">父菜单</th>
+                                        <th width="8%">优先级</th>
+                                        <th width="10%">父菜单</th>
+                                        <th width="10%">权限code</th>
                                         <th width="15%">创建时间</th>
                                         <th width="20%">操作</th>
                                     </tr>
@@ -125,6 +126,8 @@
                                  id="editMenuUrl" aria-required="true"/>
                     显示优先级：<input name="priority" class="form-control" maxlength="255" placeholder="显示优先级" type="text"
                                  id="editPriority" aria-required="true"/>
+                    权限code：<input name="code" class="form-control" maxlength="64" placeholder="权限code" type="text"
+                                 id="editCode" aria-required="true"/>
                     菜单级别:
                     <select name="menuLevel" class="form-control" id="editMenuLevel" aria-required="true">
                         <option value="1">一级菜单</option>
@@ -164,6 +167,8 @@
                                 id="menuUrl" aria-required="true"/>
                     显示优先级：<input name="priority" class="form-control" maxlength="255" placeholder="显示优先级" type="text"
                                  id="priority" aria-required="true"/>
+                    权限code：<input name="code" class="form-control" maxlength="64" placeholder="权限code" type="text"
+                                  id="code" aria-required="true"/>
                     菜单级别:
                     <select name="menuLevel" class="form-control" id="menuLevel" aria-required="true">
                         <option value="1">一级菜单</option>

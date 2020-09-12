@@ -125,7 +125,7 @@ public class SystemConfigService {
         queryWrapper.orderByDesc("id");
         Page pageInfo;
         if (start != null && length != null) {
-            pageInfo = PageHelper.startPage((start / length) + 1, length);
+            pageInfo = PageHelper.startPage(start , length);
         } else {
             pageInfo = PageHelper.startPage(1, 20);
         }

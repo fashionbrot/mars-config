@@ -209,12 +209,10 @@ public class SystemConfigDao {
             return updateConfig(systemConfigInfo, systemConfigHistoryInfo.getJson(), OperationTypeEnum.ROLLBACK);
 
         } else {
-            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             String[] file = systemConfigHistoryInfo.getFileName().split("\\.");
             SystemConfigInfo configInfo = SystemConfigInfo.builder()
                     .appName(systemConfigHistoryInfo.getAppName())
                     .envCode(systemConfigHistoryInfo.getEnvCode())
-                    .createDate(timestamp)
                     .fileType(file[1])
                     .fileName(file[0])
                     .creator(systemConfigHistoryInfo.getModifier())

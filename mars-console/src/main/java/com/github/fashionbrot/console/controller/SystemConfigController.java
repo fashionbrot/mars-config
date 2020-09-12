@@ -89,8 +89,8 @@ public class SystemConfigController  {
 
     @RequestMapping(value = "queryHistoryAll")
     @ResponseBody
-    public PageDataVo<SystemConfigHistoryInfo> queryHistoryAll(SystemConfigHistoryInfo info, Integer start, Integer length){
-        return systemConfigFacade.queryHistoryAll(info,start,length);
+    public RespVo  queryHistoryAll(SystemConfigHistoryInfo info, Integer page, Integer pageSize){
+        return RespVo.success(systemConfigFacade.queryHistoryAll(info,page,pageSize));
     }
 
     @RequestMapping(value = "queryHistoryById")

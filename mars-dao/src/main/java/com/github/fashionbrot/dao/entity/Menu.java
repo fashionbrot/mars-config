@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -23,18 +20,11 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Menu implements Serializable {
+@EqualsAndHashCode(callSuper=false)
+public class Menu extends BaseEntity{
 
     private static final long serialVersionUID = -8331064931930047236L;
 
-    @TableId(value = "id",type = IdType.AUTO)
-    private Long id;
-
-    @TableField("create_date")
-    private Date createDate;
-
-    @TableField("update_date")
-    private Date updateDate;
     /**
      * 优先级
      */
@@ -65,6 +55,11 @@ public class Menu implements Serializable {
     private Long parentMenuId;
 
     /**
+     * 权限code
+     */
+    private String code;
+
+    /**
      * 父级 菜单名称
      */
     private transient String parentMenuName;
@@ -72,4 +67,10 @@ public class Menu implements Serializable {
     private transient List<Menu> childMenu;
 
     private transient int active;
+
+    private transient boolean checked;
+
+    private transient boolean open;
+
+    private transient String name;
 }

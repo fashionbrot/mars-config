@@ -3,6 +3,7 @@ package com.github.fashionbrot.core.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.github.fashionbrot.common.annotation.IsMenu;
+import com.github.fashionbrot.common.annotation.MarsPermission;
 import com.github.fashionbrot.common.enums.RespCode;
 import com.github.fashionbrot.common.exception.MarsException;
 import com.github.fashionbrot.common.model.LoginModel;
@@ -53,33 +54,48 @@ public class MenuService {
      */
 
     public boolean checkPermissionUrl(Object handler, HttpServletRequest request) {
-
+        LoginModel model = userLoginService.getLogin();
         if (handler instanceof HandlerMethod) {
+            //如果是超级管理员
+            if (model!=null && model.isSuperAdmin()){
+                return true;
+            }
 
             String requestUrl = request.getRequestURI();
             HandlerMethod handlerMethod = (HandlerMethod) handler;
             Method method = handlerMethod.getMethod();
+
             // 判断接口是否需要登录
             IsMenu methodAnnotation = method.getAnnotation(IsMenu.class);
-            if (methodAnnotation != null && methodAnnotation.checkMenuUrlPermission()) {
-                LoginModel model = userLoginService.getLogin();
-                if (model.isSuperAdmin()) {
-                    log.info(" checkPermissionUrl user isSuperAdmin :{}",model.getUserName());
-                    return true;
-                }
-
+            if (methodAnnotation != null && methodAnnotation.checkMenuUrlPermission() ) {
                 List<Menu> menuBarList = getMenus(model);
-
                 if (CollectionUtils.isNotEmpty(menuBarList)) {
                     for (Menu m : menuBarList) {
+                        //验证菜单是否有权限
                         if (m.getMenuLevel() == 2 && equRequestUrl(m.getMenuUrl(), requestUrl)) {
                             return true;
                         }
                     }
                 }
-            } else {
-                return true;
+                return false;
             }
+            MarsPermission permission= method.getAnnotation(MarsPermission.class);
+            if(permission!=null) {
+                String permissionCode =permission!=null?permission.value():null; ;
+                List<Menu> menuBarList = getMenus(model);
+                if (CollectionUtils.isNotEmpty(menuBarList)) {
+                    for (Menu m : menuBarList) {
+                        ////验证按钮是否有权限
+                        if (m.getMenuLevel()==3 &&
+                                StringUtils.isNotBlank(permissionCode)&&
+                                permissionCode.equals(m.getCode())){
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+            return true;
         }
         return false;
     }
@@ -123,7 +139,9 @@ public class MenuService {
 
 
     public List<Menu> queryAll() {
-        List<Menu> menuBarList = menuDao.queryAll(null);
+        QueryWrapper<Menu> queryWrapper=new QueryWrapper();
+        queryWrapper.groupBy("priority ");
+        List<Menu> menuBarList = menuDao.queryAll(queryWrapper);
         if (CollectionUtils.isNotEmpty(menuBarList)) {
             for (Menu m : menuBarList) {
                 if (m.getMenuLevel() != 1) {
@@ -139,6 +157,8 @@ public class MenuService {
         if (CollectionUtils.isNotEmpty(menuBarList)) {
             for (Menu m : menuBarList) {
                 if (m.getMenuLevel() == 1 && Objects.equals(m.getId(), parentMenuId)) {
+                    return m.getMenuName();
+                }else if (m.getMenuLevel() == 2 && Objects.equals(m.getId(), parentMenuId)) {
                     return m.getMenuName();
                 }
             }
@@ -212,11 +232,31 @@ public class MenuService {
 
         List<Menu> menuBarList = menuDao.queryAll(new QueryWrapper<Menu>().orderByAsc("priority"));
         if (CollectionUtils.isNotEmpty(menuBarList)) {
-            menuBarList = loadChildMenu(menuBarList, checkedMap);
+//            menuBarList = loadChildMenu(menuBarList, checkedMap);
+            menuBarList = loadChildMenuNotStructure(menuBarList, checkedMap);
         }
 
 
         return menuBarList;
+    }
+    private List<Menu> loadChildMenuNotStructure(List<Menu> menuBarList, Map<String, Boolean> checkedMap) {
+        if (CollectionUtils.isNotEmpty(menuBarList)) {
+            List<Menu> menuList = new ArrayList<>(15);
+            for (Menu m : menuBarList) {
+                m.setName(m.getMenuName());
+
+                m.setOpen(true);
+                if (checkedMap.containsKey(m.getId().toString())) {
+                    m.setActive(1);
+                    m.setChecked(true);
+                }else{
+                    m.setChecked(false);
+                }
+                menuList.add(m);
+            }
+            return menuList;
+        }
+        return null;
     }
 
 
@@ -225,10 +265,8 @@ public class MenuService {
         menuRoleRelationDao.delete(new QueryWrapper<MenuRoleRelation>().eq("role_id", roleId));
         if (StringUtils.isNotEmpty(ids)) {
             String[] menuIds = ids.split(",");
-            Date date = new Date();
             for (String menuId : menuIds) {
                 menuRoleRelationDao.insert(MenuRoleRelation.builder()
-                        .createDate(date)
                         .roleId(roleId)
                         .menuId(Long.valueOf(menuId))
                         .build());

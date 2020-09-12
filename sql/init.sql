@@ -1,4 +1,5 @@
 
+DROP TABLE IF EXISTS `user_info`;
 CREATE TABLE `user_info` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增ID',
   `user_name` varchar(30) NOT NULL COMMENT '用户名',
@@ -12,52 +13,59 @@ CREATE TABLE `user_info` (
   `create_date` datetime NOT NULL COMMENT '创建时间',
   `update_id` bigint(11) DEFAULT NULL COMMENT '最近更新者id',
   `update_date` datetime DEFAULT NULL COMMENT '最近更新时间',
-  `del_flag` tinyint(1) NOT NULL COMMENT '删除标志位 1删除 0未删除',
+  `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='用户信息表';
+ALTER TABLE user_info ADD INDEX index_del_flag (del_flag);
 
+
+DROP TABLE IF EXISTS `role_info`;
 CREATE TABLE `role_info` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增ID',
   `role_code` varchar(30) NOT NULL COMMENT '角色标识',
   `role_name` varchar(30) NOT NULL COMMENT '角色描述',
-  `create_date` datetime NOT NULL COMMENT '创建时间',
-  `update_date` datetime DEFAULT NULL COMMENT '修改时间',
   `status` int(2) NOT NULL COMMENT '权限状态',
   `create_id` bigint(11) NOT NULL COMMENT '创建者id',
   `create_date` datetime NOT NULL COMMENT '创建时间',
   `update_id` bigint(11) DEFAULT NULL COMMENT '最近更新者id',
   `update_date` datetime DEFAULT NULL COMMENT '最近更新时间',
-  `del_flag` tinyint(1) NOT NULL COMMENT '删除标志位 1删除 0未删除',
+  `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='角色表';
+ALTER TABLE role_info ADD INDEX index_del_flag (del_flag);
 
+
+DROP TABLE IF EXISTS `user_role_relation`;
 CREATE TABLE `user_role_relation` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `user_id` bigint(20) NOT NULL COMMENT '用户ID',
   `role_id` bigint(20) NOT NULL COMMENT '角色ID',
-  `create_date` datetime NOT NULL COMMENT '创建时间',
-  `update_date` datetime DEFAULT NULL COMMENT '修改时间',
   `create_id` bigint(11) NOT NULL COMMENT '创建者id',
   `create_date` datetime NOT NULL COMMENT '创建时间',
   `update_id` bigint(11) DEFAULT NULL COMMENT '最近更新者id',
   `update_date` datetime DEFAULT NULL COMMENT '最近更新时间',
-  `del_flag` tinyint(1) NOT NULL COMMENT '删除标志位 1删除 0未删除',
+  `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户-角色关系表';
+ALTER TABLE user_role_relation ADD INDEX index_del_flag (del_flag);
 
 
-
+DROP TABLE IF EXISTS `app_info`;
 CREATE TABLE `app_info` (
+  `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `app_name` varchar(64) NOT NULL COMMENT '应用名称',
   `app_desc` varchar(255) NOT NULL COMMENT '应用说明',
   `create_id` bigint(11) NOT NULL COMMENT '创建者id',
   `create_date` datetime NOT NULL COMMENT '创建时间',
   `update_id` bigint(11) DEFAULT NULL COMMENT '最近更新者id',
   `update_date` datetime DEFAULT NULL COMMENT '最近更新时间',
-  `del_flag` tinyint(1) NOT NULL COMMENT '删除标志位 1删除 0未删除',
-  PRIMARY KEY (`app_name`)
+  `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='应用表';
+ALTER TABLE app_info ADD INDEX index_del_flag (del_flag);
 
+
+DROP TABLE IF EXISTS `env_info`;
 CREATE TABLE `env_info` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `env_code` varchar(64) NOT NULL COMMENT '环境code',
@@ -66,12 +74,13 @@ CREATE TABLE `env_info` (
   `create_date` datetime NOT NULL COMMENT '创建时间',
   `update_id` bigint(11) DEFAULT NULL COMMENT '最近更新者id',
   `update_date` datetime DEFAULT NULL COMMENT '最近更新时间',
-  `del_flag` tinyint(1) NOT NULL COMMENT '删除标志位 1删除 0未删除',
+  `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='环境表';
+ALTER TABLE env_info ADD INDEX index_del_flag (del_flag);
 
 
-
+DROP TABLE IF EXISTS `system_config_info`;
 CREATE TABLE `system_config_info` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `app_name` varchar(32) NOT NULL COMMENT '应用名称',
@@ -88,12 +97,14 @@ CREATE TABLE `system_config_info` (
   `create_date` datetime NOT NULL COMMENT '创建时间',
   `update_id` bigint(11) DEFAULT NULL COMMENT '最近更新者id',
   `update_date` datetime DEFAULT NULL COMMENT '最近更新时间',
-  `del_flag` tinyint(1) NOT NULL COMMENT '删除标志位 1删除 0未删除',
+  `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
   PRIMARY KEY (`id`),
   KEY `idx_envcode_appname` (`env_code`,`app_name`) USING BTREE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='应用系统配置表';
+ALTER TABLE system_config_info ADD INDEX index_del_flag (del_flag);
 
 
+DROP TABLE IF EXISTS `system_config_history`;
 CREATE TABLE `system_config_history` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `file_id` bigint(11) unsigned NOT NULL COMMENT '文件id',
@@ -108,49 +119,65 @@ CREATE TABLE `system_config_history` (
   `create_date` datetime NOT NULL COMMENT '创建时间',
   `update_id` bigint(11) DEFAULT NULL COMMENT '最近更新者id',
   `update_date` datetime DEFAULT NULL COMMENT '最近更新时间',
-  `del_flag` tinyint(1) NOT NULL COMMENT '删除标志位 1删除 0未删除',
+  `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
   PRIMARY KEY (`id`),
   KEY `idx_envcode_appname` (`env_code`,`app_name`) USING BTREE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='应用系统配置历史表';
+ALTER TABLE system_config_history ADD INDEX index_del_flag (del_flag);
 
 
+DROP TABLE IF EXISTS `menu`;
 CREATE TABLE `menu` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `menu_name` varchar(16) NOT NULL COMMENT '菜单名称',
   `menu_level` int(3) unsigned NOT NULL COMMENT '菜单级别',
-  `create_date` datetime NOT NULL COMMENT '创建时间',
-  `update_date` datetime DEFAULT NULL COMMENT '修改时间',
   `menu_url` varchar(255) DEFAULT NULL COMMENT '菜单url',
   `parent_menu_id` bigint(11) unsigned NOT NULL COMMENT '父菜单id',
   `priority` int(5) unsigned NOT NULL COMMENT '显示优先级',
-  `del_flag` tinyint(1) NOT NULL COMMENT '删除标志位 1删除 0未删除',
+  `code` varchar(64) DEFAULT NULL COMMENT '权限code',
+  `create_id` bigint(11) DEFAULT NULL COMMENT '创建者id',
+  `create_date` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_id` bigint(11) DEFAULT NULL COMMENT '最近更新者id',
+  `update_date` datetime DEFAULT NULL COMMENT '最近更新时间',
+  `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='菜单表';
+ALTER TABLE menu ADD INDEX index_del_flag (del_flag);
 
+
+DROP TABLE IF EXISTS `menu_role_relation`;
 CREATE TABLE `menu_role_relation` (
   `menu_id` bigint(20) NOT NULL COMMENT '用户ID',
   `role_id` bigint(20) NOT NULL COMMENT '角色ID',
-  `create_date` datetime NOT NULL COMMENT '创建时间',
-  `update_date` datetime DEFAULT NULL COMMENT '修改时间',
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `create_id` bigint(11) NOT NULL COMMENT '创建者id',
+  `create_date` datetime NOT NULL COMMENT '创建时间',
+  `update_id` bigint(11) DEFAULT NULL COMMENT '最近更新者id',
+  `update_date` datetime DEFAULT NULL COMMENT '最近更新时间',
+  `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
   PRIMARY KEY (`id`),
   KEY `idx_role_id` (`role_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='菜单-角色关系表';
+ALTER TABLE menu_role_relation ADD INDEX index_del_flag (del_flag);
 
 
+DROP TABLE IF EXISTS `system_config_role_relation`;
 CREATE TABLE `system_config_role_relation` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `role_id` bigint(20) NOT NULL COMMENT '角色ID',
   `system_config_id` bigint(20) NOT NULL COMMENT '动态配置ID',
-  `create_date` datetime NOT NULL COMMENT '创建时间',
-  `update_date` datetime DEFAULT NULL COMMENT '修改时间',
   `view_status` int(2) NOT NULL DEFAULT '0' COMMENT '权限状态 1有权限 0无权限',
   `push_status` int(2) NOT NULL DEFAULT '0' COMMENT '权限状态 1有权限 0无权限',
   `edit_status` int(2) NOT NULL DEFAULT '0' COMMENT '权限状态 1有权限 0无权限',
   `delete_status` int(2) NOT NULL DEFAULT '0' COMMENT '权限状态 1有权限 0无权限',
-  `del_flag` tinyint(1) NOT NULL COMMENT '删除标志位 1删除 0未删除',
+  `create_id` bigint(11) NOT NULL COMMENT '创建者id',
+  `create_date` datetime NOT NULL COMMENT '创建时间',
+  `update_id` bigint(11) DEFAULT NULL COMMENT '最近更新者id',
+  `update_date` datetime DEFAULT NULL COMMENT '最近更新时间',
+  `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='动态配置-角色关系表';
+ALTER TABLE system_config_role_relation ADD INDEX index_del_flag (del_flag);
 
 
 INSERT INTO `user_info` (`id`, `user_name`, `real_name`, `password`, `salt`, `status`, `super_admin`, `last_login_time`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`) VALUES ('1', 'mars', 'mars', 'f1a65d566b294b8db222cf61b3b28f72', '3bb81260d3941f5818e72dff4b1342f8', '1', '1', NULL, '1', '2020-09-11 23:40:18', NULL, NULL, '0');

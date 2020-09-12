@@ -23,19 +23,19 @@
     <select id="selectMenuRole" parameterType="java.lang.Long" resultMap="BaseResultMap">
         SELECT a.id,a.parent_menu_id,a.menu_name
         FROM  menu a
-        INNER JOIN  menu_role_relation b on a.id=b.menu_id
-        INNER JOIN  role_info c on c.id=b.role_id
-        WHERE  b.role_id=#{roleId} and c.`status`=1
+        INNER JOIN  menu_role_relation b on a.id=b.menu_id and b.del_flag=0
+        INNER JOIN  role_info c on c.id=b.role_id  and c.del_flag=0
+        WHERE  b.role_id=#{roleId} and c.`status`=1  and a.del_flag=0
         ORDER BY a.priority ASC
     </select>
 
     <select id="selectMenuRoleByUser" parameterType="java.lang.Long" resultMap="BaseResultMap">
         SELECT e.id,e.menu_name,e.menu_level,e.menu_url,e.parent_menu_id,e.priority
         FROM  user_role_relation b
-        INNER JOIN  role_info c on c.id=b.role_id
-        INNER JOIN menu_role_relation d on d.role_id=c.id
-        INNER JOIN menu e on e.id=d.menu_id
-        WHERE b.user_id=#{userId} and c.`status`='1'
+        INNER JOIN  role_info c on c.id=b.role_id   and c.del_flag=0
+        INNER JOIN menu_role_relation d on d.role_id=c.id   and d.del_flag=0
+        INNER JOIN menu e on e.id=d.menu_id   and e.del_flag=0
+        WHERE b.user_id=#{userId} and c.`status`='1'   and b.del_flag=0
         ORDER BY e.priority ASC
     </select>
 

@@ -3,7 +3,7 @@
 <head>
 
     <head th:replace="/common/head :: head"></head>
-
+    <link rel="stylesheet" type="text/css" th:href="@{/js/plugins/zTree/css/zTreeStyle/zTreeStyle.css}" />
 </head>
 <body>
 <!-- START PAGE CONTAINER -->
@@ -176,6 +176,9 @@
                     <div id="container">
 
                     </div>
+                    <div id="tree" class="ztree" >
+
+                    </div>
                     <input type="reset" name="addReset" style="display: none;"/>
                 </form>
             </div>
@@ -261,6 +264,8 @@
 
 
 <div th:replace="/common/footer :: footer"/>
+<script type="text/javascript" th:src="@{/js/plugins/zTree/js/jquery.ztree.core.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/plugins/zTree/js/jquery.ztree.excheck.min.js}"></script>
 <script type="text/javascript" th:src="@{/js/admin/role.js}"></script>
 
 
