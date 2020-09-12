@@ -213,6 +213,9 @@ function del() {
             } else {
                 alert(data.msg);
             }
+        },error: function (e) {
+            loaded();
+            alert("网络错误,请重试!");
         }
     });
 
@@ -232,6 +235,9 @@ function rollback() {
             } else {
                 alert(data.msg);
             }
+        },error: function (e) {
+            loaded();
+            alert("网络错误,请重试!");
         }
     });
 }
@@ -259,6 +265,9 @@ function edit() {
             } else {
                 alert(data.msg);
             }
+        },error: function (e) {
+            loaded();
+            alert("网络错误,请重试!");
         }
     });
 }
@@ -298,6 +307,9 @@ function publishById(id) {
             } else {
                 alert(data.msg);
             }
+        },error: function (e) {
+            loaded();
+            alert("网络错误,请重试!");
         }
     });
 }
@@ -353,9 +365,8 @@ function loadData() {
                         return  result.data.data ;
                     }
                     return [];
-                },
-                error : function(XMLHttpRequest, textStatus, errorThrown) {
-                    alert("获取列表失败");
+                },error: function (e) {
+                    alert("网络错误，请重试！");
                 }
             },
             dom: '<fB<t>ip>',

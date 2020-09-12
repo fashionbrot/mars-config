@@ -1,6 +1,7 @@
 package com.github.fashionbrot.console.controller;
 
 import com.github.fashionbrot.common.annotation.IsMenu;
+import com.github.fashionbrot.common.annotation.MarsPermission;
 import com.github.fashionbrot.common.vo.PageDataVo;
 import com.github.fashionbrot.common.vo.RespVo;
 import com.github.fashionbrot.core.service.SystemConfigService;
@@ -39,6 +40,7 @@ public class SystemConfigController  {
 
     @RequestMapping(value = "add")
     @ResponseBody
+    @MarsPermission("config:list:add")
     public RespVo add(@RequestBody SystemConfigInfo systemConfigInfo) {
         systemConfigFacade.add(systemConfigInfo);
         return RespVo.success();
@@ -46,6 +48,7 @@ public class SystemConfigController  {
 
     @RequestMapping(value = "update")
     @ResponseBody
+    @MarsPermission("config:list:edit")
     public RespVo update(@RequestBody SystemConfigInfo systemConfigInfo) {
         systemConfigFacade.update(systemConfigInfo);
         return RespVo.success();
@@ -53,6 +56,7 @@ public class SystemConfigController  {
 
     @RequestMapping(value = "deleteById")
     @ResponseBody
+    @MarsPermission("config:list:del")
     public RespVo deleteById(Long id) {
         systemConfigFacade.deleteById(id);
         return RespVo.success();
@@ -60,6 +64,7 @@ public class SystemConfigController  {
 
     @RequestMapping(value = "queryById")
     @ResponseBody
+    @MarsPermission("config:list:info")
     public RespVo queryById(Long id) {
         return RespVo.success(systemConfigFacade.queryById(id));
     }
@@ -68,6 +73,13 @@ public class SystemConfigController  {
     @ResponseBody
     public List<SystemConfigInfo> queryAll() {
         return systemConfigFacade.queryAll();
+    }
+
+    @RequestMapping(value = "queryAllList")
+    @ResponseBody
+    @MarsPermission("config:list:list")
+    public RespVo queryAllList(String appName, String envCode) {
+        return RespVo.success(systemConfigFacade.queryByAppAndEnv(appName, envCode));
     }
 
     @RequestMapping(value = "queryByAppAndEnv")
@@ -81,6 +93,7 @@ public class SystemConfigController  {
 
     @RequestMapping(value = "publishById")
     @ResponseBody
+    @MarsPermission("config:list:publish")
     public RespVo publishByFileId(Long id){
         systemConfigFacade.publish(id);
         return RespVo.success();
@@ -89,18 +102,21 @@ public class SystemConfigController  {
 
     @RequestMapping(value = "queryHistoryAll")
     @ResponseBody
+    @MarsPermission("history:list:list")
     public RespVo  queryHistoryAll(SystemConfigHistoryInfo info, Integer page, Integer pageSize){
         return RespVo.success(systemConfigFacade.queryHistoryAll(info,page,pageSize));
     }
 
     @RequestMapping(value = "queryHistoryById")
-    public SystemConfigHistoryInfo  queryHistoryById(Long id){
-        return systemConfigFacade.queryHistoryById(id);
+    @MarsPermission("history:list:info")
+    public RespVo  queryHistoryById(Long id){
+        return RespVo.success(systemConfigFacade.queryHistoryById(id));
     }
 
 
     @RequestMapping(value = "deleteHistoryById")
     @ResponseBody
+    @MarsPermission("history:list:del")
     public RespVo deleteHistoryById(Long id) {
         systemConfigFacade.deleteHistoryById(id);
         return RespVo.success();
@@ -108,6 +124,7 @@ public class SystemConfigController  {
 
     @RequestMapping(value = "rollBackById")
     @ResponseBody
+    @MarsPermission("history:list:rollback")
     public RespVo rollBackById(Long id){
         systemConfigFacade.rollBackById(id);
         return RespVo.success();

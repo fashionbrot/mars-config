@@ -8986,3 +8986,16 @@ li.ext_zip {
   border-bottom: 1px solid #fff;
   transform: rotate(45deg);
 }
+/* datatables 奇数偶数样式*/
+.table-responsive table tbody tr:nth-child(even){
+  background: rgba(250,250,255,1)
+}
+.table-responsive table tbody tr:nth-child(odd){
+  background:rgba(255,255,255,1);
+}
+.table-responsive table tbody th:nth-child(even){
+  background: rgba(250,250,255,1)
+}
+.table-responsive table tbody th:nth-child(odd){
+  background:rgba(255,255,255,1);
+}

@@ -65,8 +65,8 @@ public class MenuController {
     @RequestMapping(value = "queryAllList")
     @ResponseBody
     @MarsPermission("menu:list:list")
-    public RespVo queryAllList() {
-        return RespVo.success(envInfoFacade.queryAll());
+    public RespVo queryAllList(Integer page,Integer pageSize) {
+        return RespVo.success(envInfoFacade.queryAll(page,pageSize));
     }
 
     @RequestMapping(value = "queryAll")
@@ -96,6 +96,7 @@ public class MenuController {
 
     @RequestMapping("updateRoleMenu")
     @ResponseBody
+    @MarsPermission("role:list:update:menu")
     public RespVo updateRoleMenu(Long roleId,String menuIds){
         return envInfoFacade.updateRoleMenu(roleId,menuIds);
     }

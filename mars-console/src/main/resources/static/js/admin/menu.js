@@ -163,7 +163,150 @@ $("#editMenuLevel").on("change",function () {
 })
 
 function loadData() {
-    loading();
+    var tableId = "#dataTables-userInfo";
+    $(tableId).dataTable().fnDestroy();
+    $(tableId)
+        .on('xhr.dt', function( e, settings, json, xhr ){
+            if(json.code==0){
+                json.recordsTotal = json.data.itotalDisplayRecords;
+                json.recordsFiltered = json.data.itotalDisplayRecords;
+            }else{
+                json.recordsTotal = 0;
+                json.recordsFiltered = 0;
+            }
+        })
+        .DataTable({
+            ajax:{
+                url: "./admin/menu/queryAllList?v="+new Date().getTime(),
+                type: "post",
+                dataType: "json",
+                data: function(data){
+                    data.page = data.start / data.length + 1;
+                    data.pageSize = data.length;
+                    delete  data.columns;
+                    delete  data.search;
+                },
+                dataType: "json",
+                dataSrc : function(result) {
+                    if (result.code != 0) {
+                        alert("获取数据失败:"+result.msg);
+                        return false;
+                    }
+                    if (result.data!=null ){
+                        return  result.data.data ;
+                    }
+                    return [];
+                },
+                error : function(XMLHttpRequest, textStatus, errorThrown) {
+                    alert("获取列表失败");
+                }
+            },
+            dom: '<fB<t>ip>',
+            stripeClasses: ["odd", "even"],
+            paginationType: "full_numbers",
+            responsive: true,//自适应
+            serverSide:true,
+            language: dataTable.language(),
+            stateSave: true,
+            searching: false,
+            paging: true,
+            info: true,
+            bAutoWidth: false,
+            order:[],
+            orderable: true,
+            lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
+            columns : [
+                {
+                    data : 'id',
+                    bSortable : true,
+                    width : "25px",
+                    className : "text-center",
+                    render :  dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
+                },
+                {
+                    data : 'menuLevel',
+                    bSortable : true,
+                    width : "20px",
+                    className : "text-center",
+                    render :function (data, type, full, meta) {
+                        if(full.menuLevel==1){
+                            return "一级菜单"
+                        }else if (full.menuLevel==2){
+                            return "二级菜单"
+                        }else if (full.menuLevel==3){
+                            return "按钮"
+                        }
+
+                    }
+                },{
+                    data : 'menuName',
+                    bSortable : true,
+                    width : "20px",
+                    render : dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
+                }, {
+                    data : 'menuUrl',
+                    bSortable : true,
+                    width : "20px",
+                    render : dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
+                }, {
+                    data : 'priority',
+                    bSortable : true,
+                    width : "20px",
+                    className : "text-center",
+                    render : dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
+                }, {
+                    data : 'parentMenuName',
+                    bSortable : true,
+                    width : "25px",
+                    className : "text-center",
+                    render : dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
+                }, {
+                    data : 'code',
+                    bSortable : true,
+                    width : "25px",
+                    className : "text-center",
+                    render : dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
+                }, {
+                    data : 'createTime',
+                    bSortable : true,
+                    width : "25px",
+                    className : "text-center",
+                    render : function (data, type, full, meta) {
+                        return moment(full.createTime).format("YYYY-MM-DD HH:mm:ss");
+                    }
+                }, {
+                    data: 'operate',
+                    bSortable: false,
+                    visible: true,
+                    width : '130px',
+                    render: function (data, type, full) {
+                        return '<a class="btn btn-success btn-" onclick="queryByUserId(\'' + full.id + '\')"><i class="fa fa-edit">修改</i> </a>'
+                            + '&nbsp;&nbsp;<a class="btn btn-warning btn-circle" onclick="showModal(\'' + full.id + '\')"> <i class="fa fa-times">删除</i></a>';
+                    }
+                }
+            ]
+        });
+    $(tableId+'_wrapper').on("change", ":checkbox", function() {
+        // 列表复选框
+        if ($(this).is("[name='topCheckboxName']")) {
+            // 全选
+            $(":checkbox", '#dataTableId').prop("checked",$(this).prop("checked"));
+        }else{
+            // 一般复选
+            var checkbox = $("tbody :checkbox", '#dataTableId');
+            $(":checkbox[name='cb-check-all']", '#dataTableId').prop('checked', checkbox.length == checkbox.filter(':checked').length);
+        }
+    }).on('preXhr.dt', function(e, settings, data) {
+        // ajax 请求之前事件
+        data.page = data.start / data.length + 1;
+        data.limit = data.length;
+        delete data.start;
+        delete data.order;
+        delete data.search;
+        delete data.length;
+        delete data.columns;
+    });
+    /*loading();
     $.ajax({
         url: "./admin/menu/queryAllList?v="+new Date().getTime(),
         type: "post",
@@ -246,5 +389,5 @@ function loadData() {
             loaded();
             alert("网络错误，请重试！！");
         }
-    });
+    });*/
 }

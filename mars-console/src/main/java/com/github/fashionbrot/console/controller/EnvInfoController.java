@@ -1,6 +1,7 @@
 package com.github.fashionbrot.console.controller;
 
 import com.github.fashionbrot.common.annotation.IsMenu;
+import com.github.fashionbrot.common.annotation.MarsPermission;
 import com.github.fashionbrot.common.vo.RespVo;
 import com.github.fashionbrot.core.service.EnvInfoService;
 import com.github.fashionbrot.dao.entity.EnvInfo;
@@ -34,6 +35,7 @@ public class EnvInfoController {
 
     @RequestMapping(value = "add")
     @ResponseBody
+    @MarsPermission("env:list:add")
     public RespVo add(@RequestBody EnvInfo envInfo) {
         envInfoFacade.add(envInfo);
         return RespVo.success();
@@ -41,6 +43,7 @@ public class EnvInfoController {
 
     @RequestMapping(value = "update")
     @ResponseBody
+    @MarsPermission("env:list:edit")
     public RespVo update(@RequestBody EnvInfo envInfo) {
         envInfoFacade.update(envInfo);
         return RespVo.success();
@@ -48,6 +51,7 @@ public class EnvInfoController {
 
     @RequestMapping(value = "deleteById")
     @ResponseBody
+    @MarsPermission("env:list:del")
     public RespVo deleteById(Long id) {
         envInfoFacade.deleteById(id);
         return RespVo.success();
@@ -55,8 +59,16 @@ public class EnvInfoController {
 
     @RequestMapping(value = "queryById")
     @ResponseBody
-    public EnvInfo queryById(Long id) {
-        return envInfoFacade.queryById(id);
+    @MarsPermission("env:list:info")
+    public RespVo queryById(Long id) {
+        return RespVo.success(envInfoFacade.queryById(id));
+    }
+
+    @RequestMapping(value = "queryAllList")
+    @ResponseBody
+    @MarsPermission("env:list:list")
+    public RespVo queryAllList() {
+        return RespVo.success(envInfoFacade.queryAll());
     }
 
     @RequestMapping(value = "queryAll")

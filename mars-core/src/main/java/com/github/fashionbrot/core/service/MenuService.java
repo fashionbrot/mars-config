@@ -7,12 +7,16 @@ import com.github.fashionbrot.common.annotation.MarsPermission;
 import com.github.fashionbrot.common.enums.RespCode;
 import com.github.fashionbrot.common.exception.MarsException;
 import com.github.fashionbrot.common.model.LoginModel;
+import com.github.fashionbrot.common.vo.PageDataVo;
 import com.github.fashionbrot.common.vo.RespVo;
 import com.github.fashionbrot.core.UserLoginService;
 import com.github.fashionbrot.dao.dao.MenuDao;
 import com.github.fashionbrot.dao.dao.MenuRoleRelationDao;
 import com.github.fashionbrot.dao.entity.Menu;
 import com.github.fashionbrot.dao.entity.MenuRoleRelation;
+import com.github.fashionbrot.dao.entity.SystemConfigHistoryInfo;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -151,6 +155,23 @@ public class MenuService {
         }
 
         return menuBarList;
+    }
+    public PageDataVo queryAll(Integer page, Integer pageSize) {
+        QueryWrapper<Menu> queryWrapper=new QueryWrapper();
+        queryWrapper.groupBy("priority ");
+        Page<Object> objects = PageHelper.startPage(page, pageSize);
+        List<Menu> menuBarList = menuDao.queryAll(queryWrapper);
+        if (CollectionUtils.isNotEmpty(menuBarList)) {
+            for (Menu m : menuBarList) {
+                if (m.getMenuLevel() != 1) {
+                    m.setParentMenuName(parentMenuName(menuBarList, m.getParentMenuId()));
+                }
+            }
+        }
+        PageDataVo<Menu> pageData = new PageDataVo<Menu>();
+        pageData.setData(menuBarList);
+        pageData.setITotalDisplayRecords(objects.getTotal());
+        return pageData;
     }
 
     private String parentMenuName(List<Menu> menuBarList, Long parentMenuId) {

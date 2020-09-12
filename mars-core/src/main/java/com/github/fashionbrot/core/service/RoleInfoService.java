@@ -40,7 +40,7 @@ public class RoleInfoService  {
 
 
     public void deleteById(Long id) {
-        if(roleInfoDao.deleteById(id) >= 0){
+        if(roleInfoDao.deleteById(id)!=1){
             throw new MarsException(RespCode.DELETE_ERROR);
         }
     }

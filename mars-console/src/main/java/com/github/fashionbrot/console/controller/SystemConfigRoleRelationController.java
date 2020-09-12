@@ -1,5 +1,6 @@
 package com.github.fashionbrot.console.controller;
 
+import com.github.fashionbrot.common.annotation.MarsPermission;
 import com.github.fashionbrot.core.service.SystemConfigRoleRelationService;
 import com.github.fashionbrot.dao.entity.SystemConfigInfo;
 import com.github.fashionbrot.dao.entity.SystemConfigRoleRelation;
@@ -41,6 +42,7 @@ public class SystemConfigRoleRelationController {
 
     @RequestMapping("/save-role")
     @ResponseBody
+    @MarsPermission("role:list:update:role")
     public RespVo saveRole(@RequestBody List<SystemConfigRoleRelation> relations){
         systemConfigRoleRelationFacade.saveRole(relations);
         return RespVo.success();

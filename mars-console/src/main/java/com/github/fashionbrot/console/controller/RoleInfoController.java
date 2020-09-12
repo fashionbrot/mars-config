@@ -1,6 +1,7 @@
 package com.github.fashionbrot.console.controller;
 
 import com.github.fashionbrot.common.annotation.IsMenu;
+import com.github.fashionbrot.common.annotation.MarsPermission;
 import com.github.fashionbrot.common.vo.RespVo;
 import com.github.fashionbrot.core.service.RoleInfoService;
 import com.github.fashionbrot.dao.entity.RoleInfo;
@@ -32,6 +33,7 @@ public class RoleInfoController {
 
     @RequestMapping(value = "add")
     @ResponseBody
+    @MarsPermission("role:list:add")
     public RespVo add(@RequestBody  RoleInfo roleInfo) {
         envInfoFacade.add(roleInfo);
         return RespVo.success();
@@ -39,6 +41,7 @@ public class RoleInfoController {
 
     @RequestMapping(value = "update")
     @ResponseBody
+    @MarsPermission("role:list:edit")
     public RespVo update(@RequestBody RoleInfo roleInfo) {
         envInfoFacade.update(roleInfo);
         return RespVo.success();
@@ -46,6 +49,7 @@ public class RoleInfoController {
 
     @RequestMapping(value = "deleteById")
     @ResponseBody
+    @MarsPermission("role:list:del")
     public RespVo deleteById(Long id) {
         envInfoFacade.deleteById(id);
         return RespVo.success();
@@ -53,15 +57,22 @@ public class RoleInfoController {
 
     @RequestMapping(value = "queryById")
     @ResponseBody
-    public RoleInfo queryById(Long id) {
-        return envInfoFacade.queryById(id);
+    @MarsPermission("role:list:info")
+    public RespVo queryById(Long id) {
+        return RespVo.success(envInfoFacade.queryById(id));
     }
+
+    @RequestMapping(value = "queryAllList")
+    @ResponseBody
+    @MarsPermission("role:list:list")
+    public RespVo queryAllList() {
+        return RespVo.success(envInfoFacade.queryAll());
+    }
+
 
     @RequestMapping(value = "queryAll")
     @ResponseBody
     public List<RoleInfo> queryAll() {
         return envInfoFacade.queryAll();
     }
-
-
 }

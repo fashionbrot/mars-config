@@ -179,6 +179,9 @@ function add() {
             } else {
                 alert(data.msg);
             }
+        },error: function (e) {
+            loaded();
+            alert("网络错误，请重试！！");
         }
     });
 }
@@ -224,6 +227,9 @@ function del() {
             } else {
                 alert(data.msg);
             }
+        },error: function (e) {
+            loaded();
+            alert("网络错误，请重试！！");
         }
     });
 
@@ -252,6 +258,9 @@ function edit() {
             } else {
                 alert(data.msg);
             }
+        },error: function (e) {
+            loaded();
+            alert("网络错误，请重试！！");
         }
     });
 }
@@ -271,6 +280,9 @@ function publishById(id) {
             } else {
                 alert(data.msg);
             }
+        },error: function (e) {
+            loaded();
+            alert("网络错误，请重试！！");
         }
     });
 }
@@ -323,6 +335,9 @@ function publishById(id) {
             }else{
                 alert(dataData.msg)
             }
+        },error: function (e) {
+            loaded();
+            alert("网络错误，请重试！！");
         }
     });
 }
@@ -372,6 +387,9 @@ function viewDiv(id) {
             } else{
                 alert(dataData.msg);
             }
+        },error: function (e) {
+            loaded();
+            alert("网络错误，请重试！！");
         }
     });
 }
@@ -392,12 +410,16 @@ function loadData() {
     var appName=$("#appName").val();
     var envCode=$("#envCode").val();
     $.ajax({
-        url: "./system/queryByAppAndEnv?v="+new Date().getTime(),
+        url: "./system/queryAllList?v="+new Date().getTime(),
         type: "post",
         dataType: "json",
         data:{appName:appName,envCode:envCode},
         success: function (data) {
             loaded();
+            if (data.code!=0){
+                alert(data.msg);
+                return false;
+            }
             $('#dataTables').dataTable().fnDestroy();
             var table = $('#dataTables').DataTable({
                 language:dataTable.language(),
@@ -407,7 +429,7 @@ function loadData() {
                 info: true,
                 bAutoWidth: false,
                 lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
-                data: data,
+                data: data.data,
                 dom: '<fB<t>ip>',
                 stripeClasses: ["odd", "even"],
                 paginationType: "full_numbers",
@@ -464,6 +486,9 @@ function loadData() {
                 ]
 
             });
+        },error: function (e) {
+            loaded();
+            alert("网络错误，请重试！！");
         }
     });
 }
