@@ -158,7 +158,7 @@ public class MenuService {
     }
     public PageDataVo queryAll(Integer page, Integer pageSize) {
         QueryWrapper<Menu> queryWrapper=new QueryWrapper();
-        queryWrapper.groupBy("priority ");
+        queryWrapper.orderByAsc("priority ");
         Page<Object> objects = PageHelper.startPage(page, pageSize);
         List<Menu> menuBarList = menuDao.queryAll(queryWrapper);
         if (CollectionUtils.isNotEmpty(menuBarList)) {

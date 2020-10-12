@@ -130,10 +130,11 @@ $("#superAdmin").on("change",function () {
         type: "post",
         data: {"id": id},
         dataType: "json",
-        success: function (data) {
+        success: function (result) {
+            var data = result.data;
             loaded();
-            if (data.code != 0) {
-                alert(data.msg);
+            if (result.code != 0) {
+                alert(result.msg);
                 return false;
             }
 
