@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.github.fashionbrot.dao.mapper.TemplateMapper">
+
+
+    <resultMap type="com.github.fashionbrot.dao.entity.TemplateEntity" id="templateMap">
+            <result property="id" column="id"/>
+            <result property="appName" column="app_name"/>
+            <result property="templateKey" column="template_key"/>
+            <result property="templateName" column="template_name"/>
+            <result property="templateDesc" column="template_desc"/>
+            <result property="templateUrl" column="template_url"/>
+            <result property="createId" column="create_id"/>
+            <result property="createDate" column="create_date"/>
+    </resultMap>
+
+
+    <sql id="allSql">
+        id,app_name,template_key,template_name,template_desc,template_url,create_id,create_date
+    </sql>
+
+    
+
+</mapper>

@@ -26,6 +26,10 @@ public enum RespCode {
     PUBLISH_ERROR(304,"发布失败"),
     ROLL_BACK_ERROR(305,"回滚失败，请稍后再试"),
     EXIST_SYSTEM_CONFIG_ERROR(306,"配置已不存在，请刷新重试"),
+
+
+    RELATION_USE_TEMPLATE_KEY(416,"当前模板关系表正在使用中"),
+    CONFIG_USE_RELATION(417,"当前配置实例正在使用中"),
     ;
 
     private int code;

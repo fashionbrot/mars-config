@@ -299,10 +299,36 @@ function page_content_onresize(){
     }
     //$(window).trigger("resize");
 }*/
-
+function getSelectText(obj){
+    return $("#"+obj).find("option:selected").text();
+}
+function getSelectVaule(obj){
+    return $("#"+obj).find("option:selected").val();
+}
 
 
 var manager={
+    loadTemplateCustom:function (labelId,appName,firstOption) {
+        $.ajax({
+            url: "../admin/template/list?appName="+appName,
+            type: "get",
+            contentType: "application/json",
+            dataType: "json",
+            async:false,
+            success: function (result) {
+                var data= result.data;
+                if(data!=null){
+                    var rows=data;
+                    var html="<option value=''>"+firstOption+"</option>";
+                    for(var i=0;i<rows.length;i++){
+                        var row=rows[i];
+                        html+="<option value='"+row.templateKey+"'>"+row.templateName+" - "+row.templateKey+"</option>";
+                    }
+                }
+                $("#"+labelId).html(html);
+            }
+        });
+    },
     loadPlan:function (labelId) {
         $.ajax({
             url: "./admin/plan/list",
@@ -384,7 +410,7 @@ var manager={
                 $("#" + id).html(html);
             }
         });
-    },loadApp:function (id) {
+    },loadApp:function (id,topOption) {
         $.ajax({
             url: "./app/queryAll",
             type: "post",
@@ -394,7 +420,10 @@ var manager={
             success: function (data) {
                 if(data!=null){
                     var rows=data;
-                    var html="<option value=''>请选择应用</option>";
+                    var html="";
+                    if (topOption!=null){
+                        html="<option value=''>"+topOption+"</option>";
+                    }
                     for(var i=0;i<rows.length;i++){
                         var row=rows[i];
                         html+="<option value='"+row.appName+"'>"+row.appDesc+"</option>";
@@ -694,22 +723,7 @@ function initDateTime(dateId) {
     });
 }
 
-/**
- * 根据模板 判断是否需要展示开始结束时间
- * @param appName
- * @param templateKey
- * @param configTimeId
- */
-function queryConfigTime(appName,templateKey,configTimeId,configTimeId2) {
-    $.ajax({
-        url: "../template/queryByTemplateKeyAndAppName",
-        type: "post",
-        dataType: "json",
-        success: function (data) {
 
-        }
-    });
-}
 $("#logout").on("click",function () {
     if(window.confirm('确定要退出登录吗?')){
         var top = getTopWinow();

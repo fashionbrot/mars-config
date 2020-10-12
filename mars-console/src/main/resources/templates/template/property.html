@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"  xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <head th:replace="/common/head :: head"></head>
+
+</head>
+<body>
+<!-- START PAGE CONTAINER -->
+<div class="page-container">
+
+    <!-- START PAGE SIDEBAR -->
+    <div class="page-sidebar">
+        <!-- START X-NAVIGATION -->
+        <div th:replace="/common/left :: left"></div>
+        <!-- END X-NAVIGATION -->
+    </div>
+    <!-- END PAGE SIDEBAR -->
+
+    <!-- PAGE CONTENT -->
+    <div class="page-content">
+
+        <div th:replace="/common/top :: top"/>
+
+        <!-- START BREADCRUMB -->
+        <ul class="breadcrumb">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">模板管理</a></li>
+            <li class="active">属性列表</li>
+        </ul>
+        <!-- END BREADCRUMB -->
+
+        <!-- PAGE CONTENT WRAPPER -->
+        <div class="page-content-wrap">
+
+
+            <div class="row">
+                <div class="col-md-12">
+
+                    <!-- START DATATABLE EXPORT -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">属性列表</h3>
+                            <div class="pull-right">
+
+                            </div>
+                        </div>
+                        <div class="panel-heading" style="float: right;">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-success dropdown-toggle"
+                                        onclick="add()">
+                                    <span class="glyphicon glyphicon-plus"></span>新增
+                                </button>
+                            </div>
+                            <div class="pull-right" style="">
+                                <label>选择应用:</label>
+                                <div class="btn-group" style="width:180px;">
+                                    <select name="appName" class="form-control" id="appName" aria-required="true">
+
+                                    </select>
+                                </div>
+                                <label>选择模板:</label>
+                                <div class="btn-group" style="width:300px;">
+                                    <select name="templatekey"  id="templateKey" class="form-control" style="width: 280px" >
+                                        <option value="" >公共模板</option>
+                                    </select>
+                                </div>
+                                <label>属性key:</label>
+                                <div class="btn-group" style="width:200px;">
+                                    <input name="propertyKey" id="propertyKey" class="form-control" aria-required="true" />
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-success dropdown-toggle"
+                                            onclick="loadData()">
+                                        <span class="glyphicon glyphicon-search"></span>查询
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table id="dataTables-userInfo" class="table datatable">
+                                    <thead>
+                                    <tr>
+                                        <th>应用key</th>
+                                        <th>模板key</th>
+                                        <th>属性名称</th>
+                                        <th>属性key</th>
+                                        <th>属性类型</th>
+                                        <th>标签类型</th>
+                                        <th>前缀变量</th>
+                                        <th>创建时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END DATATABLE EXPORT -->
+
+                </div>
+            </div>
+
+        </div>
+        <!-- END PAGE CONTENT WRAPPER -->
+    </div>
+    <!-- END PAGE CONTENT -->
+</div>
+<!-- END PAGE CONTAINER -->
+
+<div id="toolbar">
+
+</div>
+
+<div class="modal fade" id="userInfoDelModal" tabindex="-1" role="dialog"
+     aria-labelledby="userInfoDelModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="userInfoDelModalLabel">删除认证</h4>
+            </div>
+            <div class="modal-body">
+                <input id="userInfoId" type="hidden">
+                <input id="delAppName" type="hidden" />
+                确定要删除么？
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="userInfoDel()">删除</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog"
+     aria-labelledby="userInfoEditModalLabel"
+     aria-hidden="true" data-backdrop='static' >
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="userInfoEditModalLabel">修改属性</h4>
+            </div>
+            <div class="modal-body">
+                <form id="userInfoEditForm">
+                    <input type="hidden" id="editId"  name="id"/>
+
+
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>选择应用</div>
+                        <div class="col-sm-8">
+                            <select name="appName" class="form-control" id="editAppName" style="width: 100%">
+
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>选择模板</div>
+                        <div class="col-sm-8">
+                            <select name="templateKey" class="form-control" id="editTemplateKey"  style="width: 100%">
+
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>属性key</div>
+                        <div class="col-sm-8">
+                            <input name="propertyKey" readonly="readonly" class="form-control" placeholder="5~30位字母 " type="text"
+                                   id="editPropertyKey" aria-required="true"/>
+                        </div>
+                    </div>
+
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>属性名称</div>
+                        <div class="col-sm-8">
+                            <input name="propertyName" class="form-control" placeholder="请输入模板名称" type="text"
+                                   id="editPropertyName" aria-required="true"/>
+                        </div>
+                    </div>
+
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>前缀常量</div>
+                        <div class="col-sm-8">
+                            <select name="variableKey" class="form-control" placeholder="" style="width: 100%" type="text"
+                                    id="editVariableKey" aria-required="true">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>属性标签类型</div>
+                        <div class="col-sm-8">
+                            <select name="labelType" class="form-control" id="editLabelType" style="width: 100%" aria-required="true">
+                                <option value="input">input:普通文本框</option>
+                                <option value="textarea">textarea:大文本框</option>
+                                <option value="select">select:下拉框</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>属性值类型</div>
+                        <div class="col-sm-8">
+                            <select name="propertyType" class="form-control" style="width: 100%" id="editPropertyType" aria-required="true">
+                                <option value="string">string:字符串类型</option>
+                                <option value="double">double:小数类型</option>
+                                <option value="long">long:整数类型</option>
+                                <option value="boolean">boolean:真假类型</option>
+                                <option value="date">date:日期类型</option>
+                            </select>
+                        </div>
+                    </div>
+
+
+                    <input id="editAttributeType" name="attributeType" type="hidden">
+                    <input type="hidden" name="labelValue" id="editLabelValue" />
+
+                    <div class="editLableSelectClass">
+                        <div class="editLableSelectClass1">
+
+                        </div>
+                        <div class="editLableSelectClass2">
+
+                        </div>
+                    </div>
+                    <input type="reset" name="editReset" style="display: none;"/>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="userInfoEdit()">修改</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog"
+     aria-labelledby="userInfoAddModalLabel"
+     aria-hidden="true"
+     data-backdrop='static'
+>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="userInfoAddModalLabel">新增属性</h4>
+            </div>
+            <div class="modal-body">
+                <form id="templateAddForm">
+
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>属性名称</div>
+                        <div class="col-sm-8">
+                            <input name="propertyName" class="form-control" placeholder="请输入属性名称" type="text"
+                                   id="addPropertyName" />
+                        </div>
+                    </div>
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>属性key</div>
+                        <div class="col-sm-8">
+                            <input name="propertyKey" class="form-control" placeholder="5~30位字母" type="text" id="addPropertyKey" />
+                        </div>
+                    </div>
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>显示优先级</div>
+                        <div class="col-sm-8">
+                            <input name="priority" class="form-control" placeholder="添加属性值位置优先级" value="1" type="text" id="addPriority" />
+                        </div>
+                    </div>
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>选择应用</div>
+                        <div class="col-sm-8">
+                            <select name="appName" class="form-control" id="addAppName" style="width: 100%" aria-required="true">
+
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-30" style="display: none;" >
+                        <div  class="form-text-right" style="color: red;"><span style="color: red;">*</span>公共属性</div>
+                        <div class="col-sm-8">
+                            <select id="addAttributeType" name="attributeType" style="width: 100%" class="form-control">
+                                <option value="1" >单个模板属性</option>
+                                <option value="0" >公共属性</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>选择模板</div>
+                        <div class="col-sm-8">
+                            <select name="templateKey" class="form-control" style="width: 100%" id="addTemplateKey" aria-required="true">
+
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>前缀常量</div>
+                        <div class="col-sm-8">
+                            <select name="variableKey" class="form-control" placeholder="" style="width: 100%" type="text"
+                                    id="addVariableKey" aria-required="true">
+
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>属性标签类型</div>
+                        <div class="col-sm-8">
+                            <select name="labelType" class="form-control" id="addLabelType" style="width: 100%" aria-required="true">
+                                <option value="input">input:普通文本框</option>
+                                <option value="textarea">textarea:大文本框</option>
+                                <option value="select">select:下拉框</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>属性值类型</div>
+                        <div class="col-sm-8">
+                            <select name="propertyType" class="form-control" style="width: 100%" id="addPropertyType" aria-required="true">
+                                <option value="string">string:字符串类型</option>
+                                <option value="double">double:小数类型</option>
+                                <option value="long">long:整数类型</option>
+                                <option value="boolean">boolean:真假类型</option>
+                                <option value="date">date:日期类型</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="labelValue" id="addLabelValue" />
+                    <div class="addLableSelectClass">
+                        <div class="addLableSelectClass1">
+
+                        </div>
+                        <div class="addLableSelectClass2">
+
+                        </div>
+                    </div>
+                    <input type="reset" name="addReset" style="display: none;"/>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="addTemplate()">新建</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="/common/footer :: footer"/>
+
+<script type="text/javascript" th:src="@{/js/admin/property.js}"></script>
+
+</body>
+</html>
+
+
+
+
+
+

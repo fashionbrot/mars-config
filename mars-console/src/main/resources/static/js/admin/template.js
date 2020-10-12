@@ -1,16 +1,40 @@
-$(function () {
-    $("#dataTables-userInfo_length").hide();
-})
+var envId;
+var appId;
 
 
 //添加用户
-var userInfoAdd = function () {
+var addTemplate = function () {
+
+    var addTemplateName=$("#addTemplateName").val();
+    if(addTemplateName==null || addTemplateName==''){
+        alert("请输入模板名称");
+        return false;
+    }
+    var addTemplateKey=$("#addTemplateKey").val();
+    if(addTemplateKey==null || addTemplateKey==''){
+        alert("请输入模板key");
+        return false;
+    }
+    if (addTemplateKey.substring(addTemplateKey.length-1,addTemplateKey.length)=='.'){
+        alert("最后一个字符不能是点");
+        return false;
+    }
+    if (addTemplateKey.substring(0,1)=='.'){
+        alert("第一个字符不能是点");
+        return false;
+    }
+    var addAppId=$("#addAppName").val();
+    if(addAppId==null || addAppId==''){
+        alert("请选择应用");
+        return false;
+    }
 
 
-    var a = $("#userInfoAddForm").serializeJson();
+    var a = $("#templateAddForm").serializeJson();
+
     loading();
     $.ajax({
-        url: "./admin/menu/add",
+        url: "../admin/template/add",
         type: "post",
         data: JSON.stringify(a),
         contentType: "application/json",
@@ -18,7 +42,7 @@ var userInfoAdd = function () {
         success: function (data) {
             loaded();
             if (data.code == "0") {
-                $("#userInfoAddModal").modal("hide");
+                $("#addModal").modal("hide");
                 $("input[type=reset]").trigger("click");
                 loadData();
             } else {
@@ -32,21 +56,19 @@ var userInfoAdd = function () {
 }
 
 function showModal(id) {
-    $("#userInfoId").val(id);
+    $("#delId").val(id);
     $('#userInfoDelModal').modal('show');
-
 }
 
 var userInfoDel = function () {
     loading();
     $.ajax({
-        url: "./admin/menu/deleteById",
+        url: "../admin/template/deleteById",
         type: "post",
-        data: {"id": $("#userInfoId").val()},
+        data: {"id": $("#delId").val()},
         dataType: "json",
         success: function (data) {
             loaded();
-
             if (data.code == "0") {
                 $('#userInfoDelModal').modal('hide');
                 loadData();
@@ -61,10 +83,35 @@ var userInfoDel = function () {
 }
 
 var userInfoEdit = function () {
-    loading();
+
+    var addTemplateName=$("#editTemplateName").val();
+    if(addTemplateName==null || addTemplateName==''){
+        alert("请输入模板名称");
+        return false;
+    }
+    var addTemplateKey=$("#editTemplateKey").val();
+    if(addTemplateKey==null || addTemplateKey==''){
+        alert("请输入模板key");
+        return false;
+    }
+    if (addTemplateKey.substring(addTemplateKey.length-1,addTemplateKey.length)=='.'){
+        alert("最后一个字符不能是点");
+        return false;
+    }
+    if (addTemplateKey.substring(0,1)=='.'){
+        alert("第一个字符不能是点");
+        return false;
+    }
+    var addAppId=$("#editAppName").val();
+    if(addAppId==null || addAppId==''){
+        alert("请选择应用");
+        return false;
+    }
+
     var a = $("#userInfoEditForm").serializeJson();
+    loading();
     $.ajax({
-        url: "./admin/menu/update",
+        url: "../admin/template/update",
         type: "post",
         data: JSON.stringify(a),
         contentType: "application/json",
@@ -72,8 +119,8 @@ var userInfoEdit = function () {
         success: function (data) {
             loaded();
             if (data.code == "0") {
-                $('#userInfoEditModal').modal('hide');
                 loadData();
+                $("#editModal").modal("hide");
             } else {
                 alert(data.msg);
             }
@@ -84,85 +131,51 @@ var userInfoEdit = function () {
     });
 }
 
-
 var queryByUserId = function (id) {
 
 
     loading();
     $.ajax({
-        url: "./admin/menu/queryById",
+        url: "../admin/template/selectById",
         type: "post",
         data: {"id": id},
         dataType: "json",
         success: function (result) {
+
             loaded();
             if (result.code!=0){
                 alert(result.msg);
                 return false;
             }
             var data = result.data;
-            $("#editId").val(data.id);
-            $("#editMenuName").val(data.menuName);
-            $("#editMenuUrl").val(data.menuUrl);
-            $("#editPriority").val(data.priority);
-            $("#editMenuLevel").val(data.menuLevel);
-            // manager.loadMenuLevel("editParentMenuId","1");
 
-
-            var level = $("#editMenuLevel").val();
-            console.log(level);
-            if (level==2){
-                manager.loadMenuLevel("editParentMenuId","1");
+            $("#editTemplateName").val(data.templateName);
+            $("#editTemplateDesc").val(data.templateDesc);
+            $("#editTemplateKey").val(data.templateKey);
+            $("#editAppName").val(data.appName);
+            $("#id").val(data.id);
+            if (data.templateUrl!=null && data.templateUrl!=''){
+                $("#editTemplateUrl").val(data.templateUrl);
+            }else{
+                $("#editTemplateUrl").val('');
             }
-            if (level==3){
-                manager.loadMenuLevel("editParentMenuId","2");
-            }
-            $("#editParentMenuId").val(data.parentMenuId);
 
-            $("#userInfoEditModal").modal("show");
+            $("#editAppName").attr("readonly", "readonly");
+            $("#editTemplateKey").attr("readonly", "readonly");
+            $("#editModal").modal("show");
         },error: function (e) {
             loaded();
             alert("网络错误，请重试！！");
         }
     });
+
 }
 
-//查询所有用户
-$(document).ready(function () {
 
-    $(".addProject").on("click",function () {
 
-        $("input[name='addReset']").trigger("click");
-        // manager.loadMenuLevel("parentMenuId","1");
-
-        $("#userInfoAddModal").modal("show");
-    })
-
-    loadData();
-
-});
-
-$("#menuLevel").on("change",function () {
-    var level = $("#menuLevel").val();
-    if (level==2){
-        manager.loadMenuLevel("parentMenuId","1");
-    }
-    if (level==3){
-        manager.loadMenuLevel("parentMenuId","2");
-    }
-})
-$("#editMenuLevel").on("change",function () {
-    var level = $("#editMenuLevel").val();
-    console.log(level);
-    if (level==2){
-        manager.loadMenuLevel("editParentMenuId","1");
-    }
-    if (level==3){
-        manager.loadMenuLevel("editParentMenuId","2");
-    }
-})
 
 function loadData() {
+    var appId=$("#appName").val();
     var tableId = "#dataTables-userInfo";
     $(tableId).dataTable().fnDestroy();
     $(tableId)
@@ -177,12 +190,13 @@ function loadData() {
         })
         .DataTable({
             ajax:{
-                url: "./admin/menu/queryAllList?v="+new Date().getTime(),
-                type: "post",
+                url: "./admin/template/page?v="+new Date().getTime(),
+                type: "get",
                 dataType: "json",
                 data: function(data){
                     data.page = data.start / data.length + 1;
                     data.pageSize = data.length;
+                    data.appName = appId;
                     delete  data.columns;
                     delete  data.search;
                 },
@@ -221,52 +235,45 @@ function loadData() {
                     bSortable : true,
                     width : "25px",
                     className : "text-center",
-                    render :  dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
-                },
-                {
-                    data : 'menuLevel',
-                    bSortable : true,
-                    width : "20px",
-                    className : "text-center",
-                    render :function (data, type, full, meta) {
-                        if(full.menuLevel==1){
-                            return "一级菜单"
-                        }else if (full.menuLevel==2){
-                            return "二级菜单"
-                        }else if (full.menuLevel==3){
-                            return "按钮"
+                    render :  function (data, type, full, meta) {
+                        if (full.templateUrl==null || full.templateUrl==''){
+                            return "";
+                        }
+                        var item=full.templateUrl.split(",");
+                        var html="";
+                        if(item!=null&& item.length>0){
+                            for(var i=0;i<item.length;i++){
+                                html+="<div style='float:left' onmousemove='showPic(event,\""+item[i]+"\");' onmouseout='hiddenPic()'><image   style='height: 30px;width: 30px;' src='"+item[i]+"'/></div>";
+                            }
                         }
 
+                        return html;
                     }
+                },
+                {
+                    data : 'templateKey',
+                    bSortable : true,
+                    width : "20px",
+                    className : "text-center",
+                    render : dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
+                },
+                {
+                    data : 'appName',
+                    bSortable : true,
+                    width : "20px",
+                    className : "text-center",
+                    render :dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
                 },{
-                    data : 'menuName',
+                    data : 'templateName',
                     bSortable : true,
                     width : "20px",
                     render : dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
                 }, {
-                    data : 'menuUrl',
+                    data : 'templateDesc',
                     bSortable : true,
                     width : "20px",
                     render : dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
-                }, {
-                    data : 'priority',
-                    bSortable : true,
-                    width : "20px",
-                    className : "text-center",
-                    render : dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
-                }, {
-                    data : 'parentMenuName',
-                    bSortable : true,
-                    width : "25px",
-                    className : "text-center",
-                    render : dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
-                }, {
-                    data : 'code',
-                    bSortable : true,
-                    width : "25px",
-                    className : "text-center",
-                    render : dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
-                }, {
+                },  {
                     data : 'createTime',
                     bSortable : true,
                     width : "25px",
@@ -308,3 +315,57 @@ function loadData() {
     });
 
 }
+
+
+function add() {
+    $("input[type=reset]").trigger("click");
+    $('#addModal').modal('show');
+    manager.loadApp("addAppName");
+}
+
+
+function showPic(e,sUrl){
+    var x,y;
+    x = e.clientX;
+    y = e.clientY;
+    document.getElementById("Layer1").style.left = x+30+'px';
+    document.getElementById("Layer1").style.top = y-200+'px';
+    document.getElementById("Layer1").innerHTML = "<img border='0' src=\"" + sUrl + "\">";
+    document.getElementById("Layer1").style.display = "";
+}
+function hiddenPic(){
+    document.getElementById("Layer1").innerHTML = "";
+    document.getElementById("Layer1").style.display = "none";
+}
+
+//查询所有用户
+$(document).ready(function () {
+    loadNoSearchSelect("appName");
+    manager.loadApp("appName","请选择应用");
+    loadData();
+
+    $("#appName").on("change",function () {
+        loadData();
+    });
+
+});
+
+$('#customFile').on('change', function() {
+    //当chooseImage的值改变时，执行此函数
+    var filePath = $(this).val(), //获取到input的value，里面是文件的路径
+    fileFormat = filePath.substring(filePath.lastIndexOf(".")).toLowerCase(),
+    src = window.URL.createObjectURL(this.files[0]); //转成可以在本地预览的格式
+
+    // 检查是否是图片
+    if(!fileFormat.match(/.png|.jpg|.jpeg/)) {
+        alert('上传错误,文件格式必须为：png/jpg/jpeg');
+        return;
+    }else{
+        $('#imgUrl').attr('src', src);
+    }
+});
+
+
+
+
+

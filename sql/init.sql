@@ -132,7 +132,7 @@ CREATE TABLE `menu` (
   `menu_name` varchar(16) NOT NULL COMMENT '菜单名称',
   `menu_level` int(3) unsigned NOT NULL COMMENT '菜单级别',
   `menu_url` varchar(255) DEFAULT NULL COMMENT '菜单url',
-  `parent_menu_id` bigint(11) unsigned NOT NULL COMMENT '父菜单id',
+  `parent_menu_id` bigint(11) unsigned DEFAULT '0' COMMENT '父菜单id',
   `priority` int(5) unsigned NOT NULL COMMENT '显示优先级',
   `code` varchar(64) DEFAULT NULL COMMENT '权限code',
   `create_id` bigint(11) DEFAULT NULL COMMENT '创建者id',
@@ -232,6 +232,102 @@ INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id
 INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id`, `priority`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`, `code`) VALUES ('48', '配置历史记录-详情', '3', '', '12', '552', '1', '2020-09-13 00:02:11', NULL, NULL, '0', 'history:list:info');
 INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id`, `priority`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`, `code`) VALUES ('49', '配置历史记录-删除', '3', '', '12', '553', '1', '2020-09-13 00:02:54', NULL, NULL, '0', 'history:list:del');
 INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id`, `priority`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`, `code`) VALUES ('50', '配置历史记录-回滚', '3', '', '12', '554', '1', '2020-09-13 00:03:30', NULL, NULL, '0', 'history:list:rollback');
+INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id`, `priority`, `code`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`) VALUES ('51', '模板管理', '1', '', '0', '600', '', '1', '2020-10-12 15:40:12', NULL, NULL, '0');
+INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id`, `priority`, `code`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`) VALUES ('52', '模板列表', '2', '/admin/template/index', '51', '601', '', '1', '2020-10-12 15:40:41', NULL, NULL, '0');
+INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id`, `priority`, `code`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`) VALUES ('53', '属性列表', '2', '/admin/property/index', '51', '602', '', '1', '2020-10-12 16:53:58', NULL, NULL, '0');
 
 
 
+
+CREATE TABLE `template` (
+  `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `app_name` varchar(64) NOT NULL COMMENT '应用名',
+  `template_key` varchar(64) NOT NULL COMMENT '模板key',
+  `template_name` varchar(64) NOT NULL COMMENT '模板名称',
+  `template_desc` varchar(1000) DEFAULT NULL COMMENT '模板描述',
+  `template_url` varchar(500) DEFAULT NULL COMMENT '模板示例图片地址',
+  `create_id` bigint(11) NOT NULL COMMENT '创建者id',
+  `create_date` datetime NOT NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='模板表';
+
+CREATE TABLE `property` (
+  `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `property_name` varchar(64) NOT NULL COMMENT '属性名称',
+  `property_key` varchar(64) NOT NULL COMMENT '属性key',
+  `property_type` varchar(64) NOT NULL COMMENT '属性类型',
+  `label_type` varchar(64) NOT NULL COMMENT 'html标签类型',
+  `label_value` text COMMENT 'html 标签值',
+  `app_name` varchar(32) NOT NULL COMMENT '应用名称',
+  `variable_key` varchar(32) DEFAULT NULL COMMENT '常量key',
+  `template_key` varchar(32) DEFAULT NULL COMMENT '模板key ，公共属性为空，指定模板属性不为空',
+  `attribute_type` tinyint(2) unsigned NOT NULL DEFAULT '0' COMMENT '0 公共属性 1 模板属性',
+  `create_id` bigint(11) NOT NULL COMMENT '创建者id',
+  `create_date` datetime NOT NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='属性表';
+
+CREATE TABLE `template_property_relation` (
+  `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `template_key` varchar(32) NOT NULL COMMENT '模板key',
+  `property_key` varchar(32) NOT NULL COMMENT '属性key',
+  `app_name` varchar(32) NOT NULL COMMENT '应用名称',
+  `priority` tinyint(5) NOT NULL DEFAULT '0' COMMENT '显示优先级',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='模板属性关系表';
+
+
+
+CREATE TABLE `env_variable_relation` (
+  `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `env_code` varchar(32) NOT NULL COMMENT '环境code',
+  `variable_value` varchar(255) NOT NULL COMMENT '常量值',
+  `variable_key` varchar(32) NOT NULL COMMENT '常量key',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='常量和环境关系表';
+
+
+CREATE TABLE `env_variable` (
+  `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `variable_name` varchar(32) NOT NULL COMMENT '变量名称',
+  `variable_desc` varchar(255) DEFAULT NULL COMMENT '变量说明',
+  `variable_key` varchar(32) NOT NULL COMMENT '变量key',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='常量表';
+
+
+CREATE TABLE `config_info` (
+  `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `status` tinyint(2) NOT NULL DEFAULT '0' COMMENT '状态 1开启 0关闭',
+  `start_time` datetime DEFAULT NULL COMMENT '开始时间',
+  `end_time` datetime DEFAULT NULL COMMENT '结束时间',
+  `template_key` varchar(32) NOT NULL COMMENT '模板key',
+  `json` text NOT NULL COMMENT '实例json',
+  `description` varchar(255) DEFAULT NULL COMMENT '描述',
+  `priority` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '优先级',
+  `env_code` varchar(32) NOT NULL COMMENT '环境code',
+  `app_name` varchar(32) NOT NULL COMMENT '应用名',
+  `user_name` varchar(32) DEFAULT NULL COMMENT '用户名',
+  `create_id` bigint(11) NOT NULL COMMENT '创建者id',
+  `create_date` datetime NOT NULL COMMENT '创建时间',
+  `update_id` bigint(11) DEFAULT NULL COMMENT '最近更新者id',
+  `update_date` datetime DEFAULT NULL COMMENT '最近更新时间',
+  `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='模板表';
+
+CREATE TABLE `data_info` (
+  `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `data_type` tinyint(2) NOT NULL COMMENT '0 导入  1导出',
+  `json` longtext COMMENT '导出导入json数据',
+  `env_code` varchar(32) NOT NULL COMMENT '环境code',
+  `app_name` varchar(32) DEFAULT NULL COMMENT '应用名',
+  `user_name` varchar(32) DEFAULT NULL COMMENT '用户名',
+  `template_key` varchar(1000) DEFAULT NULL COMMENT '模板key',
+  `create_id` bigint(11) NOT NULL COMMENT '创建者id',
+  `create_date` datetime NOT NULL COMMENT '创建时间',
+  `update_id` bigint(11) DEFAULT NULL COMMENT '最近更新者id',
+  `update_date` datetime DEFAULT NULL COMMENT '最近更新时间',
+  `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='导入导出记录表';
