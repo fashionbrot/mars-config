@@ -1,0 +1,57 @@
+<html lang="en" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro" xmlns:th="http://www.thymeleaf.org">
+
+<div class="modal-body"  th:fragment="valueEdit">
+    <form id="userInfoEditForm">
+        <input type="hidden" id="configId"  name="id"/>
+        <input type="hidden" id="operationType"  name="operationType" value="2"/>
+        <fieldset style="border:1px solid black;padding: 5px">
+            <legend>必填</legend>
+            优先级:
+            <input type="text" class="form-control"  name="priority" id="editPriority" placeholder="优先级"
+                   onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"
+            />
+            启用状态:
+            <select name="status" class="form-control" id="editStatus" aria-required="true">
+                <option value="1">启用</option>
+                <option value="0">停用</option>
+            </select>
+            描述:
+            <textarea type="text" class="form-control" name="description" id="editDescription" maxlength="255"
+                      placeholder="描述" ></textarea>
+        </fieldset>
+        <div id="editConfigTimeStatus">
+            <fieldset style="border:1px solid black;margin-top: 5px;padding: 5px">
+                <legend>选填属性</legend>
+                <div>
+                    开始时间:
+                    <input type="text" class="form-control layui-input" name="startDate" id="editStartTime" placeholder="yyyy-MM-dd HH:mm:ss" >
+                    结束时间:
+                    <input type="text" class="form-control layui-input" name="endDate" id="editEndTime" placeholder="yyyy-MM-dd HH:mm:ss" >
+                </div>
+            </fieldset>
+        </div>
+
+        <div style="display: none;">
+            选择环境:
+            <select name="envCode" class="form-control" id="editEnvCode" aria-required="true">
+
+            </select>
+            选择应用:
+            <select name="appName" class="form-control" id="editAppName" aria-required="true">
+
+            </select>
+            选择模板：
+            <select name="templateKey" class="form-control" id="editTemplateKey" aria-required="true">
+
+            </select>
+        </div>
+        <input name="json" id="editJson" type="hidden" />
+        <input type="reset" name="editReset" style="display: none;"/>
+    </form>
+    <fieldset style="border:1px solid black;margin-top: 5px;padding: 5px">
+        <legend>属性</legend>
+        <div id="editPropertyDiv" style="">
+
+        </div>
+    </fieldset>
+</div>

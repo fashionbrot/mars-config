@@ -36,6 +36,7 @@ public class PropertyService  {
 
 
     public Collection<PropertyEntity> queryList(Map<String, Object> params) {
+        PageHelper.orderBy("priority asc");
         return propertyDao.listByMap(params);
     }
 
@@ -63,6 +64,7 @@ public class PropertyService  {
         if (StringUtils.isNotEmpty(req.getPropertyKey())){
             queryWrapper.like("property_key",req.getPropertyKey());
         }
+        queryWrapper.orderByAsc("priority");
         List<PropertyEntity> list = propertyDao.list(queryWrapper);
 
         return PageVo.builder()

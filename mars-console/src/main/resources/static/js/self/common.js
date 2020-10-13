@@ -308,6 +308,26 @@ function getSelectVaule(obj){
 
 
 var manager={
+    loadTemplate:function (labelId,appName) {
+        $.ajax({
+            url: "../admin/template/list?appName="+appName,
+            type: "get",
+            dataType: "json",
+            async:false,
+            success: function (result) {
+                var data= result.data;
+                if(data!=null){
+                    var rows=data;
+                    var html="<option value=''>请选择模板</option>";
+                    for(var i=0;i<rows.length;i++){
+                        var row=rows[i];
+                        html+="<option value='"+row.templateKey+"'>"+row.templateName+"</option>";
+                    }
+                }
+                $("#"+labelId).html(html);
+            }
+        });
+    },
     loadTemplateCustom:function (labelId,appName,firstOption) {
         $.ajax({
             url: "../admin/template/list?appName="+appName,
@@ -326,6 +346,25 @@ var manager={
                     }
                 }
                 $("#"+labelId).html(html);
+            }
+        });
+    },loadVariable:function (id) {
+        $.ajax({
+            url: "../admin/variable/queryList",
+            type: "get",
+            contentType: "application/json",
+            dataType: "json",
+            async:false,
+            success: function (data) {
+                if(data!=null){
+                    var rows=data;
+                    var html="<option value=''>无前缀</option>";
+                    for(var i=0;i<rows.length;i++){
+                        var row=rows[i];
+                        html+="<option value='"+row.variableKey+"'>"+row.variableKey+"  -  "+row.variableName+"</option>";
+                    }
+                }
+                $("#"+id).html(html);
             }
         });
     },

@@ -189,6 +189,7 @@ var queryByUserId = function (id) {
             }
             var data=result.data;
             $("#editId").val(data.id);
+            $("#editPriority").val(data.priority);
             $("#editPropertyName").val(data.propertyName);
             $("#editPropertyKey").val(data.propertyKey);
             $("#editPropertyType").val(data.propertyType);
@@ -200,8 +201,7 @@ var queryByUserId = function (id) {
             $("#editAttributeType").val(data.attributeType);
 
 
-
-            //manager.loadVariable("editVariableKey");
+            manager.loadVariable("editVariableKey");
             $("#editVariableKey").val(data.variableKey);
 
             addDivClass('editLableSelectClass');
@@ -246,7 +246,7 @@ function getforJsonHtml(json) {
 
 
 function loadData() {
-
+    loadVariableData();
     propertyKey=$("#propertyKey").val();
     var appName=$("#appName").val();
     var templateKey=$("#templateKey").val();
@@ -308,6 +308,15 @@ function loadData() {
             lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
             columns : [
                 {
+                    data : 'priority',
+                    bSortable : true,
+                    width : "20px",
+                    className : "text-center",
+                    render :function(data, type, row, meta) {
+                        return '<span title="' + data + '">' + data + '</span>';
+                    }
+                },
+                {
                     data : 'appName',
                     bSortable : true,
                     width : "20px",
@@ -344,7 +353,13 @@ function loadData() {
                     data : 'variableKey',
                     bSortable : true,
                     width : "20px",
-                    render : dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
+                    render : function (data, type, full, meta) {
+                        var variable= getVariable(variableData,full.variableKey);
+                        if(variable!=null){
+                            return variable.variableName;
+                        }
+                        return full.variableKey;
+                    }
                 },{
                     data : 'createTime',
                     bSortable : true,
@@ -392,8 +407,8 @@ function loadData() {
 var variableData=null;
 function loadVariableData() {
     $.ajax({
-        url: "../admin/variable/queryAll",
-        type: "post",
+        url: "../admin/variable/queryList",
+        type: "get",
         dataType: "json",
         async: false,
         success: function (data) {
@@ -404,114 +419,6 @@ function loadVariableData() {
 
 
 
-function loadDataEnvAndApp(propertyKey,appName,templateKey) {
-    loadVariableData();
-
-    loading();
-    $.ajax({
-        url: "../admin/property/queryAll",
-        type: "post",
-        dataType: "json",
-        cache:false,
-        data:{propertyKey:propertyKey,appName:appName,templateKey:templateKey},
-        success: function (data) {
-            loaded();
-
-
-
-            $('#dataTables-userInfo').dataTable().fnDestroy();
-            var table = $('#dataTables-userInfo').DataTable({
-                language: {
-                    "sProcessing": "处理中...",
-                    "sLengthMenu": "显示 _MENU_ 项结果",
-                    "sZeroRecords": "没有匹配结果",
-                    "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
-                    "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
-                    "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
-                    "sInfoPostFix": "",
-                    // "sSearch": "搜索:",
-                    "sUrl": "",
-                    "sEmptyTable": "表中数据为空",
-                    "sLoadingRecords": "载入中...",
-                    "sInfoThousands": ",",
-                    "oPaginate": {
-                        "sFirst": "首页",
-                        "sPrevious": "上页",
-                        "sNext": "下页",
-                        "sLast": "末页"
-                    }
-                },
-
-                stateSave: true,
-                searching: false,
-                paging: true,
-                info: true,
-                bAutoWidth: false,
-                dom: 'T<"right"><"toolbar">Clfrtip',
-                lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
-                data: data,
-                columnDefs: [
-                    {
-                        targets: 0,width:100, render: function (data, type, full, meta) {
-                        return full.appName;
-                    }
-                    },
-                    {
-                        targets: 1,width:100, render: function (data, type, full, meta) {
-                        return full.templateKey;
-                    }
-                    },
-
-                    {
-                        targets: 2,width:100, render: function (data, type, full, meta) {
-                            return full.propertyName;
-                        }
-                    },
-                    {
-                        targets: 3,width:100, render: function (data, type, full, meta) {
-                                return full.propertyKey;
-                            }
-                    },
-                    {
-                        targets: 4,width:100, render: function (data, type, full, meta) {
-                                return full.propertyType;
-                            }
-                    },
-                    {
-                        targets: 5,width:80, render: function (data, type, full, meta) {
-                            return full.labelType;
-                        }
-                    }
-                    ,
-                    {
-                        targets: 6,width:80, render: function (data, type, full, meta) {
-                           var variable= getVariable(variableData,full.variableKey);
-                           if(variable!=null){
-                               return variable.variableName;
-                           }
-                        return full.variableKey;
-                    }
-                    },
-                    {
-                        targets: 7, width:50,render: function (data, type, full, meta) {
-                            return moment(full.createTime).format("YYYY-MM-DD HH:mm:ss");
-                        }
-                    },
-                    {
-                        targets: 8, render: function (data, type, full, meta) {
-                        var updateHtml= '<a class="btn btn-success btn-" onclick="queryByUserId(\'' + full.id + '\')"><i class="glyphicon glyphicon-edit"></i>修改</a>';
-
-                        var deleteHtml= '&nbsp;&nbsp;<a class="btn btn-warning btn-circle" onclick="showModal(\'' + full.id + '\')"> <i class="glyphicon glyphicon-trash"></i>删除</a>';
-
-
-                            return updateHtml+deleteHtml;
-                    }
-                    }
-                ]
-            });
-        }
-    });
-}
 
 
 function getVariable(variableData,variableKey) {
@@ -535,44 +442,18 @@ function add() {
 
     loadNoSearchSelect("addAttributeType");
     loadNoSearchSelect("addVariableKey");
-    /*
-
+    manager.loadVariable("addVariableKey");
     loadNoSearchSelect("addLabelType");
     loadNoSearchSelect("addPropertyType");
-
 
 
     initPropertyInfo("addLabelType","addLableSelectClass");
     changeLableType("addLabelType","addLableSelectClass");
 
-    manager.loadVariable("addVariableKey");
-    $("#addTemplateKey").show();
-    $("#addAttributeType").on("change",function () {
-        var flag=$("#addAttributeType").val();
-        if('0'==flag || 0==flag){
-            $("#addTemplateKey").hide();
-        }else{
-            $("#addTemplateKey").show();
-        }
-    });
-
-    var appName=$("#appName").val();
-    if (appName!=null && appName!=''){
-        $("#addAppName").val(appName);
-        manager.loadTemplate("addTemplateKey",appName);
-        var templateKey=$("#templateKey").val();
-        if(templateKey!=null && templateKey!=''){
-            $("#addTemplateKey").val(templateKey);
-        }
-    }*/
-
-
-
-
+    $("#addAppName").val($("#appName").val());
+    $("#addTemplateKey").val($("#templateKey").val());
 
     $('#addModal').modal('show');
-
-
 }
 
 

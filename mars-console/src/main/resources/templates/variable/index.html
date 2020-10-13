@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro" xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <head th:replace="/common/head :: head"></head>
+
+</head>
+<body>
+<!-- START PAGE CONTAINER -->
+<div class="page-container">
+
+    <!-- START PAGE SIDEBAR -->
+    <div class="page-sidebar">
+        <!-- START X-NAVIGATION -->
+        <div th:replace="/common/left :: left"></div>
+        <!-- END X-NAVIGATION -->
+    </div>
+    <!-- END PAGE SIDEBAR -->
+
+    <!-- PAGE CONTENT -->
+    <div class="page-content">
+
+        <div th:replace="/common/top :: top"/>
+
+        <!-- START BREADCRUMB -->
+        <ul class="breadcrumb">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">项目管理</a></li>
+            <li class="active">环境变量列表</li>
+        </ul>
+        <!-- END BREADCRUMB -->
+
+        <!-- PAGE CONTENT WRAPPER -->
+        <div class="page-content-wrap">
+
+
+            <div class="row">
+                <div class="col-md-12">
+
+                    <!-- START DATATABLE EXPORT -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">环境变量列表</h3>
+                            <div class="pull-right">
+                               <!-- <div class="btn-group">
+                                    <button class="btn btn-success addProject dropdown-toggle btn-condensed">新增</button>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default panel-collapse btn-condensed">
+                                        <i class="fa fa-caret-up"></i>
+                                    </button>
+                                </div>-->
+                            </div>
+                        </div>
+                        <div class="panel-heading" style="float: right;">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-success addProject dropdown-toggle"
+                                        onclick="">
+                                    <span class="glyphicon glyphicon-plus"></span>新增
+                                </button>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table id="dataTables-userInfo" class="table datatable">
+                                    <thead>
+                                    <tr>
+                                        <th width="10%">变量Key</th>
+                                        <th width="10%">变量名称</th>
+                                        <th width="10%">变量说明</th>
+                                        <th width="15%">创建时间</th>
+                                        <th width="20%">操作</th>
+                                    </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END DATATABLE EXPORT -->
+
+                </div>
+            </div>
+
+        </div>
+        <!-- END PAGE CONTENT WRAPPER -->
+    </div>
+    <!-- END PAGE CONTENT -->
+</div>
+<!-- END PAGE CONTAINER -->
+
+<div class="modal fade" id="userInfoDelModal" tabindex="-1" role="dialog"
+     aria-labelledby="userInfoDelModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="userInfoDelModalLabel">删除认证</h4>
+            </div>
+            <div class="modal-body">
+                <input id="userInfoId" type="hidden">
+                确定要删除这个环境信息么？
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="userInfoDel()">删除</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="userInfoEditModal" tabindex="-1" role="dialog" data-backdrop='static'
+     aria-labelledby="userInfoAddModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="">编辑</h4>
+            </div>
+            <div class="modal-body">
+                <form id="userInfoEditForm">
+                    <input  type="hidden" name="id" id="variableId"/>
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>变量Key</div>
+                        <div class="col-sm-8">
+                            <input name="variableKey" class="form-control" maxlength="64" minlength="2" placeholder="变量Key" type="text"
+                                   id="editVariableKey" aria-required="true"/>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>变量名称</div>
+                        <div class="col-sm-8">
+                            <input name="variableName" class="form-control" maxlength="64" minlength="2" placeholder="变量名称" type="text"
+                                   id="editVariableName" aria-required="true"/>
+                        </div>
+                    </div>
+                    <div class="form-group "  style="height:54px">
+                        <div  class="form-text-right"><span style="color: red;">*</span>变量说明</div>
+                        <div class="col-sm-8">
+                            <textarea name="variableDesc" class="form-control" maxlength="255" placeholder="变量说明" type="text"
+                                      id="editVariableDesc" aria-required="true"></textarea>
+                        </div>
+                    </div>
+
+                    <div id="editVariableRelationDiv">
+
+                    </div>
+                    <input type="hidden" id="editRelationJson"  name="relation"/>
+                    <input type="reset" name="addReset" style="display: none;"/>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="userInfoEdit()">确认</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="userInfoAddModal" tabindex="-1" role="dialog" data-backdrop='static'
+     aria-labelledby="userInfoAddModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="userInfoAddModalLabel">新增项目</h4>
+            </div>
+            <div class="modal-body">
+                <form id="userInfoAddForm">
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>变量Key</div>
+                        <div class="col-sm-8">
+                            <input name="variableKey" class="form-control" maxlength="64" minlength="2" placeholder="变量Key" type="text"
+                                   id="addVariableKey" aria-required="true"/>
+                        </div>
+                    </div>
+
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>变量名称</div>
+                        <div class="col-sm-8">
+                            <input name="variableName" class="form-control" maxlength="64" minlength="2" placeholder="变量名称" type="text"
+                                   id="addVariableName" aria-required="true"/>
+                        </div>
+                    </div>
+
+                    <div class="form-group " style="height:54px" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>变量说明</div>
+                        <div class="col-sm-8">
+                            <textarea name="variableDesc" class="form-control" maxlength="255" placeholder="变量说明" type="text"
+                                      id="addVariableDesc" aria-required="true"></textarea>
+                        </div>
+                    </div>
+
+                    <div id="addVariableRelationDiv">
+
+                    </div>
+                    <input type="hidden" id="addRelationJson"  name="relation"/>
+                    <input type="reset" name="addReset" style="display: none;"/>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="userInfoAdd()">确认</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="/common/footer :: footer"/>
+
+<script type="text/javascript" th:src="@{/js/admin/variable.js}"></script>
+
+
+</body>
+</html>
+
+
+
+
+
+

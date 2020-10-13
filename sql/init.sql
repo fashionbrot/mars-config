@@ -262,6 +262,7 @@ CREATE TABLE `property` (
   `variable_key` varchar(32) DEFAULT NULL COMMENT '常量key',
   `template_key` varchar(32) DEFAULT NULL COMMENT '模板key ，公共属性为空，指定模板属性不为空',
   `attribute_type` tinyint(2) unsigned NOT NULL DEFAULT '0' COMMENT '0 公共属性 1 模板属性',
+  `priority` tinyint(5) NOT NULL DEFAULT '0' COMMENT '显示优先级',
   `create_id` bigint(11) NOT NULL COMMENT '创建者id',
   `create_date` datetime NOT NULL COMMENT '创建时间',
   PRIMARY KEY (`id`)
@@ -269,6 +270,8 @@ CREATE TABLE `property` (
 
 CREATE TABLE `template_property_relation` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `create_id` bigint(11) NOT NULL COMMENT '创建者id',
+  `create_date` datetime NOT NULL COMMENT '创建时间',
   `template_key` varchar(32) NOT NULL COMMENT '模板key',
   `property_key` varchar(32) NOT NULL COMMENT '属性key',
   `app_name` varchar(32) NOT NULL COMMENT '应用名称',
@@ -280,6 +283,8 @@ CREATE TABLE `template_property_relation` (
 
 CREATE TABLE `env_variable_relation` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `create_id` bigint(11) NOT NULL COMMENT '创建者id',
+  `create_date` datetime NOT NULL COMMENT '创建时间',
   `env_code` varchar(32) NOT NULL COMMENT '环境code',
   `variable_value` varchar(255) NOT NULL COMMENT '常量值',
   `variable_key` varchar(32) NOT NULL COMMENT '常量key',
@@ -289,6 +294,8 @@ CREATE TABLE `env_variable_relation` (
 
 CREATE TABLE `env_variable` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `create_id` bigint(11) NOT NULL COMMENT '创建者id',
+  `create_date` datetime NOT NULL COMMENT '创建时间',
   `variable_name` varchar(32) NOT NULL COMMENT '变量名称',
   `variable_desc` varchar(255) DEFAULT NULL COMMENT '变量说明',
   `variable_key` varchar(32) NOT NULL COMMENT '变量key',
@@ -296,7 +303,7 @@ CREATE TABLE `env_variable` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='常量表';
 
 
-CREATE TABLE `config_info` (
+CREATE TABLE `config_value` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `status` tinyint(2) NOT NULL DEFAULT '0' COMMENT '状态 1开启 0关闭',
   `start_time` datetime DEFAULT NULL COMMENT '开始时间',
@@ -314,9 +321,9 @@ CREATE TABLE `config_info` (
   `update_date` datetime DEFAULT NULL COMMENT '最近更新时间',
   `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='模板表';
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='配置数据表';
 
-CREATE TABLE `data_info` (
+CREATE TABLE `value_data` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `data_type` tinyint(2) NOT NULL COMMENT '0 导入  1导出',
   `json` longtext COMMENT '导出导入json数据',

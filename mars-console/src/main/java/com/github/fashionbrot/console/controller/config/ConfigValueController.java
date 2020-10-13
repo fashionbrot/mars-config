@@ -3,12 +3,11 @@ package com.github.fashionbrot.console.controller.config;
 
 
 import com.github.fashionbrot.common.annotation.IsMenu;
-import com.github.fashionbrot.common.req.PropertyReq;
+import com.github.fashionbrot.common.req.ConfigValueReq;
 import com.github.fashionbrot.common.vo.PageVo;
 import com.github.fashionbrot.common.vo.RespVo;
-import com.github.fashionbrot.core.service.PropertyService;
-import com.github.fashionbrot.dao.entity.PropertyEntity;
-import com.github.pagehelper.PageHelper;
+import com.github.fashionbrot.core.service.ConfigValueService;
+import com.github.fashionbrot.dao.entity.ConfigValueEntity;
 import com.github.xiaoymin.knife4j.annotations.ApiSort;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -22,41 +21,41 @@ import java.util.Map;
 
 
 /**
- * 属性表
+ * 配置数据表
  *
  * @author fashionbrot
  * @email fashionbrot@163.com
- * @date 2020-10-12
+ * @date 2020-10-13
  */
 
 @Controller
-@RequestMapping("/admin/property")
-@Api(tags="属性表")
-@ApiSort(20496873)
-public class PropertyController {
+@RequestMapping("/admin/config/value")
+@Api(tags="配置数据表")
+@ApiSort(20514926)
+public class ConfigValueController {
 
     @Autowired
-    private PropertyService propertyService;
+    private ConfigValueService configValueService;
 
     @IsMenu
     @GetMapping("/index")
     public String index(){
-        return "/template/property";
+        return "/value/index";
     }
 
     @ApiOperation("数据列表—分页")
     @GetMapping("/page")
     @ResponseBody
-    public RespVo page(PropertyReq req){
-        return  RespVo.success(propertyService.pageList(req));
+    public RespVo page(ConfigValueReq req){
+        return  RespVo.success(configValueService.pageList(req));
     }
 
 
     @ApiOperation("数据列表")
     @GetMapping("/queryList")
     @ResponseBody
-    public Collection<PropertyEntity> queryList(@RequestParam Map<String, Object> params){
-        return  propertyService.queryList(params);
+    public Collection<ConfigValueEntity> queryList(@RequestParam Map<String, Object> params){
+        return  configValueService.queryList(params);
     }
 
 
@@ -64,7 +63,7 @@ public class PropertyController {
     @PostMapping("/selectById")
     @ResponseBody
     public RespVo selectById(Long id){
-        PropertyEntity data = propertyService.selectById(id);
+        ConfigValueEntity data = configValueService.selectById(id);
         return RespVo.success(data);
     }
 
@@ -72,8 +71,8 @@ public class PropertyController {
     @ApiOperation("新增")
     @PostMapping("/insert")
     @ResponseBody
-    public RespVo add(@RequestBody PropertyEntity entity){
-        propertyService.insert(entity);
+    public RespVo add(@RequestBody ConfigValueEntity entity){
+        configValueService.insert(entity);
         return RespVo.success();
     }
 
@@ -81,15 +80,15 @@ public class PropertyController {
     @ApiOperation("修改")
     @PostMapping("/updateById")
     @ResponseBody
-    public RespVo updateById(@RequestBody PropertyEntity entity){
-        propertyService.updateById(entity);
+    public RespVo updateById(@RequestBody ConfigValueEntity entity){
+        configValueService.updateById(entity);
         return RespVo.success();
     }
     @ApiOperation("根据id删除")
     @PostMapping("/deleteById")
     @ResponseBody
     public RespVo deleteById(Long id){
-        propertyService.deleteById(id);
+        configValueService.deleteById(id);
         return RespVo.success();
     }
 
@@ -98,7 +97,7 @@ public class PropertyController {
     @PostMapping("/deleteByIds")
     @ResponseBody
     public RespVo delete(@RequestBody Long[] ids){
-        propertyService.deleteBatchIds(Arrays.asList(ids));
+        configValueService.deleteBatchIds(Arrays.asList(ids));
         return RespVo.success();
     }
 

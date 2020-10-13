@@ -65,4 +65,8 @@ public class PropertyEntity {
 	@ApiModelProperty(value = "0 公共属性 1 模板属性")
 	@TableField("attribute_type")
 	private Integer attributeType;
+
+	@ApiModelProperty(value = "显示优先级")
+	@TableField("priority")
+	private Integer priority;
 }

@@ -1,14 +1,11 @@
 package com.github.fashionbrot.console.controller.config;
 
 
-
 import com.github.fashionbrot.common.annotation.IsMenu;
-import com.github.fashionbrot.common.req.PropertyReq;
-import com.github.fashionbrot.common.vo.PageVo;
+import com.github.fashionbrot.common.req.EnvVariableReq;
 import com.github.fashionbrot.common.vo.RespVo;
-import com.github.fashionbrot.core.service.PropertyService;
-import com.github.fashionbrot.dao.entity.PropertyEntity;
-import com.github.pagehelper.PageHelper;
+import com.github.fashionbrot.core.service.EnvVariableService;
+import com.github.fashionbrot.dao.entity.EnvVariableEntity;
 import com.github.xiaoymin.knife4j.annotations.ApiSort;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -22,49 +19,49 @@ import java.util.Map;
 
 
 /**
- * 属性表
+ * 常量表
  *
  * @author fashionbrot
  * @email fashionbrot@163.com
- * @date 2020-10-12
+ * @date 2020-10-13
  */
 
 @Controller
-@RequestMapping("/admin/property")
-@Api(tags="属性表")
-@ApiSort(20496873)
-public class PropertyController {
+@RequestMapping("/admin/variable")
+@Api(tags="常量表")
+@ApiSort(20510960)
+public class EnvVariableController {
 
     @Autowired
-    private PropertyService propertyService;
+    private EnvVariableService envVariableService;
 
     @IsMenu
     @GetMapping("/index")
     public String index(){
-        return "/template/property";
+        return "/variable/index";
     }
 
     @ApiOperation("数据列表—分页")
     @GetMapping("/page")
     @ResponseBody
-    public RespVo page(PropertyReq req){
-        return  RespVo.success(propertyService.pageList(req));
+    public RespVo page(EnvVariableReq req){
+        return  RespVo.success(envVariableService.pageList(req));
     }
 
 
     @ApiOperation("数据列表")
     @GetMapping("/queryList")
     @ResponseBody
-    public Collection<PropertyEntity> queryList(@RequestParam Map<String, Object> params){
-        return  propertyService.queryList(params);
+    public Collection<EnvVariableEntity> queryList(@RequestParam Map<String, Object> params){
+        return  envVariableService.queryList(params);
     }
 
 
     @ApiOperation("根据id查询")
     @PostMapping("/selectById")
     @ResponseBody
-    public RespVo selectById(Long id){
-        PropertyEntity data = propertyService.selectById(id);
+    public RespVo selectById( Long id){
+        EnvVariableEntity data = envVariableService.selectById(id);
         return RespVo.success(data);
     }
 
@@ -72,8 +69,8 @@ public class PropertyController {
     @ApiOperation("新增")
     @PostMapping("/insert")
     @ResponseBody
-    public RespVo add(@RequestBody PropertyEntity entity){
-        propertyService.insert(entity);
+    public RespVo add(@RequestBody EnvVariableEntity entity){
+        envVariableService.insert(entity);
         return RespVo.success();
     }
 
@@ -81,15 +78,15 @@ public class PropertyController {
     @ApiOperation("修改")
     @PostMapping("/updateById")
     @ResponseBody
-    public RespVo updateById(@RequestBody PropertyEntity entity){
-        propertyService.updateById(entity);
+    public RespVo updateById(@RequestBody EnvVariableEntity entity){
+        envVariableService.updateById(entity);
         return RespVo.success();
     }
     @ApiOperation("根据id删除")
     @PostMapping("/deleteById")
     @ResponseBody
     public RespVo deleteById(Long id){
-        propertyService.deleteById(id);
+        envVariableService.deleteById(id);
         return RespVo.success();
     }
 
@@ -98,7 +95,7 @@ public class PropertyController {
     @PostMapping("/deleteByIds")
     @ResponseBody
     public RespVo delete(@RequestBody Long[] ids){
-        propertyService.deleteBatchIds(Arrays.asList(ids));
+        envVariableService.deleteBatchIds(Arrays.asList(ids));
         return RespVo.success();
     }
 
