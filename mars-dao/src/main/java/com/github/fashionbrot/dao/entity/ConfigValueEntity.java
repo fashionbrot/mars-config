@@ -62,4 +62,8 @@ public class ConfigValueEntity extends BaseEntity {
 	@ApiModelProperty(value = "用户名")
 	@TableField("user_name")
 	private String userName;
+
+	@ApiModelProperty("发布状态 1已发布 0 未发布")
+	@TableField("release_status")
+	private Integer releaseStatus;
 }

@@ -2,7 +2,6 @@
 <html lang="en" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"  xmlns:th="http://www.thymeleaf.org">
 <head>
 
-    <div th:replace="/common/css :: css"></div>
 
     <head th:replace="/common/head :: head"></head>
 
@@ -109,7 +108,7 @@
 
                         <div class="panel-body">
                             <div class="table-responsive">
-                                <table id="dataTables-userInfo" class="table datatable">
+                                <table id="dataTables-userInfo" class="table table-bordered">
                                     <thead>
                                     <tr>
                                         <th width="5%">id</th>
@@ -242,29 +241,12 @@
     </div>
 </div>
 
-<div id="Layer1" style="display: none; position: absolute; z-index: 100;">
+<div th:replace="/common/footer :: footer"/>
 
-<audio id="audio-alert" th:src="@{/audio/alert.mp3}" preload="auto"></audio>
-<audio id="audio-fail" th:src="@{/audio/fail.mp3}" preload="auto"></audio>
-<script type="text/javascript" th:src="@{/js/plugins/jquery/jquery.min.js}"></script>
-<script type="text/javascript"  th:src="@{/js/plugins/jquery/jquery-ui.min.js}"></script>
-<script type="text/javascript" th:src="@{/js/plugins/bootstrap/bootstrap.min.js}"></script>
-<script type="text/javascript" th:src="@{/js/plugins/metisMenu/metisMenu.min.js}"></script>
-<script type="text/javascript" th:src="@{/js/plugins/momentjs/momentjs.js}"></script>
-<script type="text/javascript" th:src="@{/js/plugins/datatables/jquery.dataTables.min.js}"></script>
-<script type="text/javascript" th:src="@{/js/plugins/bootstrap/bootstrap-datepicker.js}"></script>
-    <script type="text/javascript" th:src="@{/js/plugins/icheck/icheck.min.js}"></script>
-    <script type="text/javascript" th:src="@{/js/plugins/mcustomscrollbar/jquery.mCustomScrollbar.min.js}"></script>
-    <script type="text/javascript" th:src="@{/js/plugins/laydate/laydate.js}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js"></script>
-    <script type="text/javascript" th:src="@{/js/self/common.js}"></script>
-    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js"></script>-->
 
-    <!--<script type="text/javascript" th:src="@{/js/jquery.searchableSelect.js}"></script>-->
-<script type="text/javascript" th:src="@{/js/self/value/data.js}"></script>
+<script type="text/javascript" th:src="@{/js/admin/value/data.js}"></script>
 <script type="text/javascript" th:src="@{/js/ajaxfileupload.js}"></script>
-    <script type="text/javascript" th:src="@{/js/settings.js}"></script>
-    <script type="text/javascript" th:src="@{/js/actions.js}"></script>
+
 
 
 </body>

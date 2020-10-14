@@ -2,6 +2,7 @@ package com.github.fashionbrot.console.controller.config;
 
 
 
+import com.github.fashionbrot.common.annotation.IsMenu;
 import com.github.fashionbrot.common.req.ValueDataReq;
 import com.github.fashionbrot.common.vo.PageVo;
 import com.github.fashionbrot.common.vo.RespVo;
@@ -28,13 +29,19 @@ import java.util.Map;
  */
 
 @Controller
-@RequestMapping("value/data")
+@RequestMapping("/admin/data")
 @Api(tags="导入导出记录表")
 @ApiSort(20514926)
 public class ValueDataController {
 
     @Autowired
     private ValueDataService valueDataService;
+
+    @IsMenu
+    @GetMapping("/index")
+    public String index(){
+        return "/value/data";
+    }
 
 
     @ApiOperation("数据列表—分页")

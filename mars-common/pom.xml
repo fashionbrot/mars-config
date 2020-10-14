@@ -74,6 +74,12 @@
             <artifactId>knife4j-spring-boot-starter</artifactId>
             <version>2.0.3</version>
         </dependency>
+        <dependency>
+            <groupId>org.xerial.snappy</groupId>
+            <artifactId>snappy-java</artifactId>
+            <version>1.1.7.6</version>
+        </dependency>
+
     </dependencies>
 
     <build>

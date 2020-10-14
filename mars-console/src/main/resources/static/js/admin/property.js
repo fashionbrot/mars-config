@@ -6,8 +6,10 @@ var propertyKey;
 $(document).ready(function () {
 
 
-    loadData();
+
     appNameChange("appName","templateKey");
+
+    loadData();
 
     $("#appName").on("change",function () {
         loadData();
@@ -321,14 +323,26 @@ function loadData() {
                     bSortable : true,
                     width : "20px",
                     className : "text-center",
-                    render : dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
+                    render : function(data, type, row, meta) {
+                        if (data=="" || data==null || data=="-1"){
+                            data = "公共应用";
+                            return '<span style="color: red;" title="' + data + '">' + data + '</span>';
+                        }
+                        return '<span title="' + data + '">' + data + '</span>';
+                    }
                 },
                 {
                     data : 'templateKey',
                     bSortable : true,
                     width : "20px",
                     className : "text-center",
-                    render :dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
+                    render :function(data, type, row, meta) {
+                        if (data=="" || data==null || data=="-1"){
+                            data = "公共模板";
+                            return '<span style="color: red;" title="' + data + '">' + data + '</span>';
+                        }
+                        return '<span title="' + data + '">' + data + '</span>';
+                    }
                 },{
                     data : 'propertyName',
                     bSortable : true,
@@ -461,7 +475,7 @@ function appNameChange(appNameId,templateKeyId) {
 
     loadSelect(templateKeyId);
     loadNoSearchSelect(appNameId);
-    manager.loadApp(appNameId);
+    manager.loadApp(appNameId,"公共应用");
 
     var appName= $("#"+appNameId).val();
     manager.loadTemplateCustom(templateKeyId,appName,"公共模板");
@@ -556,4 +570,241 @@ function getPropertyJson(divClass) {
         return "{"+json+"}";
     }
     return false;
+}
+
+function copy() {
+    appNameChange("oldAppName","oldTemplateKey");
+    loadCopyData("oldTable",$("#oldAppName").val(),$("#oldTemplateKey").val());
+
+    $("#oldAppName").on("change",function () {
+        loadCopyData("oldTable",$("#oldAppName").val(),$("#oldTemplateKey").val());
+    });
+    $("#oldTemplateKey").on("change",function () {
+        loadCopyData("oldTable",$("#oldAppName").val(),$("#oldTemplateKey").val());
+    });
+
+
+    appNameChange("newAppName","newTemplateKey");
+    loadCopyData("newTable",$("#newAppName").val(),$("#newTemplateKey").val());
+
+    $("#newAppName").on("change",function () {
+        loadCopyData("newTable",$("#newAppName").val(),$("#newTemplateKey").val());
+    });
+    $("#newTemplateKey").on("change",function () {
+        loadCopyData("newTable",$("#newAppName").val(),$("#newTemplateKey").val());
+    });
+
+    $('#copyModal').modal('show');
+}
+function copyFunction() {
+    var listIds = $("#oldTable input[name='stuCheckbox']:checked");
+    var ids="";
+    if (listIds){
+        for(var i=0;i<listIds.length;i++){
+            if (ids==""){
+                ids =$(listIds[i]).val();
+            }else{
+                ids += ","+$(listIds[i]).val();
+            }
+        }
+    }
+    if (ids==""){
+        alert("请选择要复制的属性");
+        return false;
+    }
+    console.log(ids);
+    loading();
+    $.ajax({
+        url: "../admin/property/copyProperty",
+        type: "post",
+        data: {"ids":ids,"appName":$("#newAppName").val(),"templateKey":$("#newTemplateKey").val()},
+        dataType: "json",
+        success: function (data) {
+            loaded();
+            if (data.code == "0") {
+                loadCopyData("newTable",$("#newAppName").val(),$("#newTemplateKey").val());
+            } else {
+                alert(data.msg);
+            }
+        },error: function (e) {
+            loaded();
+            alert("网络错误，请重试！！");
+        }
+    });
+}
+function delNewProperty() {
+    var listIds = $("#newTable input[name='stuCheckbox']:checked");
+    var ids="";
+    if (listIds){
+        for(var i=0;i<listIds.length;i++){
+            if (ids==""){
+                ids =$(listIds[i]).val();
+            }else{
+                ids += ","+$(listIds[i]).val();
+            }
+        }
+    }
+    if (ids==""){
+        alert("请选择要复制的属性");
+        return false;
+    }
+    loading();
+    $.ajax({
+        url: "../admin/property/deleteByIds",
+        type: "post",
+        data: {"ids":ids},
+        dataType: "json",
+        success: function (data) {
+            loaded();
+            if (data.code == "0") {
+                loadCopyData("newTable",$("#newAppName").val(),$("#newTemplateKey").val());
+            } else {
+                alert(data.msg);
+            }
+        },error: function (e) {
+            loaded();
+            alert("网络错误，请重试！！");
+        }
+    });
+}
+function code() {
+    loading();
+    $.ajax({
+        url: "../admin/property/code",
+        type: "post",
+        data: {"appName":$("#appName").val(),"templateKey":$("#templateKey").val()},
+        dataType: "json",
+        success: function (data) {
+            loaded();
+            if (data.code == "0") {
+                $("#javaContent").val(data.data);
+                $('#javaModal').modal('show');
+            } else {
+                alert(data.msg);
+            }
+        },error: function (e) {
+            loaded();
+            alert("网络错误，请重试！！");
+        }
+    });
+}
+
+function loadCopyData(Id,appName,templateKey) {
+    var tableId = "#"+Id;
+
+    $(tableId).dataTable().fnDestroy();
+    $(tableId)
+        .DataTable({
+            ajax:{
+                url: "./admin/property/queryListVo?v="+new Date().getTime(),
+                type: "get",
+                dataType: "json",
+                data: function(data){
+                    data.page = data.start / data.length + 1;
+                    data.pageSize = data.length;
+                    data.appName = appName;
+                    data.templateKey = templateKey;
+                    delete  data.columns;
+                    delete  data.search;
+                },
+                dataType: "json",
+                dataSrc : function(result) {
+                    if (result.code != 0) {
+                        alert("获取数据失败:"+result.msg);
+                        return false;
+                    }
+                    if (result.data!=null ){
+                        return  result.data ;
+                    }
+                    return [];
+                },
+                error : function(XMLHttpRequest, textStatus, errorThrown) {
+                    alert("获取列表失败");
+                }
+            },
+            dom: '<fB<t>ip>',
+            stripeClasses: ["odd", "even"],
+            paginationType: "full_numbers",
+            responsive: true,//自适应
+            serverSide:true,
+            language: dataTable.language(),
+            stateSave: true,
+            searching: false,
+            paging: false,
+            info: false,
+            bAutoWidth: false,
+            order:[],
+            orderable: true,
+            lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
+            columns : [
+                {
+                    className: "td-checkbox",
+                    orderable : false,
+                    bSortable : false,
+                    className : "text-center",
+                    data : "id",
+                    width : '15px',
+                    render : function(data, type, row, meta) {
+                        var content = '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline">';
+                        content += '	<input type="checkbox" name="stuCheckbox" class="group-checkable" value="' + row.id + '" />';
+                        content += '	<span></span>';
+                        content += '</label>';
+                        return content;
+                    }
+                },
+                {
+                    data : 'propertyName',
+                    bSortable : false,
+                    width : "20px",
+                    render : dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
+                }, {
+                    data : 'propertyKey',
+                    bSortable : false,
+                    width : "20px",
+                    render : dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
+                }, {
+                    data : 'propertyType',
+                    bSortable : false,
+                    width : "20px",
+                    render : dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
+                }, {
+                    data : 'labelType',
+                    bSortable : false,
+                    width : "20px",
+                    render : dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
+                }, {
+                    data : 'variableKey',
+                    bSortable : false,
+                    width : "20px",
+                    render : function (data, type, full, meta) {
+                        var variable= getVariable(variableData,full.variableKey);
+                        if(variable!=null){
+                            return variable.variableName;
+                        }
+                        return full.variableKey;
+                    }
+                }
+            ]
+        });
+    $(tableId+'_wrapper').on("change", ":checkbox", function() {
+        // 列表复选框
+        if ($(this).is("[name='topCheckboxName']")) {
+            // 全选
+            $(":checkbox", ''+tableId).prop("checked",$(this).prop("checked"));
+        }else{
+            // 一般复选
+            var checkbox = $("tbody :checkbox", ''+tableId);
+            $(":checkbox[name='cb-check-all']", ''+tableId).prop('checked', checkbox.length == checkbox.filter(':checked').length);
+        }
+    }).on('preXhr.dt', function(e, settings, data) {
+        // ajax 请求之前事件
+        data.page = data.start / data.length + 1;
+        data.limit = data.length;
+        delete data.start;
+        delete data.order;
+        delete data.search;
+        delete data.length;
+        delete data.columns;
+    });
+
 }

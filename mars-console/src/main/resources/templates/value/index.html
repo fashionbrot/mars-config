@@ -56,12 +56,12 @@
                                     <span class="glyphicon glyphicon-plus"></span>新增
                                 </button>
                             </div>
-                            <div class="btn-group">
+                            <!--<div class="btn-group">
                                 <button type="button" class="btn btn-success dropdown-toggle"
                                         onclick="releaseConfig(0)">
                                     <span class="glyphicon glyphicon-send"></span>发布全部
                                 </button>
-                            </div>
+                            </div>-->
                             <div class="btn-group">
                                 <button type="button" class="btn btn-success dropdown-toggle"
                                         onclick="releaseConfig(1)">
@@ -69,19 +69,19 @@
                                 </button>
                             </div>
                             <div class="pull-right" style="">
-                                <label>环境选择:</label>
+                                <label>环境</label>
                                 <div class="btn-group" style="width:180px;">
                                     <select name="envCode" class="form-control" id="envCode" aria-required="true">
 
                                     </select>
                                 </div>
-                                <label>选择应用:</label>
+                                <label>应用</label>
                                 <div class="btn-group" style="width:180px;">
                                     <select name="appName" class="form-control" id="appName" aria-required="true">
 
                                     </select>
                                 </div>
-                                <label>模板选择:</label>
+                                <label>模板</label>
                                 <div class="btn-group" style="width:300px;">
                                     <select name="templateKey" class="form-control" style="" id="templateKey" aria-required="true">
 
@@ -110,7 +110,7 @@
 
                         <div class="panel-body">
                             <div class="table-responsive">
-                                <table id="dataTables-userInfo" class="table datatable">
+                                <table id="dataTables-userInfo" class="table table-bordered">
                                     <thead>
                                     <tr>
                                         <!--<th width="5%">实例key</th>-->
@@ -120,6 +120,7 @@
                                         <th  width="7%">开始时间</th>
                                         <th  width="7%">结束时间</th>
                                         <th  width="5%">状态</th>
+                                        <th  width="5%">发布状态</th>
                                         <th width="4%">操作人</th>
                                         <th  width="7%">修改时间</th>
                                         <th  width="18%">操作</th>
@@ -251,7 +252,7 @@
                         </div>
                     </div>
 
-                    <div class="form-group form-group-30" >
+                    <!--<div class="form-group form-group-30" >
                         <div  class="form-text-right"><span style="color: red;"></span>开始时间</div>
                         <div class="col-sm-8" style="height: 54px;">
                             <input type="text" class="form-control layui-input" name="startDate" id="addStartTime" placeholder="yyyy-MM-dd HH:mm:ss" >
@@ -262,7 +263,7 @@
                         <div class="col-sm-8" style="height: 54px;">
                             <input type="text" class="form-control layui-input" name="endDate" id="addEndTime" placeholder="yyyy-MM-dd HH:mm:ss" >
                         </div>
-                    </div>
+                    </div>-->
 
 
 
@@ -270,7 +271,7 @@
                     <input type="reset" name="addReset" style="display: none;"/>
                 </form>
                 <fieldset style="border:1px solid black;margin-top: 5px;padding: 5px;width: 100%;">
-                <legend>属性</legend>
+                <legend>模板属性</legend>
                     <div id="addPropertyDiv" style="">
 
                     </div>

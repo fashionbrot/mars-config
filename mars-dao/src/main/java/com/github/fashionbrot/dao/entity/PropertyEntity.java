@@ -3,8 +3,7 @@ package com.github.fashionbrot.dao.entity;
 import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import java.util.Date;
 
@@ -19,6 +18,9 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper=false)
 @TableName("property")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class PropertyEntity {
 
 	@TableId(type = IdType.AUTO)
@@ -69,4 +71,8 @@ public class PropertyEntity {
 	@ApiModelProperty(value = "显示优先级")
 	@TableField("priority")
 	private Integer priority;
+
+	@TableLogic(value = "0", delval = "1")
+	@TableField(value = "del_flag",fill = FieldFill.INSERT)
+	private int delFlag;
 }

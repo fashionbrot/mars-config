@@ -40,8 +40,8 @@ function loadPropertyAttrDiv(id,templateKey,appName,className,json,flag,diff) {
                     if(value==null || value==''){
                         value='';
                     }
-
-                    html+="<span style='color:#3300FF'>"+row.propertyName+":<span>";
+                    var title=row.propertyName;
+                    //html+="<span style='color:#3300FF'>"+row.propertyName+":<span>";
                     var type=row.propertyType;
                     var key=row.propertyKey;
                     var name=row.propertyName;
@@ -67,59 +67,65 @@ function loadPropertyAttrDiv(id,templateKey,appName,className,json,flag,diff) {
                     if(labelType=='textarea'){
 
                         propertyHtml+=" placeholder='key:"+key+"  "+type+"类型'";
-                        html+="<textarea type='text'   "+propertyHtml+" class='form-control "+className+"' >"+strValue+"</textarea>";
-
+                        var h ="<textarea type='text'   "+propertyHtml+" class='form-control "+className+"' >"+strValue+"</textarea>";
+                        html+=lineHtml(title,h);
                     }else if(labelType=='select'){
                         var selectId=(flag?"add":(diff?"edit":"edit2"))+"selectJson"+key;
                         selectIds.push(selectId);
                         propertyHtml+=" id='"+selectId+"'  style='width:100%'";
 
                         var valueJson=eval('(' + labelValue + ')');
-                        html += "<select   class='form-control " + className + "' "+propertyHtml+">";
+                        var h = "<select   class='form-control " + className + "' "+propertyHtml+">";
                         for(var k in valueJson){
                             if(value==k){
-                                html += "<option value='"+k+"' selected='selected' >"+valueJson[k]+" : "+k+"</option>";
+                                h = "<option value='"+k+"' selected='selected' >"+valueJson[k]+" : "+k+"</option>";
                             }else{
-                                html += "<option value='"+k+"'  >"+valueJson[k]+" : "+k+"</option>";
+                                h = "<option value='"+k+"'  >"+valueJson[k]+" : "+k+"</option>";
                             }
                         }
-                        html += "</select>"
-
+                        h += "</select>"
+                        html+=lineHtml(title,h);
                     }else if(labelType=='input' ){
                         propertyHtml+=" placeholder='key:"+key+"  "+type+"类型'";
 
                         if (type=='boolean') {
-                            html += "<select  class='form-control " + className + "' "+propertyHtml+" >";
+                            var h = "<select  class='form-control " + className + "' "+propertyHtml+" >";
                             if (value == true || value=='true') {
-                                html += "<option value='true' selected='selected' >true</option>";
-                                html += "<option value='false'>false</option>";
+                                h += "<option value='true' selected='selected' >true</option>";
+                                h += "<option value='false'>false</option>";
                             } else {
-                                html += "<option value='false'>false</option>";
-                                html += "<option value='true'>true</option>";
+                                h += "<option value='false'>false</option>";
+                                h += "<option value='true'>true</option>";
                             }
-                            html += "</select>"
+                            h += "</select>"
+                            html+=lineHtml(title,h);
                         }else if(type=='long'){
                             var onkeyup="this.value=this.value.replace(/\\D/g,\"\")";
                             var onafterpaste="this.value=this.value.replace(/\\D/g,\"\")";
-                            html+="<input type='text' onkeyup='"+onkeyup+"' onafterpaste='"+onafterpaste+"'  value='"+value+"' "+propertyHtml+" class='form-control "+className+"' />";
+                            var h="<input type='text' onkeyup='"+onkeyup+"' onafterpaste='"+onafterpaste+"'  value='"+value+"' "+propertyHtml+" class='form-control "+className+"' />";
+                            html+=lineHtml(title,h);
                         }else if(type=='date') {
                             var dateId = key + "-date-" + row.id;
                             dateIds.push(dateId);
-                            html += "<input type='text' id='" + dateId + "' value='" + value + "' "+propertyHtml+" class='form-control layui-input " + className + "'  />";
+                            var h = "<input type='text' id='" + dateId + "' value='" + value + "' "+propertyHtml+" class='form-control layui-input " + className + "'  />";
+                            html+=lineHtml(title,h);
                         }else if(type=='double'){
                             var onkeyup="if(isNaN(value))execCommand(\"undo\")";
                             var onafterpaste="if(isNaN(value))execCommand(\"undo\")";
-                            html+="<input type='text' onkeyup='"+onkeyup+"' onafterpaste='"+onafterpaste+"'  value='"+value+"' "+propertyHtml+" class='form-control "+className+"'  />";
+                            var h="<input type='text' onkeyup='"+onkeyup+"' onafterpaste='"+onafterpaste+"'  value='"+value+"' "+propertyHtml+" class='form-control "+className+"'  />";
+                            html+=lineHtml(title,h);
                         }else{
 
                             if (variableKey!=null && variableKey!=''){
                                 var stringHtml="<input type='text' value='"+strValue+"'  "+propertyHtml+" style='width:70%' class='form-control btn-group "+className+"'  />";
                                 var selectHtml=getVariableSelect(selectVariableKey,key,className);
-                                html+="<div>"+selectHtml+stringHtml+"</div>";
+                                //html+="<div>"+selectHtml+stringHtml+"</div>";
+                                html+=lineHtml(title,selectHtml+stringHtml);
                             }else{
                                 var stringHtml="<input type='text' value='"+strValue+"' "+propertyHtml+" class='form-control "+className+"'  />";
-                                html+=stringHtml;
+                                html+=lineHtml(title,stringHtml);
                             }
+
                         }
 
                     }
@@ -143,6 +149,15 @@ function loadPropertyAttrDiv(id,templateKey,appName,className,json,flag,diff) {
             }
         }
     });
+}
+
+function lineHtml(title,inputHtml) {
+ return "<div class=\"form-group form-group-30\" >\n" +
+     "                        <div  class=\"form-text-right\"><span style=\"color: red;\"></span>"+title+"</div>\n" +
+     "                        <div class=\"col-sm-8\" style=\"height: 54px;\">\n" +
+     inputHtml+
+     "                        </div>\n" +
+     "                    </div>";
 }
 
 /**

@@ -69,7 +69,7 @@ public class TemplateService {
 
     public Object list(TemplateReq req) {
         QueryWrapper queryWrapper=new QueryWrapper();
-        if (StringUtils.isNotEmpty(req.getAppName())){
+        if (StringUtils.isNotEmpty(req.getAppName()) && !"-1".equals(req.getAppName())){
             queryWrapper.eq("app_name",req.getAppName());
         }
         return templateDao.list(queryWrapper);

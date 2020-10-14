@@ -52,18 +52,28 @@
                                     <span class="glyphicon glyphicon-plus"></span>新增
                                 </button>
                             </div>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-success dropdown-toggle"
+                                        onclick="copy()">
+                                    <span class="fa fa-copy"></span>复制模板属性
+                                </button>
+                            </div>
                             <div class="pull-right" style="">
-                                <label>选择应用:</label>
                                 <div class="btn-group" style="width:180px;">
                                     <select name="appName" class="form-control" id="appName" aria-required="true">
 
                                     </select>
                                 </div>
-                                <label>选择模板:</label>
                                 <div class="btn-group" style="width:300px;">
                                     <select name="templatekey"  id="templateKey" class="form-control" style="width: 280px" >
                                         <option value="" >公共模板</option>
                                     </select>
+                                </div>
+                                <div class="btn-group" style="width:100px;">
+                                    <button type="button" class="btn btn-success dropdown-toggle"
+                                            onclick="code()">
+                                        <span class="fa fa-code"></span>java代码
+                                    </button>
                                 </div>
                                 <label>属性key:</label>
                                 <div class="btn-group" style="width:200px;">
@@ -80,7 +90,7 @@
 
                         <div class="panel-body">
                             <div class="table-responsive">
-                                <table id="dataTables-userInfo" class="table datatable">
+                                <table id="dataTables-userInfo" class="table table-bordered">
                                     <thead>
                                     <tr>
                                         <th>优先级</th>
@@ -216,6 +226,7 @@
                                 <option value="string">string:字符串类型</option>
                                 <option value="double">double:小数类型</option>
                                 <option value="long">long:整数类型</option>
+                                <option value="int">int:整数类型</option>
                                 <option value="boolean">boolean:真假类型</option>
                                 <option value="date">date:日期类型</option>
                             </select>
@@ -329,6 +340,7 @@
                                 <option value="string">string:字符串类型</option>
                                 <option value="double">double:小数类型</option>
                                 <option value="long">long:整数类型</option>
+                                <option value="int">int:整数类型</option>
                                 <option value="boolean">boolean:真假类型</option>
                                 <option value="date">date:日期类型</option>
                             </select>
@@ -354,6 +366,145 @@
         </div>
     </div>
 </div>
+
+
+<div class="modal fade" id="copyModal" tabindex="-1" role="dialog"
+     aria-labelledby="userInfoAddModalLabel"
+     aria-hidden="true"
+     data-backdrop='static'
+
+>
+    <div class="modal-dialog"  style="width: 60%">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" >复制模板属性</h4>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center;width: 100%;height: 50px;">
+                    <button type="button" class="btn btn-success dropdown-toggle" onclick="copyFunction()" >
+                        复制原模板属性到目标模板 &nbsp;<span class="glyphicon glyphicon-arrow-right"></span>
+                    </button>
+                </div>
+                <div>
+                    <div style="float: left;width: 50%;">
+                        <fieldset style="border:1px solid black;padding:5px 5px;">
+                            <legend>原模板属性</legend>
+                                <div style="border: 0px solid red;height: 40px;" >
+                                    <div class="pull-right" style="">
+                                        <div class="btn-group">
+                                            <select name="appName" class="form-control" id="oldAppName"  style="width:100px;">
+
+                                            </select>
+
+                                        </div>
+                                        <div class="btn-group">
+                                            <select name="templatekey"  id="oldTemplateKey" class="form-control" style="width:150px" >
+                                                <option value="" >公共模板</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div >
+                                    <table id="oldTable" class="table table-bordered">
+                                        <thead>
+                                        <tr>
+                                            <th>
+                                                <div class="td-checkbox">
+                                                    <input type="checkbox" name="topCheckboxName" class="group-checkable" />
+                                                </div>
+                                            </th>
+                                            <th>属性名称</th>
+                                            <th>属性key</th>
+                                            <th>属性类型</th>
+                                            <th>标签类型</th>
+                                            <th>前缀变量</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                        </fieldset>
+                    </div>
+
+                    <div style="float: left;width: 50%;">
+                        <fieldset style="border:1px solid black;padding:5px 5px;">
+                            <legend>目标模板属性</legend>
+                            <div style="border: 0px solid red;height: 40px;" >
+                                <div class="pull-right" style="">
+                                    <div class="btn-group" >
+                                        <select name="appName" class="form-control" id="newAppName" aria-required="true">
+
+                                        </select>
+                                    </div>
+                                    <div class="btn-group" >
+                                        <select name="templatekey"  id="newTemplateKey" class="form-control" style="width: 150px" >
+                                            <option value="" >公共模板</option>
+                                        </select>
+                                    </div>
+                                    <div class="btn-group" >
+                                        <button type="button" class="btn btn-success dropdown-toggle" onclick="delNewProperty()" >
+                                            <span class="glyphicon glyphicon-trash"></span>删除
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div >
+                                <table id="newTable" class="table table-bordered" >
+                                    <thead>
+                                    <tr>
+                                        <th >
+                                            <div class="td-checkbox">
+                                                <input type="checkbox" name="topCheckboxName" class="group-checkable" />
+                                            </div>
+                                        </th>
+                                        <th>属性名称</th>
+                                        <th>属性key</th>
+                                        <th>属性类型</th>
+                                        <th>标签类型</th>
+                                        <th>前缀变量</th>
+                                    </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="javaModal" tabindex="-1" role="dialog"
+     aria-labelledby="userInfoAddModalLabel"
+     aria-hidden="true"
+     data-backdrop='static'
+>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" >java class</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group form-group-30" >
+                    <div class="col-sm-8">
+                        <textarea class="form-control" id="javaContent" rows="3"
+                        style="margin: 0px -153.344px 0px 0px; width: 501px; height: 400px;"
+                        ></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <div th:replace="/common/footer :: footer"/>
 

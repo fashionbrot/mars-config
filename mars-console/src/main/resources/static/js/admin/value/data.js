@@ -179,9 +179,210 @@ function importData() {
 
 
 function loadData() {
-   //
     var envCode=$("#envCode").val();
     var appName=$("#appName").val();
+
+    var tableId = "#dataTables-userInfo";
+    $(tableId).dataTable().fnDestroy();
+    $(tableId)
+        .on('xhr.dt', function( e, settings, json, xhr ){
+            if(json.code==0){
+                json.recordsTotal = json.data.itotalDisplayRecords;
+                json.recordsFiltered = json.data.itotalDisplayRecords;
+            }else{
+                json.recordsTotal = 0;
+                json.recordsFiltered = 0;
+            }
+        })
+        .DataTable({
+            ajax:{
+                url: "./admin/data/page?v="+new Date().getTime(),
+                type: "get",
+                dataType: "json",
+                data: function(data){
+                    data.page = data.start / data.length + 1;
+                    data.pageSize = data.length;
+                    data.envCode = envCode;
+                    data.appName = appName;
+                    delete  data.columns;
+                    delete  data.search;
+                },
+                dataType: "json",
+                dataSrc : function(result) {
+                    if (result.code != 0) {
+                        alert("获取数据失败:"+result.msg);
+                        return false;
+                    }
+                    if (result.data!=null ){
+                        return  result.data.data ;
+                    }
+                    return [];
+                },
+                error : function(XMLHttpRequest, textStatus, errorThrown) {
+                    alert("获取列表失败");
+                }
+            },
+            dom: '<fB<t>ip>',
+            stripeClasses: ["odd", "even"],
+            paginationType: "full_numbers",
+            responsive: true,//自适应
+            serverSide:true,
+            language: dataTable.language(),
+            stateSave: true,
+            searching: false,
+            paging: true,
+            info: true,
+            bAutoWidth: false,
+            order:[],
+            orderable: true,
+            lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
+            columns : [
+                {
+                    data : 'userName',
+                    bSortable : true,
+                    width : "20px",
+                    className : "text-center",
+                    render : dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
+                },
+                {
+                    data : 'envCode',
+                    bSortable : true,
+                    width : "20px",
+                    className : "text-center",
+                    render :dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
+                },
+                {
+                    data : 'appName',
+                    bSortable : true,
+                    width : "20px",
+                    className : "text-center",
+                    render :dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
+                },{
+                    data : 'templateKey',
+                    bSortable : true,
+                    width : "20px",
+                    className : "text-center",
+                    render :dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
+                },{
+                    data : 'dataType',
+                    bSortable : true,
+                    width : "20px",
+                    render : function (data, type, full, meta) {
+                        if (data==0){
+                            return "导入"
+                        }else if (data==1){
+                            return "导出"
+                        }else if (data==2){
+                            return "编辑"
+                        }else  if (data==3){
+
+                        }else if (data==4){
+
+                        }
+                        return html;
+                    }
+                },{
+                    data : 'id',
+                    bSortable : true,
+                    width : "20px",
+                    render : function (data, type, full, meta) {
+                        if(full.endTime=='' || full.endTime==null){
+                            return '';
+                        }
+                        var html="";
+                        var nowTime=new Date();
+                        if(full.endTime!=null ) {
+                            var time=moment(full.endTime).format("YYYY-MM-DD HH:mm:ss")
+                            if(nowTime.getTime()>(new Date(full.endTime)).getTime()){
+                                html+="<span style='color:red;font-weight: bold;'>"+time+"</span>"
+                            }else{
+                                html+=time;
+                            }
+                        }
+                        return html;
+                    }
+                },
+                {
+                    data : 'description',
+                    bSortable : true,
+                    width : "20px",
+                    className : "text-center",
+                    render :function (data, type, full, meta) {
+                        if (full.status == "1") {
+                            return "开启";
+                        } else {
+                            return "<span style='color:red;font-weight: bold;'>停用</span>";
+                        }
+                    }
+                },{
+                    data : 'releaseType',
+                    bSortable : true,
+                    width : "20px",
+                    className : "text-center",
+                    render :function (data, type, full, meta) {
+                        if (full.releaseType == "1") {
+                            return "已发布";
+                        } else {
+                            return "<span style='color:red;font-weight: bold;'>未发布</span>";
+                        }
+                    }
+                },
+                {
+                    data : 'userName',
+                    bSortable : true,
+                    width : "20px",
+                    className : "text-center",
+                    render :dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
+                },  {
+                    data : 'id',
+                    bSortable : true,
+                    width : "25px",
+                    className : "text-center",
+                    render : function (data, type, full, meta) {
+                        if(full.updateDate!=null){
+                            return moment(full.updateDate).format("YYYY-MM-DD HH:mm:ss");
+                        }else{
+                            return moment(full.createDate).format("YYYY-MM-DD HH:mm:ss");
+                        }
+                    }
+                }, {
+                    data: 'operate',
+                    bSortable: false,
+                    visible: true,
+                    width : '130px',
+                    render: function (data, type, full) {
+                        return '<a class="btn btn-success btn-" onclick="queryByUserId(\'' + full.id + '\')"><i class="glyphicon glyphicon-edit"></i>修改</a>'
+                            + '&nbsp;&nbsp;<a class="btn btn-warning btn-circle" onclick="showModal(\'' + full.id + '\',this)"> <i class="glyphicon glyphicon-trash"></i>删除</a>';
+                    }
+                }
+            ]
+        });
+    $(tableId+'_wrapper').on("change", ":checkbox", function() {
+        // 列表复选框
+        if ($(this).is("[name='topCheckboxName']")) {
+            // 全选
+            $(":checkbox", '#dataTableId').prop("checked",$(this).prop("checked"));
+        }else{
+            // 一般复选
+            var checkbox = $("tbody :checkbox", '#dataTableId');
+            $(":checkbox[name='cb-check-all']", '#dataTableId').prop('checked', checkbox.length == checkbox.filter(':checked').length);
+        }
+    }).on('preXhr.dt', function(e, settings, data) {
+        // ajax 请求之前事件
+        data.page = data.start / data.length + 1;
+        data.limit = data.length;
+        delete data.start;
+        delete data.order;
+        delete data.search;
+        delete data.length;
+        delete data.columns;
+    });
+
+
+
+
+
+
     $('#dataTables-userInfo').dataTable().fnDestroy();
     var table = $('#dataTables-userInfo').DataTable({
         ajax:{

@@ -145,7 +145,7 @@ var userInfoDel = function () {
 
     loading();
     $.ajax({
-        url: "../admin/config/deleteById",
+        url: "../admin/config/value/deleteById",
         type: "post",
         data: {"id": $("#userInfoId").val()},
         dataType: "json",
@@ -390,6 +390,18 @@ function loadDataEnvAndApp(envCode,appName,templateKey,description) {
                             return "开启";
                         } else {
                             return "<span style='color:red;font-weight: bold;'>停用</span>";
+                        }
+                    }
+                },{
+                    data : 'releaseType',
+                    bSortable : true,
+                    width : "20px",
+                    className : "text-center",
+                    render :function (data, type, full, meta) {
+                        if (full.releaseType == "1") {
+                            return "已发布";
+                        } else {
+                            return "<span style='color:red;font-weight: bold;'>未发布</span>";
                         }
                     }
                 },

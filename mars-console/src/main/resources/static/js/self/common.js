@@ -339,7 +339,7 @@ var manager={
                 var data= result.data;
                 if(data!=null){
                     var rows=data;
-                    var html="<option value=''>"+firstOption+"</option>";
+                    var html="<option value='-1'>"+firstOption+"</option>";
                     for(var i=0;i<rows.length;i++){
                         var row=rows[i];
                         html+="<option value='"+row.templateKey+"'>"+row.templateName+" - "+row.templateKey+"</option>";
@@ -461,7 +461,7 @@ var manager={
                     var rows=data;
                     var html="";
                     if (topOption!=null){
-                        html="<option value=''>"+topOption+"</option>";
+                        html="<option value='-1'>"+topOption+"</option>";
                     }
                     for(var i=0;i<rows.length;i++){
                         var row=rows[i];

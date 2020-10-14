@@ -6,20 +6,25 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.github.fashionbrot.common.enums.RespCode;
 import com.github.fashionbrot.common.exception.CurdException;
+import com.github.fashionbrot.common.exception.MarsException;
 import com.github.fashionbrot.common.req.PropertyReq;
 import com.github.fashionbrot.common.vo.PageVo;
 import com.github.fashionbrot.dao.dao.PropertyDao;
 import com.github.fashionbrot.dao.entity.PropertyEntity;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.io.StringWriter;
+import java.util.*;
 
 /**
  * 属性表
@@ -160,5 +165,94 @@ public class PropertyService  {
     }
 
 
+    @Transactional(rollbackFor = Exception.class)
+    public void copyProperty(Long[] ids, String appName, String templateKey) {
+        List<PropertyEntity> propertyEntities = (List<PropertyEntity>) propertyDao.listByIds(Arrays.asList(ids));
+        if (CollectionUtils.isEmpty(propertyEntities)) {
+            throw new MarsException("请选择要复制的模板");
+        }
+        List<PropertyEntity> list = new ArrayList<>(ids.length);
+        for (PropertyEntity p : propertyEntities) {
+            QueryWrapper<PropertyEntity> q = new QueryWrapper();
+            q.eq("app_name", appName);
+            q.eq("template_key", templateKey);
+            q.eq("property_key", p.getPropertyKey());
+            int count = propertyDao.count(q);
+            if (count > 0) {
+                continue;
+            }
+            PropertyEntity newP = new PropertyEntity();
+            BeanUtils.copyProperties(p, newP);
+            newP.setAppName(appName);
+            newP.setTemplateKey(templateKey);
+            newP.setId(null);
+            list.add(newP);
+        }
+        if (CollectionUtils.isNotEmpty(list)){
+            propertyDao.saveBatch(list);
+        }
+    }
 
+    public Object codeProperty(String appName, String templateKey) {
+        QueryWrapper<PropertyEntity> q = new QueryWrapper();
+        q.eq("app_name", appName);
+        q.eq("template_key", templateKey);
+        List<PropertyEntity> list = propertyDao.list(q);
+        if (CollectionUtils.isNotEmpty(list)){
+            for(PropertyEntity p: list){
+                if ("string".equals(p.getPropertyType())){
+                    p.setPropertyType("String");
+                }else if ("double".equalsIgnoreCase(p.getPropertyType())){
+                    p.setPropertyType("Double");
+                }else if ("int".equalsIgnoreCase(p.getPropertyType())){
+                    p.setPropertyType("Integer");
+                }else if ("long".equalsIgnoreCase(p.getPropertyType())){
+                    p.setPropertyType("Long");
+                }else if ("boolean".equalsIgnoreCase(p.getPropertyType())){
+                    p.setPropertyType("Boolean");
+                }else if ("date".equalsIgnoreCase(p.getPropertyType())){
+                    p.setPropertyType("Date");
+                }
+            }
+            Map<String, Object> map = new HashMap<>();
+            map.put("columns",list);
+            map.put("className",captureName(templateKey));
+            VelocityContext context = new VelocityContext(map);
+            StringWriter sw = new StringWriter();
+
+            Template tpl = Velocity.getTemplate("bean.java.vm", "UTF-8");
+            tpl.merge(context, sw);
+
+            return sw.toString();
+        }
+
+        return null;
+    }
+
+    @PostConstruct
+    public  void initVelocity() {
+        Properties p = new Properties();
+        //加载classpath目录下的vm文件
+        p.setProperty("file.resource.loader.class",
+                "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+        //定义字符集
+        p.setProperty(Velocity.ENCODING_DEFAULT, "UTF-8");
+        // 初始化Velocity引擎，指定配置Properties
+        Velocity.init(p);
+    }
+
+    /**
+     * 将字符串的首字母转大写
+     * @param str 需要转换的字符串
+     * @return
+     */
+    private static String captureName(String str) {
+        if (StringUtils.isNotEmpty(str)) {
+            // 进行字母的ascii编码前移，效率要高于截取字符串进行转换的操作
+            char[] cs = str.toCharArray();
+            cs[0] -= 32;
+            return String.valueOf(cs);
+        }
+        return "";
+    }
 }

@@ -4,22 +4,34 @@
     <form id="userInfoEditForm">
         <input type="hidden" id="configId"  name="id"/>
         <input type="hidden" id="operationType"  name="operationType" value="2"/>
-        <fieldset style="border:1px solid black;padding: 5px">
-            <legend>必填</legend>
-            优先级:
-            <input type="text" class="form-control"  name="priority" id="editPriority" placeholder="优先级"
-                   onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"
-            />
-            启用状态:
-            <select name="status" class="form-control" id="editStatus" aria-required="true">
-                <option value="1">启用</option>
-                <option value="0">停用</option>
-            </select>
-            描述:
-            <textarea type="text" class="form-control" name="description" id="editDescription" maxlength="255"
-                      placeholder="描述" ></textarea>
-        </fieldset>
-        <div id="editConfigTimeStatus">
+
+        <div class="form-group form-group-30" >
+            <div  class="form-text-right"><span style="color: red;">*</span>优先级</div>
+            <div class="col-sm-8">
+                <input type="text" class="form-control"  name="priority" id="editPriority" placeholder="优先级"
+                       onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"
+                />
+            </div>
+        </div>
+        <div class="form-group form-group-30" >
+            <div  class="form-text-right"><span style="color: red;">*</span>启用状态</div>
+            <div class="col-sm-8">
+                <select name="status" class="form-control" id="editStatus" aria-required="true">
+                    <option value="1">启用</option>
+                    <option value="0">停用</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group form-group-30" style="height: 54px;" >
+            <div  class="form-text-right"><span style="color: red;">*</span>描述</div>
+            <div class="col-sm-8">
+                <textarea type="text" class="form-control" name="description" id="editDescription" maxlength="255"
+                          placeholder="描述" ></textarea>
+            </div>
+        </div>
+
+
+        <!--<div id="editConfigTimeStatus">
             <fieldset style="border:1px solid black;margin-top: 5px;padding: 5px">
                 <legend>选填属性</legend>
                 <div>
@@ -29,7 +41,7 @@
                     <input type="text" class="form-control layui-input" name="endDate" id="editEndTime" placeholder="yyyy-MM-dd HH:mm:ss" >
                 </div>
             </fieldset>
-        </div>
+        </div>-->
 
         <div style="display: none;">
             选择环境:
@@ -49,7 +61,7 @@
         <input type="reset" name="editReset" style="display: none;"/>
     </form>
     <fieldset style="border:1px solid black;margin-top: 5px;padding: 5px">
-        <legend>属性</legend>
+        <legend>模板属性</legend>
         <div id="editPropertyDiv" style="">
 
         </div>

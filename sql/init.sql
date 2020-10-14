@@ -268,6 +268,12 @@ CREATE TABLE `property` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='属性表';
 
+INSERT INTO `property` (`property_name`, `property_key`, `property_type`, `label_type`, `label_value`, `app_name`, `variable_key`, `template_key`, `attribute_type`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`, `priority`) VALUES ( '标题', 'title', 'string', 'input', '', '-1', '', '-1', '1', '1', '2020-10-14 14:56:59', NULL, NULL, '0', '1');
+INSERT INTO `property` (`property_name`, `property_key`, `property_type`, `label_type`, `label_value`, `app_name`, `variable_key`, `template_key`, `attribute_type`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`, `priority`) VALUES ( '开始时间', 'startDate', 'date', 'input', '', '-1', '', '-1', '0', '1', '2020-10-14 14:58:03', NULL, NULL, '0', '2');
+INSERT INTO `property` (`property_name`, `property_key`, `property_type`, `label_type`, `label_value`, `app_name`, `variable_key`, `template_key`, `attribute_type`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`, `priority`) VALUES ( '结束时间', 'endDate', 'date', 'input', '', '-1', '', '-1', '1', '1', '2020-10-14 14:58:47', NULL, NULL, '0', '3');
+
+
+
 CREATE TABLE `template_property_relation` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `create_id` bigint(11) NOT NULL COMMENT '创建者id',
@@ -320,6 +326,7 @@ CREATE TABLE `config_value` (
   `update_id` bigint(11) DEFAULT NULL COMMENT '最近更新者id',
   `update_date` datetime DEFAULT NULL COMMENT '最近更新时间',
   `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
+  `release_status` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1发布 0未发布',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='配置数据表';
 

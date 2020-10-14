@@ -1,22 +1,30 @@
 package com.github.fashionbrot.core.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.github.fashionbrot.common.enums.RespCode;
 import com.github.fashionbrot.common.exception.CurdException;
+import com.github.fashionbrot.common.exception.MarsException;
+import com.github.fashionbrot.common.model.LoginModel;
 import com.github.fashionbrot.common.req.ConfigValueReq;
 import com.github.fashionbrot.common.vo.PageVo;
+import com.github.fashionbrot.core.UserLoginService;
 import com.github.fashionbrot.dao.dao.ConfigValueDao;
 import com.github.fashionbrot.dao.entity.ConfigValueEntity;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +41,9 @@ public class ConfigValueService  {
 
     @Autowired
     private ConfigValueDao configValueDao;
+
+    @Autowired
+    private UserLoginService userLoginService;
 
 
     public Collection<ConfigValueEntity> queryList(Map<String, Object> params) {
@@ -73,8 +84,41 @@ public class ConfigValueService  {
 
 
     public void insert(ConfigValueEntity entity) {
+        setDate(entity);
         if(!configValueDao.save(entity)){
             throw new CurdException(RespCode.SAVE_ERROR);
+        }
+    }
+
+    private void setDate(ConfigValueEntity entity) {
+        LoginModel model = userLoginService.getLogin();
+        if (model!=null){
+
+            entity.setUserName(new String(Base64.getDecoder().decode(model.getUserName())));
+        }
+        String json = entity.getJson();
+        if (StringUtils.isEmpty(json)){
+            throw new MarsException("请配置模板属性");
+        }
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = JSON.parseObject(json);
+        }catch (Exception e){
+            throw new MarsException("填写属性值格式有误，请检查");
+        }
+        if (jsonObject!=null && jsonObject.containsKey("startDate") && StringUtils.isNotEmpty(jsonObject.getString("startDate"))){
+            try {
+                entity.setStartTime(DateUtils.parseDate(jsonObject.getString("startDate"),"yyyy-MM-dd HH:mm:ss"));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        if (jsonObject!=null && jsonObject.containsKey("endDate") && StringUtils.isNotEmpty(jsonObject.getString("endDate"))){
+            try {
+                entity.setEndTime(DateUtils.parseDate(jsonObject.getString("endDate"),"yyyy-MM-dd HH:mm:ss"));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -99,6 +143,7 @@ public class ConfigValueService  {
 
 
     public void updateById(ConfigValueEntity entity) {
+        setDate(entity);
         if(!configValueDao.updateById(entity)){
             throw new CurdException(RespCode.UPDATE_ERROR);
         }
