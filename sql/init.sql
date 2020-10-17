@@ -235,6 +235,8 @@ INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id
 INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id`, `priority`, `code`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`) VALUES ('51', '模板管理', '1', '', '0', '600', '', '1', '2020-10-12 15:40:12', NULL, NULL, '0');
 INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id`, `priority`, `code`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`) VALUES ('52', '模板列表', '2', '/admin/template/index', '51', '601', '', '1', '2020-10-12 15:40:41', NULL, NULL, '0');
 INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id`, `priority`, `code`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`) VALUES ('53', '属性列表', '2', '/admin/property/index', '51', '602', '', '1', '2020-10-12 16:53:58', NULL, NULL, '0');
+INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id`, `priority`, `code`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`) VALUES ('54', '配置数据管理', '1', '', '0', '700', '', '1', '2020-10-18 00:07:29', '1', '2020-10-18 00:07:40', '0');
+INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id`, `priority`, `code`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`) VALUES ('55', '配置数据列表', '2', '/admin/config/value/index', '54', '701', '', '1', '2020-10-18 00:08:06', NULL, NULL, '0');
 
 
 
@@ -265,12 +267,13 @@ CREATE TABLE `property` (
   `priority` tinyint(5) NOT NULL DEFAULT '0' COMMENT '显示优先级',
   `create_id` bigint(11) NOT NULL COMMENT '创建者id',
   `create_date` datetime NOT NULL COMMENT '创建时间',
+  `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='属性表';
 
-INSERT INTO `property` (`property_name`, `property_key`, `property_type`, `label_type`, `label_value`, `app_name`, `variable_key`, `template_key`, `attribute_type`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`, `priority`) VALUES ( '标题', 'title', 'string', 'input', '', '-1', '', '-1', '1', '1', '2020-10-14 14:56:59', NULL, NULL, '0', '1');
-INSERT INTO `property` (`property_name`, `property_key`, `property_type`, `label_type`, `label_value`, `app_name`, `variable_key`, `template_key`, `attribute_type`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`, `priority`) VALUES ( '开始时间', 'startDate', 'date', 'input', '', '-1', '', '-1', '0', '1', '2020-10-14 14:58:03', NULL, NULL, '0', '2');
-INSERT INTO `property` (`property_name`, `property_key`, `property_type`, `label_type`, `label_value`, `app_name`, `variable_key`, `template_key`, `attribute_type`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`, `priority`) VALUES ( '结束时间', 'endDate', 'date', 'input', '', '-1', '', '-1', '1', '1', '2020-10-14 14:58:47', NULL, NULL, '0', '3');
+INSERT INTO `property` (`property_name`, `property_key`, `property_type`, `label_type`, `label_value`, `app_name`, `variable_key`, `template_key`, `attribute_type`, `create_id`, `create_date`,  `del_flag`, `priority`) VALUES ( '标题', 'title', 'string', 'input', '', '-1', '', '-1', '1', '1', '2020-10-14 14:56:59', '0', '1');
+INSERT INTO `property` (`property_name`, `property_key`, `property_type`, `label_type`, `label_value`, `app_name`, `variable_key`, `template_key`, `attribute_type`, `create_id`, `create_date`, `del_flag`, `priority`) VALUES ( '开始时间', 'startDate', 'date', 'input', '', '-1', '', '-1', '0', '1', '2020-10-14 14:58:03', '0', '2');
+INSERT INTO `property` (`property_name`, `property_key`, `property_type`, `label_type`, `label_value`, `app_name`, `variable_key`, `template_key`, `attribute_type`, `create_id`, `create_date`,  `del_flag`, `priority`) VALUES ( '结束时间', 'endDate', 'date', 'input', '', '-1', '', '-1', '1', '1', '2020-10-14 14:58:47', '0', '3');
 
 
 
@@ -326,9 +329,32 @@ CREATE TABLE `config_value` (
   `update_id` bigint(11) DEFAULT NULL COMMENT '最近更新者id',
   `update_date` datetime DEFAULT NULL COMMENT '最近更新时间',
   `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
-  `release_status` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1发布 0未发布',
+  `release_status` tinyint(1) DEFAULT '0' COMMENT '发布状态 1发布 0未发布',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='配置数据表';
+
+CREATE TABLE `config_value` (
+  `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `status` tinyint(2) NOT NULL DEFAULT '0' COMMENT '状态 1开启 0关闭',
+  `start_time` datetime DEFAULT NULL COMMENT '开始时间',
+  `end_time` datetime DEFAULT NULL COMMENT '结束时间',
+  `template_key` varchar(32) NOT NULL COMMENT '模板key',
+  `json` text NOT NULL COMMENT '实例json',
+  `description` varchar(255) DEFAULT NULL COMMENT '描述',
+  `priority` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '优先级',
+  `env_code` varchar(32) NOT NULL COMMENT '环境code',
+  `app_name` varchar(32) NOT NULL COMMENT '应用名',
+  `user_name` varchar(32) DEFAULT NULL COMMENT '用户名',
+  `create_id` bigint(11) NOT NULL COMMENT '创建者id',
+  `create_date` datetime NOT NULL COMMENT '创建时间',
+  `update_id` bigint(11) DEFAULT NULL COMMENT '最近更新者id',
+  `update_date` datetime DEFAULT NULL COMMENT '最近更新时间',
+  `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
+  `release_status` tinyint(1) DEFAULT '0' COMMENT '发布状态 1发布 0未发布',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='配置数据表';
+
+
 
 CREATE TABLE `value_data` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',

@@ -56,18 +56,34 @@
                                     <span class="glyphicon glyphicon-plus"></span>新增
                                 </button>
                             </div>
-                            <!--<div class="btn-group">
-                                <button type="button" class="btn btn-success dropdown-toggle"
-                                        onclick="releaseConfig(0)">
-                                    <span class="glyphicon glyphicon-send"></span>发布全部
-                                </button>
-                            </div>-->
                             <div class="btn-group">
                                 <button type="button" class="btn btn-success dropdown-toggle"
                                         onclick="releaseConfig(1)">
                                     <span class="glyphicon glyphicon-send"></span>发布已修改模板
                                 </button>
                             </div>
+                        </div>
+
+                        <div class="panel-heading" style="float: right;">
+                           <!-- <div class="btn-group">
+                                <button type="button" class="btn btn-success dropdown-toggle"
+                                        onclick="add()">
+                                    <span class="glyphicon glyphicon-plus"></span>新增
+                                </button>
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-success dropdown-toggle"
+                                        onclick="releaseConfig(1)">
+                                    <span class="glyphicon glyphicon-send"></span>发布已修改模板
+                                </button>
+                            </div>-->
+                            <!--<div class="btn-group">
+                                <button type="button" class="btn btn-success dropdown-toggle"
+                                        onclick="releaseConfig(0)">
+                                    <span class="glyphicon glyphicon-send"></span>发布全部
+                                </button>
+                            </div>-->
+
                             <div class="pull-right" style="">
                                 <label>环境</label>
                                 <div class="btn-group" style="width:180px;">
@@ -82,8 +98,8 @@
                                     </select>
                                 </div>
                                 <label>模板</label>
-                                <div class="btn-group" style="width:300px;">
-                                    <select name="templateKey" class="form-control" style="" id="templateKey" aria-required="true">
+                                <div class="btn-group" style="width:280px;">
+                                    <select name="templateKey" class="form-control" style="" id="templateKey" >
 
                                     </select>
                                 </div>
@@ -95,9 +111,9 @@
                                 </div>
 
 
-                                <label>模糊搜索:</label>
+
                                 <div class="btn-group" style="width:200px;">
-                                    <input name="description" class="form-control" id="description" aria-required="true"/>
+                                    <input name="description" class="form-control" id="description" placeholder="模糊搜索描述"/>
                                 </div>
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-success dropdown-toggle"
