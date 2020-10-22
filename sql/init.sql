@@ -333,26 +333,20 @@ CREATE TABLE `config_value` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='配置数据表';
 
-CREATE TABLE `config_value` (
+CREATE TABLE `config_record` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
-  `status` tinyint(2) NOT NULL DEFAULT '0' COMMENT '状态 1开启 0关闭',
-  `start_time` datetime DEFAULT NULL COMMENT '开始时间',
-  `end_time` datetime DEFAULT NULL COMMENT '结束时间',
-  `template_key` varchar(32) NOT NULL COMMENT '模板key',
-  `json` text NOT NULL COMMENT '实例json',
-  `description` varchar(255) DEFAULT NULL COMMENT '描述',
-  `priority` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '优先级',
   `env_code` varchar(32) NOT NULL COMMENT '环境code',
   `app_name` varchar(32) NOT NULL COMMENT '应用名',
+  `template_key` varchar(32) NOT NULL COMMENT '模板key',
+  `json` text NOT NULL COMMENT '实例json',
+  `new_json` text NOT NULL COMMENT '实例json',
   `user_name` varchar(32) DEFAULT NULL COMMENT '用户名',
+  `operation_type` tinyint(1) DEFAULT '0' COMMENT '操作类型 1编辑 2:删除',
   `create_id` bigint(11) NOT NULL COMMENT '创建者id',
   `create_date` datetime NOT NULL COMMENT '创建时间',
-  `update_id` bigint(11) DEFAULT NULL COMMENT '最近更新者id',
-  `update_date` datetime DEFAULT NULL COMMENT '最近更新时间',
   `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
-  `release_status` tinyint(1) DEFAULT '0' COMMENT '发布状态 1发布 0未发布',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='配置数据表';
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='配置数据记录表';
 
 
 

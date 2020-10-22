@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.github.cliftonlabs.json_simple.JsonObject;
+import com.github.fashionbrot.common.enums.OperationTypeEnum;
 import com.github.fashionbrot.common.enums.RespCode;
 import com.github.fashionbrot.common.exception.CurdException;
 import com.github.fashionbrot.common.exception.MarsException;
@@ -12,7 +14,9 @@ import com.github.fashionbrot.common.model.LoginModel;
 import com.github.fashionbrot.common.req.ConfigValueReq;
 import com.github.fashionbrot.common.vo.PageVo;
 import com.github.fashionbrot.core.UserLoginService;
+import com.github.fashionbrot.dao.dao.ConfigRecordDao;
 import com.github.fashionbrot.dao.dao.ConfigValueDao;
+import com.github.fashionbrot.dao.entity.ConfigRecordEntity;
 import com.github.fashionbrot.dao.entity.ConfigValueEntity;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -41,6 +45,9 @@ public class ConfigValueService  {
 
     @Autowired
     private ConfigValueDao configValueDao;
+
+    @Autowired
+    private ConfigRecordDao configRecordDao;
 
     @Autowired
     private UserLoginService userLoginService;
@@ -142,11 +149,26 @@ public class ConfigValueService  {
     }
 
 
+    @Transactional(rollbackFor = Exception.class)
     public void updateById(ConfigValueEntity entity) {
+        ConfigValueEntity value = configValueDao.getById(entity.getId());
+        if (value==null){
+            throw new MarsException("配置不存在");
+        }
         setDate(entity);
+        entity.setReleaseStatus(0);
         if(!configValueDao.updateById(entity)){
             throw new CurdException(RespCode.UPDATE_ERROR);
         }
+        ConfigRecordEntity record=ConfigRecordEntity.builder()
+                .appName(entity.getAppName())
+                .envCode(entity.getEnvCode())
+                .templateKey(entity.getTemplateKey())
+                .json(JSON.toJSONString(value))
+                .newJson(JSON.toJSONString(entity))
+                .operationType(OperationTypeEnum.DELETE.getCode())
+                .build();
+        configRecordDao.save(record);
     }
 
 
@@ -174,10 +196,24 @@ public class ConfigValueService  {
     }
 
 
+    @Transactional(rollbackFor = Exception.class)
     public void deleteById(Serializable id) {
+        ConfigValueEntity value = configValueDao.getById(id);
+        if (value==null){
+            throw new MarsException("配置不存在");
+        }
         if(!configValueDao.removeById(id)){
             throw new CurdException(RespCode.DELETE_ERROR);
         }
+        ConfigRecordEntity record=ConfigRecordEntity.builder()
+                .appName(value.getAppName())
+                .envCode(value.getEnvCode())
+                .templateKey(value.getTemplateKey())
+                .json(JSON.toJSONString(value))
+                .newJson("")
+                .operationType(OperationTypeEnum.DELETE.getCode())
+                .build();
+        configRecordDao.save(record);
     }
 
 

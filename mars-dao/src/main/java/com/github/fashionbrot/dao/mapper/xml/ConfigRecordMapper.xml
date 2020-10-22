@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.github.fashionbrot.dao.mapper.ConfigRecordMapper">
+
+
+    <resultMap type="com.github.fashionbrot.dao.entity.ConfigRecordEntity" id="configRecordMap">
+            <result property="id" column="id"/>
+            <result property="envCode" column="env_code"/>
+            <result property="appName" column="app_name"/>
+            <result property="templateKey" column="template_key"/>
+            <result property="json" column="json"/>
+            <result property="newJson" column="new_json"/>
+            <result property="userName" column="user_name"/>
+            <result property="createId" column="create_id"/>
+            <result property="createDate" column="create_date"/>
+            <result property="delFlag" column="del_flag"/>
+    </resultMap>
+
+
+    <sql id="allSql">
+        id,env_code,app_name,template_key,json,new_json,user_name,create_id,create_date
+    </sql>
+
+    
+
+</mapper>
