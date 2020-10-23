@@ -13,9 +13,8 @@ $(document).ready(function () {
         loadData(false);
     })
     $("#envCode").on("change",function () {
-        $("#appName").val('');
+        $("#appName").val('-1');
     })
-    loadData();
 });
 
 function add() {

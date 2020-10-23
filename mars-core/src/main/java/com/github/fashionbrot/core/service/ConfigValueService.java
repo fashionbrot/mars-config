@@ -7,18 +7,22 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.github.cliftonlabs.json_simple.JsonObject;
+import com.github.fashionbrot.common.enums.DateEnum;
 import com.github.fashionbrot.common.enums.OperationTypeEnum;
 import com.github.fashionbrot.common.enums.RespCode;
 import com.github.fashionbrot.common.exception.CurdException;
 import com.github.fashionbrot.common.exception.MarsException;
 import com.github.fashionbrot.common.model.LoginModel;
 import com.github.fashionbrot.common.req.ConfigValueReq;
+import com.github.fashionbrot.common.util.DateUtil;
 import com.github.fashionbrot.common.vo.PageVo;
 import com.github.fashionbrot.core.UserLoginService;
 import com.github.fashionbrot.dao.dao.ConfigRecordDao;
 import com.github.fashionbrot.dao.dao.ConfigValueDao;
+import com.github.fashionbrot.dao.dao.PropertyDao;
 import com.github.fashionbrot.dao.entity.ConfigRecordEntity;
 import com.github.fashionbrot.dao.entity.ConfigValueEntity;
+import com.github.fashionbrot.dao.entity.PropertyEntity;
 import com.github.fashionbrot.dao.entity.TableColumnEntity;
 import com.github.fashionbrot.dao.mapper.TableColumnMapper;
 import com.github.pagehelper.Page;
@@ -34,6 +38,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -59,6 +65,9 @@ public class ConfigValueService  {
     @Autowired
     private TableColumnMapper tableColumnMapper;
 
+    @Autowired
+    private PropertyDao propertyDao;
+
     public Collection<ConfigValueEntity> queryList(Map<String, Object> params) {
         return configValueDao.listByMap(params);
     }
@@ -78,24 +87,20 @@ public class ConfigValueService  {
     * @return
     */
     public PageVo pageList(ConfigValueReq req){
-        Page<?> page= PageHelper.startPage(req.getPage(),req.getPageSize());
-        QueryWrapper<ConfigValueEntity> queryWrapper=new QueryWrapper();
-        queryWrapper.eq("app_name",req.getAppName());
-        queryWrapper.eq("env_code",req.getEnvCode());
-        queryWrapper.eq("template_key",req.getTemplateKey());
-        if (StringUtils.isNotEmpty(req.getDescription())){
-            queryWrapper.like("description",req.getDescription());
-        }
+
+
+        List<PropertyEntity> propertyList = getPropertyList(req.getAppName(),req.getTemplateKey());
+
         String tableName=req.getAppName()+"_"+req.getTemplateKey();
         req.setTableName(tableName);
+        Page<?> page= PageHelper.startPage(req.getPage(),req.getPageSize());
         List<Map<String,Object>> list = configValueDao.configValueList(req);
         if (CollectionUtils.isNotEmpty(list)){
-            SimpleDateFormat sf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
             for(Map<String,Object> map:list){
-                Date startDate = (Date) map.get("startDate");
-                map.put("startDate",sf.format(startDate));
-                Date endDate= (Date) map.get("endDate");
-                map.put("endDate",sf.format(endDate));
+                for(Map.Entry<String,Object> mm: map.entrySet()){
+                    formatDate(propertyList,mm,mm.getKey());
+                }
             }
         }
 
@@ -105,8 +110,37 @@ public class ConfigValueService  {
                 .build();
     }
 
-    private static Set<String> columnTypeString=new HashSet<>(Arrays.asList("datetime","date","time","year","varchar","text"));
+    private void formatDate(List<PropertyEntity> list, Map.Entry<String, Object> map, String column){
+        if (CollectionUtils.isNotEmpty(list)){
+            for(PropertyEntity p: list){
+                DateEnum dateEnum = DateEnum.ofDateType(p.getPropertyType());
+                if (dateEnum==DateEnum.YEAR && p.getPropertyKey().equals(column)){
+                    java.sql.Date value= (java.sql.Date) map.getValue();
+                    map.setValue(DateUtil.getYear(value));
+                    break;
+                }
+                if (dateEnum==DateEnum.DATE && p.getPropertyKey().equals(column)){
+                    java.sql.Date value= (java.sql.Date) map.getValue();
+                    map.setValue(value.toString());
+                    break;
+                }
+                if (dateEnum==DateEnum.TIME && p.getPropertyKey().equals(column)){
+                    java.sql.Time value= (java.sql.Time) map.getValue();
+                    map.setValue(value.toString());
+                    break;
+                }
+                if (dateEnum!=null && p.getPropertyKey().equals(column)){
+                    Date value = (Date) map.getValue();
+                    if (value!=null){
+                        map.setValue(DateUtil.formatDate(dateEnum.getPattern(),value));
+                    }
+                    break;
+                }
+            }
+        }
+    }
 
+    private static Set<String> columnTypeString=new HashSet<>(Arrays.asList("datetime","date","time","year","varchar","text"));
 
     @Transactional(rollbackFor = Exception.class)
     public void insert(ConfigValueEntity entity) {
@@ -282,22 +316,24 @@ public class ConfigValueService  {
         ConfigValueEntity configValue= configValueDao.getById(id);
         if (configValue!=null){
             configValue.setTableName(configValue.getAppName()+"_"+configValue.getTemplateKey());
+            List<PropertyEntity> list =  getPropertyList(configValue.getAppName(),configValue.getTemplateKey());
             Map<String,Object> map = tableColumnMapper.selectTable(configValue);
             if (map!=null){
-                SimpleDateFormat sf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                for(Map.Entry<String, Object> m :map.entrySet()){
-                    Object value = m.getValue();
-                    if (value instanceof Date){
-                        map.put(m.getKey(),sf.format((Date) value));
-                    }
+                for(Map.Entry<String,Object> mm: map.entrySet()) {
+                    formatDate(list, mm,mm.getKey() );
                 }
             }
-
             configValue.setValue(map);
         }
         return configValue;
     }
 
+    public List<PropertyEntity> getPropertyList(String appName,String templateKey){
+        QueryWrapper<PropertyEntity> queryWrapper=new QueryWrapper();
+        queryWrapper.eq("app_name",appName);
+        queryWrapper.eq("template_key",templateKey);
+        return propertyDao.list(queryWrapper);
+    }
 
     @Transactional(rollbackFor = Exception.class)
     public void deleteById(Serializable id) {

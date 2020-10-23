@@ -761,6 +761,36 @@ function initDateTime(dateId) {
         });
     });
 }
+function initDateOpt(dateId) {
+    var format="";
+    var type="";
+    if (dateId.indexOf("date-year")!=-1){
+        format="yyyy";
+        type="year";
+    }else if (dateId.indexOf("date-time")!=-1){
+        format="HH:mm:ss";
+        type="time";
+    }else if (dateId.indexOf("date-datetime")!=-1){
+        format="yyyy-MM-dd HH:mm:ss";
+        type="datetime";
+    }else if (dateId.indexOf("date-date")!=-1){
+        format="yyyy-MM-dd";
+        type="date";
+    }
+    console.log(dateId,format,type);
+    lay('#'+dateId).each(function(){
+        laydate.render({
+            elem: this
+            ,position:'fixed'
+            ,format:format
+            ,type:type
+            ,trigger: 'click'
+            ,theme: 'grid'
+            ,zIndex: 99999999
+            ,top:30
+        });
+    });
+}
 
 
 $("#logout").on("click",function () {
