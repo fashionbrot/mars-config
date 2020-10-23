@@ -32,7 +32,7 @@ function loadPropertyAttrDiv(id,templateKey,appName,className,json,flag,diff) {
                     var value;
                     var selectVariableKey;
                     if(json!=null && json!=''){
-                        var valueJson=eval('(' + json + ')');
+                        var valueJson= json
                         //var valueJson=strToJson(json);
                         value=forJson(valueJson,row.propertyKey);
                         selectVariableKey=forJson(valueJson,row.propertyKey+"Prefix");
@@ -58,11 +58,7 @@ function loadPropertyAttrDiv(id,templateKey,appName,className,json,flag,diff) {
 
                     var propertyHtml="property-type='"+type+"'   property-key='"+key+"'  property-name='"+name+"' ";
 
-                    var strValue="";
-                    if (value!=null && value!=''){
-                        strValue= JSON.stringify(value).replace(/\"/g,"");
-                    }
-
+                    var strValue=value;
 
                     if(labelType=='textarea'){
 
@@ -104,7 +100,7 @@ function loadPropertyAttrDiv(id,templateKey,appName,className,json,flag,diff) {
                             var onafterpaste="this.value=this.value.replace(/\\D/g,\"\")";
                             var h="<input type='text' onkeyup='"+onkeyup+"' onafterpaste='"+onafterpaste+"'  value='"+value+"' "+propertyHtml+" class='form-control "+className+"' />";
                             html+=lineHtml(title,h);
-                        }else if(type=='date') {
+                        }else if(type=='datetime') {
                             var dateId = key + "-date-" + row.id;
                             dateIds.push(dateId);
                             var h = "<input type='text' id='" + dateId + "' value='" + value + "' "+propertyHtml+" class='form-control layui-input " + className + "'  />";
@@ -149,6 +145,13 @@ function loadPropertyAttrDiv(id,templateKey,appName,className,json,flag,diff) {
             }
         }
     });
+}
+function getValue(map,key) {
+    if (map!=null){
+        $.each(map,function(n,item){  //.parseJSON（）方法把JSON字符串转换为javascript对象，不转换的话将会抛出错误。
+            console.log(n,item);
+        })
+    }
 }
 
 function lineHtml(title,inputHtml) {
@@ -326,11 +329,11 @@ function getJson(className) {
         }
 
 
-        if (type=='double' && !checkDouble(value)){
+        if (floatType(type) && !checkDouble(value)){
             alert("<"+name+"> 的值不属于"+type);
             return false;
         }
-        if (type=='long' && !checkLong(value)){
+        if (integerType(type) && !checkLong(value)){
             alert("<"+name+"> 的值不属于"+type);
             return false;
         }
@@ -339,12 +342,12 @@ function getJson(className) {
             json+=':';
             json+="\""+value+"\"";
             flag=true;
-        }else if(type=='string' || type=='date'){
+        }else if(stringType(type)){
             json+='"'+key+'"';
             json+=':';
             json+="\""+(value)+"\"";
             flag=true;
-        }else if(type=='boolean' || type=='double' || type=='long'){
+        }else if(numberType(type)){
             json+='"'+key+'":'+value+'';
             flag=true;
         }else{
@@ -354,6 +357,56 @@ function getJson(className) {
     }
     json+="}";
     return json;
+}
+
+function stringType(type) {
+    if (type=="varchar"){
+        return true;
+    }else if (type=="datetime"){
+        return true;
+    }else if (type=="date"){
+        return true;
+    }else if (type=="time"){
+        return true;
+    }else if (type=="year"){
+        return true;
+    }else if (type=="text"){
+        return true;
+    }
+    return false;
+}
+
+function numberType(type) {
+    if (type=="int"){
+        return true;
+    }else if (type=="tinyint"){
+        return true;
+    }else if (type=="bigint"){
+        return true;
+    }else if (type=="double"){
+        return true;
+    }else if (type=="decimal"){
+        return true;
+    }
+    return false;
+}
+function integerType(type) {
+    if (type=="int"){
+        return true;
+    }else if (type=="tinyint"){
+        return true;
+    }else if (type=="bigint"){
+        return true;
+    }
+    return false;
+}
+function floatType(type) {
+    if (type=="double"){
+        return true;
+    }else if (type=="decimal"){
+        return true;
+    }
+    return false;
 }
 
 function checkDouble(val){

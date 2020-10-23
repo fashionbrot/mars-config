@@ -19,6 +19,44 @@ $(document).ready(function () {
     });
 });
 
+$("#addPropertyType").on("change",function () {
+    var value=$("#addPropertyType").val();
+    typeFlag(value,"addPropertyTypeDiv",true);
+});
+function typeFlag(value,divId,isAdd){
+    if (value=="date" || value=="year" || value=="time" || value=="datetime" || value =="text" || value=="decimal" || value=="double" ){
+        $("#"+divId).hide();
+        if (isAdd){
+            $("#addColumnLength").val('0');
+        }else{
+            $("#editColumnLength").val('0');
+        }
+    }else{
+        var length=0;
+        if (value=='bigint'){
+            length = 11;
+        }else if (value=="tinyint"){
+            length =3;
+        }else if (value=="int"){
+            length =4;
+        }else if (value=="varchar"){
+            length =200;
+        }
+        if (isAdd){
+            $("#addColumnLength").val(length);
+        }else{
+            $("#editColumnLength").val(length);
+        }
+        $("#"+divId).show();
+    }
+}
+
+$("#editPropertyType").on("change",function () {
+    var value=$("#editPropertyType").val();
+    typeFlag(value,"editPropertyTypeDiv",false);
+});
+
+
 //添加用户
 var addTemplate = function () {
 
@@ -192,6 +230,7 @@ var queryByUserId = function (id) {
             var data=result.data;
             $("#editId").val(data.id);
             $("#editPriority").val(data.priority);
+            $("#editColumnLength").val(data.columnLength);
             $("#editPropertyName").val(data.propertyName);
             $("#editPropertyKey").val(data.propertyKey);
             $("#editPropertyType").val(data.propertyType);
@@ -227,6 +266,9 @@ var queryByUserId = function (id) {
             loadNoSearchSelect("editVariableKey");
             loadNoSearchSelect("editLabelType");
             loadNoSearchSelect("editPropertyType");
+
+            typeFlag(data.propertyType,"editPropertyTypeDiv");
+
             $("#editModal").modal("show");
 
         },error: function (e) {
@@ -477,12 +519,14 @@ function appNameChange(appNameId,templateKeyId) {
     loadNoSearchSelect(appNameId);
     manager.loadApp(appNameId,"公共应用");
 
-    var appName= $("#"+appNameId).val();
-    manager.loadTemplateCustom(templateKeyId,appName,"公共模板");
 
     $("#"+appNameId).on("change",function () {
         var appName= $("#"+appNameId).val();
-        manager.loadTemplateCustom(templateKeyId,appName,"公共模板");
+        if(appName=="-1") {
+            $("#"+templateKeyId).html("<option value=\"-1\" >公共模板</option>");
+        }else{
+            manager.loadTemplateCustom(templateKeyId, appName, "公共模板");
+        }
         loadSelect(templateKeyId);
     })
 }

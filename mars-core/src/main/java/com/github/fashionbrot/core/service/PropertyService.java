@@ -1,5 +1,6 @@
 package com.github.fashionbrot.core.service;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -11,6 +12,7 @@ import com.github.fashionbrot.common.req.PropertyReq;
 import com.github.fashionbrot.common.vo.PageVo;
 import com.github.fashionbrot.dao.dao.PropertyDao;
 import com.github.fashionbrot.dao.entity.PropertyEntity;
+import com.github.fashionbrot.dao.mapper.TableColumnMapper;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import org.apache.velocity.Template;
@@ -24,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
 import java.io.StringWriter;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -38,6 +41,8 @@ public class PropertyService  {
 
     @Autowired
     private PropertyDao propertyDao;
+    @Autowired
+    private TableColumnMapper tableColumnMapper;
 
 
     public Collection<PropertyEntity> queryList(Map<String, Object> params) {
@@ -80,10 +85,13 @@ public class PropertyService  {
 
 
 
+    @Transactional(rollbackFor = Exception.class)
     public void insert(PropertyEntity entity) {
         if(!propertyDao.save(entity)){
             throw new CurdException(RespCode.SAVE_ERROR);
         }
+        entity.setTemplateKey(entity.getAppName()+"_"+entity.getTemplateKey());
+        tableColumnMapper.addTableColumn(entity);
     }
 
 
@@ -106,10 +114,13 @@ public class PropertyService  {
     }
 
 
+    @Transactional(rollbackFor = Exception.class)
     public void updateById(PropertyEntity entity) {
         if(!propertyDao.updateById(entity)){
             throw new CurdException(RespCode.UPDATE_ERROR);
         }
+        entity.setTemplateKey(entity.getAppName()+"_"+entity.getTemplateKey());
+        tableColumnMapper.updateTableColumn(entity);
     }
 
 
@@ -137,10 +148,17 @@ public class PropertyService  {
     }
 
 
+    @Transactional(rollbackFor = Exception.class)
     public void deleteById(Serializable id) {
+        PropertyEntity byId = propertyDao.getById(id);
+        if (byId==null){
+            throw new MarsException("属性不存在");
+        }
         if(!propertyDao.removeById(id)){
             throw new CurdException(RespCode.DELETE_ERROR);
         }
+        byId.setTemplateKey(byId.getAppName()+"_"+byId.getTemplateKey());
+        tableColumnMapper.updateTableColumn(byId);
     }
 
 
@@ -190,6 +208,10 @@ public class PropertyService  {
         }
         if (CollectionUtils.isNotEmpty(list)){
             propertyDao.saveBatch(list);
+            for(PropertyEntity pp : list){
+                pp.setTemplateKey(pp.getAppName()+"_"+pp.getTemplateKey());
+                tableColumnMapper.addTableColumn(pp);
+            }
         }
     }
 
@@ -200,17 +222,18 @@ public class PropertyService  {
         List<PropertyEntity> list = propertyDao.list(q);
         if (CollectionUtils.isNotEmpty(list)){
             for(PropertyEntity p: list){
-                if ("string".equals(p.getPropertyType())){
+
+                if ("varchar".equals(p.getPropertyType()) || "text".equals(p.getPropertyType())){
                     p.setPropertyType("String");
                 }else if ("double".equalsIgnoreCase(p.getPropertyType())){
                     p.setPropertyType("Double");
-                }else if ("int".equalsIgnoreCase(p.getPropertyType())){
+                }else if ("int".equalsIgnoreCase(p.getPropertyType()) || "tinyint".equalsIgnoreCase(p.getPropertyType())){
                     p.setPropertyType("Integer");
-                }else if ("long".equalsIgnoreCase(p.getPropertyType())){
+                }else if ("bigint".equalsIgnoreCase(p.getPropertyType())){
                     p.setPropertyType("Long");
-                }else if ("boolean".equalsIgnoreCase(p.getPropertyType())){
-                    p.setPropertyType("Boolean");
-                }else if ("date".equalsIgnoreCase(p.getPropertyType())){
+                }else if ("decimal".equalsIgnoreCase(p.getPropertyType())){
+                    p.setPropertyType("BigDecimal");
+                }else if ("date".equalsIgnoreCase(p.getPropertyType()) || "datetime".equalsIgnoreCase(p.getPropertyType()) || "time".equalsIgnoreCase(p.getPropertyType()) || "year".equalsIgnoreCase(p.getPropertyType())){
                     p.setPropertyType("Date");
                 }
             }

@@ -258,6 +258,7 @@ CREATE TABLE `property` (
   `property_name` varchar(64) NOT NULL COMMENT '属性名称',
   `property_key` varchar(64) NOT NULL COMMENT '属性key',
   `property_type` varchar(64) NOT NULL COMMENT '属性类型',
+  `column_length` int(4) NOT NULL COMMENT '属性长度',
   `label_type` varchar(64) NOT NULL COMMENT 'html标签类型',
   `label_value` text COMMENT 'html 标签值',
   `app_name` varchar(32) NOT NULL COMMENT '应用名称',
@@ -271,9 +272,9 @@ CREATE TABLE `property` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='属性表';
 
-INSERT INTO `property` (`property_name`, `property_key`, `property_type`, `label_type`, `label_value`, `app_name`, `variable_key`, `template_key`, `attribute_type`, `create_id`, `create_date`,  `del_flag`, `priority`) VALUES ( '标题', 'title', 'string', 'input', '', '-1', '', '-1', '1', '1', '2020-10-14 14:56:59', '0', '1');
-INSERT INTO `property` (`property_name`, `property_key`, `property_type`, `label_type`, `label_value`, `app_name`, `variable_key`, `template_key`, `attribute_type`, `create_id`, `create_date`, `del_flag`, `priority`) VALUES ( '开始时间', 'startDate', 'date', 'input', '', '-1', '', '-1', '0', '1', '2020-10-14 14:58:03', '0', '2');
-INSERT INTO `property` (`property_name`, `property_key`, `property_type`, `label_type`, `label_value`, `app_name`, `variable_key`, `template_key`, `attribute_type`, `create_id`, `create_date`,  `del_flag`, `priority`) VALUES ( '结束时间', 'endDate', 'date', 'input', '', '-1', '', '-1', '1', '1', '2020-10-14 14:58:47', '0', '3');
+INSERT INTO `property` (`column_length`,`property_name`, `property_key`, `property_type`, `label_type`, `label_value`, `app_name`, `variable_key`, `template_key`, `attribute_type`, `create_id`, `create_date`,  `del_flag`, `priority`) VALUES (64, '标题', 'title', 'varchar', 'input', '', '-1', '', '-1', '1', '1', '2020-10-14 14:56:59', '0', '1');
+INSERT INTO `property` (`column_length`,`property_name`, `property_key`, `property_type`, `label_type`, `label_value`, `app_name`, `variable_key`, `template_key`, `attribute_type`, `create_id`, `create_date`, `del_flag`, `priority`) VALUES (0,'开始时间', 'startDate', 'datetime', 'input', '', '-1', '', '-1', '0', '1', '2020-10-14 14:58:03', '0', '2');
+INSERT INTO `property` (`column_length`,`property_name`, `property_key`, `property_type`, `label_type`, `label_value`, `app_name`, `variable_key`, `template_key`, `attribute_type`, `create_id`, `create_date`,  `del_flag`, `priority`) VALUES (0, '结束时间', 'endDate', 'datetime', 'input', '', '-1', '', '-1', '1', '1', '2020-10-14 14:58:47', '0', '3');
 
 
 
@@ -332,6 +333,17 @@ CREATE TABLE `config_value` (
   `release_status` tinyint(1) DEFAULT '0' COMMENT '发布状态 1发布 0未发布',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='配置数据表';
+
+
+CREATE TABLE `config_value` (
+  `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `config_id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '配置id',
+  `env_code` varchar(32) NOT NULL COMMENT '环境code',
+  `app_name` varchar(32) NOT NULL COMMENT '应用名',
+  `template_key` varchar(32) NOT NULL COMMENT '模板key',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='配置数据表';
+
 
 CREATE TABLE `config_record` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',

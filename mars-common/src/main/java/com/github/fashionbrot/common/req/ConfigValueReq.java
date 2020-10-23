@@ -11,4 +11,5 @@ public class ConfigValueReq extends PageReq {
     private String templateKey;
     private String description;
 
+    private String tableName;
 }

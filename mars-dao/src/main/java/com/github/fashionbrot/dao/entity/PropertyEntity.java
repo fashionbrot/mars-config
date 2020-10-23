@@ -44,6 +44,10 @@ public class PropertyEntity {
 	@TableField("property_type")
 	private String propertyType;
 
+	@ApiModelProperty("属性长度")
+	@TableField("column_length")
+	private Integer columnLength;
+
 	@ApiModelProperty(value = "html标签类型")
 	@TableField("label_type")
 	private String labelType;

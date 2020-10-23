@@ -6,11 +6,13 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.github.fashionbrot.common.enums.RespCode;
 import com.github.fashionbrot.common.exception.CurdException;
+import com.github.fashionbrot.common.exception.MarsException;
 import com.github.fashionbrot.common.req.TemplateReq;
 import com.github.fashionbrot.common.vo.PageVo;
 import com.github.fashionbrot.dao.dao.TemplateDao;
 import com.github.fashionbrot.dao.dao.TemplatePropertyRelationDao;
 import com.github.fashionbrot.dao.entity.TemplateEntity;
+import com.github.fashionbrot.dao.mapper.TableColumnMapper;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,9 @@ public class TemplateService {
 
     @Autowired
     private TemplateDao templateDao;
+
+    @Autowired
+    private TableColumnMapper tableColumnMapper;
 
 
     public Collection<TemplateEntity> queryList(Map<String, Object> params) {
@@ -77,10 +82,18 @@ public class TemplateService {
 
 
 
+    @Transactional(rollbackFor = Exception.class)
     public void insert(TemplateEntity entity) {
+        if(templateDao.count(new QueryWrapper<TemplateEntity>()
+                .eq("template_key",entity.getTemplateKey())
+                .eq("app_name",entity.getAppName())
+        )>0){
+            throw new MarsException("模板已存在");
+        }
         if(!templateDao.save(entity)){
             throw new CurdException(RespCode.SAVE_ERROR);
         }
+        tableColumnMapper.addTable(entity.getAppName()+"_"+entity.getTemplateKey());
     }
 
 
@@ -104,6 +117,7 @@ public class TemplateService {
 
 
     public void updateById(TemplateEntity entity) {
+
         if(!templateDao.updateById(entity)){
             throw new CurdException(RespCode.UPDATE_ERROR);
         }
@@ -134,10 +148,16 @@ public class TemplateService {
     }
 
 
+    @Transactional(rollbackFor = Exception.class)
     public void deleteById(Serializable id) {
+        TemplateEntity byId = templateDao.getById(id);
+        if (byId==null){
+            throw new MarsException("模板不存在");
+        }
         if(!templateDao.removeById(id)){
             throw new CurdException(RespCode.DELETE_ERROR);
         }
+        tableColumnMapper.dropTable(byId.getAppName()+"_"+byId.getTemplateKey());
     }
 
 

@@ -1,6 +1,7 @@
 package com.github.fashionbrot.core.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -18,8 +19,12 @@ import com.github.fashionbrot.dao.dao.ConfigRecordDao;
 import com.github.fashionbrot.dao.dao.ConfigValueDao;
 import com.github.fashionbrot.dao.entity.ConfigRecordEntity;
 import com.github.fashionbrot.dao.entity.ConfigValueEntity;
+import com.github.fashionbrot.dao.entity.TableColumnEntity;
+import com.github.fashionbrot.dao.mapper.TableColumnMapper;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.mysql.fabric.xmlrpc.base.Value;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +33,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
 import java.text.ParseException;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * 配置数据表
@@ -41,6 +44,7 @@ import java.util.Map;
  * @date 2020-10-13
  */
 @Service
+@Slf4j
 public class ConfigValueService  {
 
     @Autowired
@@ -52,6 +56,8 @@ public class ConfigValueService  {
     @Autowired
     private UserLoginService userLoginService;
 
+    @Autowired
+    private TableColumnMapper tableColumnMapper;
 
     public Collection<ConfigValueEntity> queryList(Map<String, Object> params) {
         return configValueDao.listByMap(params);
@@ -80,7 +86,18 @@ public class ConfigValueService  {
         if (StringUtils.isNotEmpty(req.getDescription())){
             queryWrapper.like("description",req.getDescription());
         }
-        List<ConfigValueEntity> list = configValueDao.list(queryWrapper);
+        String tableName=req.getAppName()+"_"+req.getTemplateKey();
+        req.setTableName(tableName);
+        List<Map<String,Object>> list = configValueDao.configValueList(req);
+        if (CollectionUtils.isNotEmpty(list)){
+            SimpleDateFormat sf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            for(Map<String,Object> map:list){
+                Date startDate = (Date) map.get("startDate");
+                map.put("startDate",sf.format(startDate));
+                Date endDate= (Date) map.get("endDate");
+                map.put("endDate",sf.format(endDate));
+            }
+        }
 
         return PageVo.builder()
                 .data(list)
@@ -88,14 +105,56 @@ public class ConfigValueService  {
                 .build();
     }
 
+    private static Set<String> columnTypeString=new HashSet<>(Arrays.asList("datetime","date","time","year","varchar","text"));
 
 
+    @Transactional(rollbackFor = Exception.class)
     public void insert(ConfigValueEntity entity) {
-        setDate(entity);
         if(!configValueDao.save(entity)){
             throw new CurdException(RespCode.SAVE_ERROR);
         }
+
+        String tableName = entity.getAppName()+"_"+entity.getTemplateKey();
+        List<TableColumnEntity> columnList = tableColumnMapper.selectList(new QueryWrapper<TableColumnEntity>().eq("table_name",tableName));
+        StringBuilder sb =new StringBuilder();
+        StringBuilder values =new StringBuilder();
+        sb.append("insert into ").append(tableName).append(" ");
+
+        JSONObject jsonObject = JSONObject.parseObject(entity.getJson());
+        sb.append(" ( config_id");
+        values.append("(").append(entity.getId());
+
+        for (Map.Entry<String, Object> entry: jsonObject.entrySet()) {
+            String columnType = getColumnType(columnList,entry.getKey());
+            if (columnTypeString.contains(columnType)){
+                sb.append(",").append(entry.getKey());
+                values.append(",'").append(entry.getValue()).append("'");
+            }else{
+                sb.append(",").append(entry.getKey());
+                values.append(",").append(entry.getValue());
+            }
+        }
+        sb.append(" ) ");
+        values.append(" ) ");
+        sb.append(" values ");
+        sb.append(values.toString());
+        log.info("insert sql:" +sb.toString());
+        tableColumnMapper.insertTable(sb.toString());
+
+
     }
+    public String getColumnType(List<TableColumnEntity> list,String key){
+        if (CollectionUtils.isNotEmpty(list)){
+            for(TableColumnEntity p:list){
+                if (p.getColumnName().equals(key)){
+                    return p.getDataType();
+                }
+            }
+        }
+        return "";
+    }
+
+
 
     private void setDate(ConfigValueEntity entity) {
         LoginModel model = userLoginService.getLogin();
@@ -113,7 +172,7 @@ public class ConfigValueService  {
         }catch (Exception e){
             throw new MarsException("填写属性值格式有误，请检查");
         }
-        if (jsonObject!=null && jsonObject.containsKey("startDate") && StringUtils.isNotEmpty(jsonObject.getString("startDate"))){
+        /*if (jsonObject!=null && jsonObject.containsKey("startDate") && StringUtils.isNotEmpty(jsonObject.getString("startDate"))){
             try {
                 entity.setStartTime(DateUtils.parseDate(jsonObject.getString("startDate"),"yyyy-MM-dd HH:mm:ss"));
             } catch (ParseException e) {
@@ -126,7 +185,7 @@ public class ConfigValueService  {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
     }
 
 
@@ -160,6 +219,34 @@ public class ConfigValueService  {
         if(!configValueDao.updateById(entity)){
             throw new CurdException(RespCode.UPDATE_ERROR);
         }
+
+
+
+        String tableName = entity.getAppName()+"_"+entity.getTemplateKey();
+        List<TableColumnEntity> columnList = tableColumnMapper.selectList(new QueryWrapper<TableColumnEntity>().eq("table_name",tableName));
+
+        StringBuilder sb =new StringBuilder();
+        sb.append("update  ").append(tableName).append(" set ");
+        JSONObject jsonObject = JSONObject.parseObject(entity.getJson());
+        boolean isFlag=false;
+        for (Map.Entry<String, Object> entry: jsonObject.entrySet()) {
+            if (isFlag){
+                sb.append(",");
+            }
+            String columnType = getColumnType(columnList,entry.getKey());
+            if (columnTypeString.contains(columnType)){
+                sb.append(entry.getKey()).append(" = ").append(" '").append(entry.getValue()).append("' ");
+            }else{
+                sb.append(entry.getKey()).append(" = ").append(" '").append(entry.getValue()).append("' ");
+            }
+            isFlag = true;
+        }
+        sb.append(" where  config_id = ").append(entity.getId());
+
+        log.info("update sql:" +sb.toString());
+        tableColumnMapper.updateTable(sb.toString());
+
+
         ConfigRecordEntity record=ConfigRecordEntity.builder()
                 .appName(entity.getAppName())
                 .envCode(entity.getEnvCode())
@@ -192,7 +279,23 @@ public class ConfigValueService  {
 
 
     public ConfigValueEntity selectById(Serializable id) {
-        return configValueDao.getById(id);
+        ConfigValueEntity configValue= configValueDao.getById(id);
+        if (configValue!=null){
+            configValue.setTableName(configValue.getAppName()+"_"+configValue.getTemplateKey());
+            Map<String,Object> map = tableColumnMapper.selectTable(configValue);
+            if (map!=null){
+                SimpleDateFormat sf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                for(Map.Entry<String, Object> m :map.entrySet()){
+                    Object value = m.getValue();
+                    if (value instanceof Date){
+                        map.put(m.getKey(),sf.format((Date) value));
+                    }
+                }
+            }
+
+            configValue.setValue(map);
+        }
+        return configValue;
     }
 
 

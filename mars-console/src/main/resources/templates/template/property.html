@@ -4,6 +4,7 @@
 
     <head th:replace="/common/head :: head"></head>
 
+
 </head>
 <body>
 <!-- START PAGE CONTAINER -->
@@ -61,23 +62,23 @@
                             <div class="pull-right" style="">
                                 <div class="btn-group" style="width:180px;">
                                     <select name="appName" class="form-control" id="appName" aria-required="true">
-
+                                        <option value="-1" >公共应用</option>
                                     </select>
                                 </div>
                                 <div class="btn-group" style="width:300px;">
                                     <select name="templatekey"  id="templateKey" class="form-control" style="width: 280px" >
-                                        <option value="" >公共模板</option>
+                                        <option value="-1" >公共模板</option>
                                     </select>
                                 </div>
-                                <div class="btn-group" style="width:100px;">
+                                <div class="btn-group" style="width:150px;">
                                     <button type="button" class="btn btn-success dropdown-toggle"
                                             onclick="code()">
-                                        <span class="fa fa-code"></span>java代码
+                                        <span class="fa fa-code"></span>生成java代码
                                     </button>
                                 </div>
-                                <label>属性key:</label>
+
                                 <div class="btn-group" style="width:200px;">
-                                    <input name="propertyKey" id="propertyKey" class="form-control" aria-required="true" />
+                                    <input name="propertyKey" id="propertyKey" class="form-control" placeholder="属性key" />
                                 </div>
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-success dropdown-toggle"
@@ -160,6 +161,15 @@
                 <form id="userInfoEditForm">
                     <input type="hidden" id="editId"  name="id"/>
 
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>显示优先级</div>
+                        <div class="col-sm-8">
+                            <input name="priority" class="form-control" value="1" placeholder="显示优先级" type="text"
+                                   onkeyup="this.value=this.value.replace(/\D/g,'')"
+                                   onafterpaste="this.value=this.value.replace(/\D/g,'')"
+                                   id="editPriority" aria-required="true"/>
+                        </div>
+                    </div>
 
                     <div class="form-group form-group-30" >
                         <div  class="form-text-right"><span style="color: red;">*</span>选择应用</div>
@@ -185,12 +195,34 @@
                         </div>
                     </div>
                     <div class="form-group form-group-30" >
-                        <div  class="form-text-right"><span style="color: red;">*</span>优先级</div>
+                        <div  class="form-text-right"><span style="color: red;">*</span>属性值类型</div>
                         <div class="col-sm-8">
-                            <input name="priority" class="form-control" value="1" placeholder="优先级" type="text"
-                                   id="editPriority" aria-required="true"/>
+                            <select name="propertyType" class="form-control" readonly="readonly" style="width: 100%" id="editPropertyType" aria-required="true">
+                                <option value="varchar">varchar 字符串数据</option>
+                                <option value="text">text 长文本数据</option>
+                                <option value="tinyint">tinyint (1 byte) 小整数值</option>
+                                <option value="int">int (4 bytes) 大整数值</option>
+                                <option value="bigint">bigint (8 bytes) 极大整数值</option>
+                                <option value="double">double (8 bytes) 双精度浮点数值</option>
+                                <option value="decimal">decimal 小数值</option>
+                                <option value="date">date (yyyy-MM-dd) 日期值</option>
+                                <option value="time">time (HH:mm:ss) 时间值</option>
+                                <option value="year">year (yyyy) 年份值</option>
+                                <option value="datetime">datetime (yyyy-MM-dd HH:mm:ss) 日期时间</option>
+                            </select>
+
                         </div>
                     </div>
+                    <div class="form-group form-group-30" id="editPropertyTypeDiv" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>属性类型长度</div>
+                        <div class="col-sm-8">
+                            <input id="editColumnLength" name="columnLength" class="form-control"
+                                   onkeyup="this.value=this.value.replace(/\D/g,'')"
+                                   onafterpaste="this.value=this.value.replace(/\D/g,'')"
+                            />
+                        </div>
+                    </div>
+
                     <div class="form-group form-group-30" >
                         <div  class="form-text-right"><span style="color: red;">*</span>属性名称</div>
                         <div class="col-sm-8">
@@ -219,19 +251,7 @@
                         </div>
                     </div>
 
-                    <div class="form-group form-group-30" >
-                        <div  class="form-text-right"><span style="color: red;">*</span>属性值类型</div>
-                        <div class="col-sm-8">
-                            <select name="propertyType" class="form-control" style="width: 100%" id="editPropertyType" aria-required="true">
-                                <option value="string">string:字符串类型</option>
-                                <option value="double">double:小数类型</option>
-                                <option value="long">long:整数类型</option>
-                                <option value="int">int:整数类型</option>
-                                <option value="boolean">boolean:真假类型</option>
-                                <option value="date">date:日期类型</option>
-                            </select>
-                        </div>
-                    </div>
+
 
 
                     <input id="editAttributeType" name="attributeType" type="hidden">
@@ -272,7 +292,10 @@
                     <div class="form-group form-group-30" >
                         <div  class="form-text-right"><span style="color: red;">*</span>显示优先级</div>
                         <div class="col-sm-8">
-                            <input name="priority" class="form-control" placeholder="添加属性值位置优先级" value="1" type="text" id="addPriority" />
+                            <input name="priority" class="form-control" placeholder="添加属性值位置优先级" value="1"
+                                   onkeyup="this.value=this.value.replace(/\D/g,'')"
+                                   onafterpaste="this.value=this.value.replace(/\D/g,'')"
+                                   type="text" id="addPriority" />
                         </div>
                     </div>
                     <div class="form-group form-group-30" >
@@ -288,6 +311,35 @@
                             <input name="propertyKey" class="form-control" placeholder="5~30位字母" type="text" id="addPropertyKey" />
                         </div>
                     </div>
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>属性值类型</div>
+                        <div class="col-sm-8">
+                            <select name="propertyType" class="form-control select2" style="width: 100%" id="addPropertyType" aria-required="true">
+                                <option value="varchar">varchar 字符串数据</option>
+                                <option value="text">text 长文本数据</option>
+                                <option value="tinyint">tinyint (1 byte) 小整数值</option>
+                                <option value="int">int (4 bytes) 大整数值</option>
+                                <option value="bigint">bigint (8 bytes) 极大整数值</option>
+                                <option value="double">double (8 bytes) 双精度浮点数值</option>
+                                <option value="decimal">decimal 小数值</option>
+                                <option value="date">date (yyyy-MM-dd) 日期值</option>
+                                <option value="time">time (HH:mm:ss) 时间值</option>
+                                <option value="year">year (yyyy) 年份值</option>
+                                <option value="datetime">datetime (yyyy-MM-dd HH:mm:ss) 日期时间</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-30" id="addPropertyTypeDiv">
+                        <div  class="form-text-right"><span style="color: red;">*</span>属性类型长度</div>
+                        <div class="col-sm-8">
+                            <input id="addColumnLength" name="columnLength" class="form-control"
+                                   onkeyup="this.value=this.value.replace(/\D/g,'')"
+                                   onafterpaste="this.value=this.value.replace(/\D/g,'')"
+                                   value="255"
+                            />
+                        </div>
+                    </div>
+
 
                     <div class="form-group form-group-30" >
                         <div  class="form-text-right"><span style="color: red;">*</span>选择应用</div>
@@ -333,19 +385,8 @@
                             </select>
                         </div>
                     </div>
-                    <div class="form-group form-group-30" >
-                        <div  class="form-text-right"><span style="color: red;">*</span>属性值类型</div>
-                        <div class="col-sm-8">
-                            <select name="propertyType" class="form-control" style="width: 100%" id="addPropertyType" aria-required="true">
-                                <option value="string">string:字符串类型</option>
-                                <option value="double">double:小数类型</option>
-                                <option value="long">long:整数类型</option>
-                                <option value="int">int:整数类型</option>
-                                <option value="boolean">boolean:真假类型</option>
-                                <option value="date">date:日期类型</option>
-                            </select>
-                        </div>
-                    </div>
+
+
 
                     <input type="hidden" name="labelValue" id="addLabelValue" />
                     <div class="addLableSelectClass">

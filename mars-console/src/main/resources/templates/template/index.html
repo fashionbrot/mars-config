@@ -143,23 +143,40 @@
             <div class="modal-body">
                 <form id="userInfoEditForm">
                     <input type="hidden" id="templateId"  name="id"/>
-                    模板key：<input name="templateKey" class="form-control" placeholder="5~30位字母  格式banner.feedback" type="text"
-                                 id="editTemplateKey" aria-required="true"/>
-                    应用:<input name="appName" class="form-control"  type="text" id="editAppName" aria-required="true"/>
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>模板key</div>
+                        <div class="col-sm-8">
+                            <input name="templateKey" class="form-control" placeholder="5~30位字母  格式banner.feedback" type="text"
+                                   id="editTemplateKey" aria-required="true"/>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>应用</div>
+                        <div class="col-sm-8">
+                            <input name="appName" class="form-control"  type="text" id="editAppName" aria-required="true"/>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>模板名称</div>
+                        <div class="col-sm-8">
+                            <input name="templateName" class="form-control" placeholder="请输入模板名称" type="text"
+                                   id="editTemplateName" aria-required="true"/>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-30" style="height: 54px;" >
+                        <div  class="form-text-right"><span style="color: red;"></span>模板描述</div>
+                        <div class="col-sm-8">
+                            <textarea name="templateDesc" class="form-control" style="height: 54px" placeholder="请输入模板描述" type="text"
+                                      id="editTemplateDesc" aria-required="true"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;"></span>示例图</div>
+                        <div class="col-sm-8">
+                            <input class="form-control" name="templateUrl" id="editTemplateUrl" />
+                        </div>
+                    </div>
 
-                    模板名称：<input name="templateName" class="form-control" placeholder="请输入模板名称" type="text"
-                                id="editTemplateName" aria-required="true"/>
-
-
-                    模板描述：<textarea name="templateDesc" class="form-control" style="height: 80px" placeholder="请输入模板描述" type="text"
-                                   id="editTemplateDesc" aria-required="true"></textarea>
-
-
-
-
-
-                    示例图：
-                    <textarea class="form-control" name="templateUrl" id="editTemplateUrl"></textarea>
                     <input name="id"  type="hidden" id="id" aria-required="true"/>
                     <input type="reset" name="editReset" style="display: none;"/>
                 </form>
@@ -183,17 +200,45 @@
             </div>
             <div class="modal-body">
                 <form id="templateAddForm">
-                    模板名称：<input name="templateName" class="form-control" placeholder="请输入模板名称" type="text"
-                                id="addTemplateName" aria-required="true"/>
-                    模板key：<input name="templateKey" class="form-control" placeholder="不支持修改key" type="text"
-                                 id="addTemplateKey" aria-required="true"/>
-                    应用:<select name="appName" class="form-control" id="addAppName" aria-required="true">
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>模板名称</div>
+                        <div class="col-sm-8">
+                            <input name="templateName" class="form-control" placeholder="请输入模板名称" type="text"
+                                   id="addTemplateName" aria-required="true"/>
+                        </div>
+                    </div>
 
-                         </select>
-                    模板描述：<textarea name="templateDesc" class="form-control" style="height: 80px" placeholder="请输入模板描述" type="text"
-                                   id="addTemplateDesc" aria-required="true"></textarea>
-                    示例图：
-                    <textarea class="form-control" name="templateUrl" id="addTemplateUrl"></textarea>
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>模板key</div>
+                        <div class="col-sm-8">
+                            <input name="templateKey" class="form-control" placeholder="不支持修改key" type="text"
+                                   id="addTemplateKey" aria-required="true"/>
+                        </div>
+                    </div>
+
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;">*</span>应用</div>
+                        <div class="col-sm-8">
+                            <select name="appName" class="form-control" id="addAppName" style="width: 100%;">
+
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-30"  style="height: 54px;" >
+                        <div  class="form-text-right"><span style="color: red;"></span>模板描述</div>
+                        <div class="col-sm-8">
+                            <textarea name="templateDesc" class="form-control" style="height: 54px" placeholder="请输入模板描述" type="text"
+                                      id="addTemplateDesc" aria-required="true"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-30" >
+                        <div  class="form-text-right"><span style="color: red;"></span>示例图</div>
+                        <div class="col-sm-8">
+                            <input class="form-control" name="templateUrl" id="addTemplateUrl" />
+                        </div>
+                    </div>
+
+
                     <input type="reset" name="addReset" style="display: none;"/>
                 </form>
             </div>

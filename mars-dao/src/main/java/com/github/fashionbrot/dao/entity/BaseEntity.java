@@ -29,4 +29,5 @@ public abstract class BaseEntity {
     @TableLogic(value = "0", delval = "1")
     @TableField(value = "del_flag",fill = FieldFill.INSERT)
     private int delFlag;
+
 }

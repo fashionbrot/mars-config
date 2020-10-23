@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.github.fashionbrot.dao.mapper.ConfigValueMapper">
+
+
+    <resultMap type="com.github.fashionbrot.dao.entity.ConfigValueEntity" id="configValueMap">
+            <result property="id" column="configId"/>
+            <result property="status" column="status"/>
+            <result property="templateKey" column="template_key"/>
+            <result property="description" column="description"/>
+            <result property="priority" column="priority"/>
+            <result property="envCode" column="env_code"/>
+            <result property="appName" column="app_name"/>
+            <result property="userName" column="user_name"/>
+            <result property="createId" column="create_id"/>
+            <result property="createDate" column="create_date"/>
+    </resultMap>
+
+
+    <sql id="allSql">
+        id,status,template_key,description,priority,env_code,app_name,user_name
+    </sql>
+
+
+        <select id="configValueList" resultType="java.util.Map" parameterType="com.github.fashionbrot.common.req.ConfigValueReq">
+            select
+            a.status,a.template_key,a.description,a.priority,a.env_code,a.app_name,a.user_name,a.release_status
+            ,b.*
+            from config_value a
+            inner join ${tableName} b on b.config_id = a.id
+            where a.del_flag=0
+            and a.env_code = #{envCode} and a.app_name=#{appName}
+            <if test="templateKey!=null and templateKey!=''">
+                    and a.template_key = #{templateKey}
+            </if>
+            <if test="description!=null and description!=''">
+                    and a.description  LIKE concat('%',#{description},'%')
+            </if>
+            order by priority
+
+        </select>
+    
+
+</mapper>

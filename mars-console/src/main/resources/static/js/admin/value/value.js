@@ -203,7 +203,7 @@ var queryByUserId = function (id) {
                 $("#editEndTime").val('');
             }
 
-            loadPropertyAttrDiv("editPropertyDiv",data.templateKey,data.appName,"editPropertyClass",data.json,false,false);
+            loadPropertyAttrDiv("editPropertyDiv",data.templateKey,data.appName,"editPropertyClass",data.value,false,false);
 
             $("#editTemplateKey").on("change",function () {
                 var templateKey =$("#editTemplateKey").val();
@@ -344,14 +344,14 @@ function loadDataEnvAndApp(envCode,appName,templateKey,description) {
                     bSortable : true,
                     width : "20px",
                     render : function (data, type, full, meta) {
-                        if(full.startTime=='' || full.startTime==null){
+                        if(full.startDate=='' || full.startDate==null){
                             return '';
                         }
                         var html="";
                         var nowTime=new Date();
-                        if(full.startTime!=null ) {
-                            var time=moment(full.startTime).format("YYYY-MM-DD HH:mm:ss");
-                            if(nowTime.getTime()<(new Date(full.startTime)).getTime()){
+                        if(full.startDate!=null ) {
+                            var time=moment(full.startDate).format("YYYY-MM-DD HH:mm:ss");
+                            if(nowTime.getTime()<(new Date(full.startDate)).getTime()){
                                 html+="<span style='color:red;font-weight: bold;'>"+time+"</span>"
                             }else{
                                 html+=time;
@@ -364,14 +364,14 @@ function loadDataEnvAndApp(envCode,appName,templateKey,description) {
                     bSortable : true,
                     width : "20px",
                     render : function (data, type, full, meta) {
-                        if(full.endTime=='' || full.endTime==null){
+                        if(full.endDate=='' || full.endDate==null){
                             return '';
                         }
                         var html="";
                         var nowTime=new Date();
-                        if(full.endTime!=null ) {
-                            var time=moment(full.endTime).format("YYYY-MM-DD HH:mm:ss")
-                            if(nowTime.getTime()>(new Date(full.endTime)).getTime()){
+                        if(full.endDate!=null ) {
+                            var time=moment(full.endDate).format("YYYY-MM-DD HH:mm:ss")
+                            if(nowTime.getTime()>(new Date(full.endDate)).getTime()){
                                 html+="<span style='color:red;font-weight: bold;'>"+time+"</span>"
                             }else{
                                 html+=time;
@@ -406,7 +406,7 @@ function loadDataEnvAndApp(envCode,appName,templateKey,description) {
                     }
                 },
                 {
-                    data : 'userName',
+                    data : 'user_name',
                     bSortable : true,
                     width : "20px",
                     className : "text-center",
@@ -429,8 +429,8 @@ function loadDataEnvAndApp(envCode,appName,templateKey,description) {
                     visible: true,
                     width : '130px',
                     render: function (data, type, full) {
-                        return '<a class="btn btn-success btn-" onclick="queryByUserId(\'' + full.id + '\')"><i class="glyphicon glyphicon-edit"></i>修改</a>'
-                            + '&nbsp;&nbsp;<a class="btn btn-warning btn-circle" onclick="showModal(\'' + full.id + '\',this)"> <i class="glyphicon glyphicon-trash"></i>删除</a>';
+                        return '<a class="btn btn-success btn-" onclick="queryByUserId(\'' + full.config_id + '\')"><i class="glyphicon glyphicon-edit"></i>修改</a>'
+                            + '&nbsp;&nbsp;<a class="btn btn-warning btn-circle" onclick="showModal(\'' + full.config_id + '\',this)"> <i class="glyphicon glyphicon-trash"></i>删除</a>';
                     }
                 }
             ]

@@ -320,7 +320,10 @@ function loadData() {
 function add() {
     $("input[type=reset]").trigger("click");
     $('#addModal').modal('show');
-    manager.loadApp("addAppName");
+    manager.loadApp("addAppName","选择应用");
+    $("#addAppName").val($("#appName").val());
+    loadNoSearchSelect("addAppName");
+
 }
 
 

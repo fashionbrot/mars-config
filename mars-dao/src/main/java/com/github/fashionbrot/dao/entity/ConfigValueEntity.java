@@ -7,7 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Date;
+import java.util.*;
 
 /**
  * 配置数据表
@@ -22,34 +22,21 @@ import java.util.Date;
 @TableName("config_value")
 public class ConfigValueEntity extends BaseEntity {
 
+	@ApiModelProperty(value = "优先级")
+	@TableField("priority")
+	private Integer priority;
 
 	@ApiModelProperty(value = "状态 1开启 0关闭")
 	@TableField("status")
 	private Integer status;
 
-	@ApiModelProperty(value = "开始时间")
-	@TableField("start_time")
-	private Date startTime;
-
-	@ApiModelProperty(value = "结束时间")
-	@TableField("end_time")
-	private Date endTime;
-
 	@ApiModelProperty(value = "模板key")
 	@TableField("template_key")
 	private String templateKey;
 
-	@ApiModelProperty(value = "实例json")
-	@TableField("json")
-	private String json;
-
 	@ApiModelProperty(value = "描述")
 	@TableField("description")
 	private String description;
-
-	@ApiModelProperty(value = "优先级")
-	@TableField("priority")
-	private Integer priority;
 
 	@ApiModelProperty(value = "环境code")
 	@TableField("env_code")
@@ -66,4 +53,11 @@ public class ConfigValueEntity extends BaseEntity {
 	@ApiModelProperty("发布状态 1已发布 0 未发布")
 	@TableField("release_status")
 	private Integer releaseStatus;
+
+	private transient String json;
+
+	private transient String tableName;
+
+	private transient Map<String,Object> value;
+
 }
