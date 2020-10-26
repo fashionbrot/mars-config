@@ -37,13 +37,17 @@ $(function () {
     loadNoSearchSelect("envCode")
     manager.loadEnv("envCode");
     loadNoSearchSelect("appName")
-    manager.loadProject("appName");
+    manager.loadApp("appName");
     loadSelect("templateKey");
     var appNameId="appName";
+
+    var appName=$("#"+appNameId).val();
+    manager.loadTemplate("templateKey",appName);
+    loadSelect("templateKey");
+
     $("#"+appNameId).on("change",function () {
         var appName=$("#"+appNameId).val();
         manager.loadTemplate("templateKey",appName);
-
         loadSelect("templateKey");
     })
 
@@ -71,6 +75,9 @@ $(function () {
     })
 
     $("#appName").on("change",function () {
+        loadData();
+    });
+    $("#templateKey").on("change",function () {
         loadData();
     });
 })
@@ -102,29 +109,7 @@ var userInfoDel = function () {
 }
 
 
-var queryByUserId = function (id) {
-    loading();
-    $.ajax({
-        url: "../data/queryById",
-        type: "post",
-        data: {"id": id},
-        //contentType: "application/json",
-        dataType: "json",
-        success: function (data) {
-            loaded();
-            $("#editEnvCode").val(data.envCode);
-            $("#editAppName").val(data.appName);
-            $("#editDataType").val(data.dataType);
-            $("#editJson").val(formatJson(data.json));
 
-            $("#editModal").modal("show");
-
-            setTimeout(function () {
-                //readyNumber();
-            },500)
-        }
-    });
-}
 
 function importData() {
     var envCode=$("#envCode").val();
@@ -181,7 +166,7 @@ function importData() {
 function loadData() {
     var envCode=$("#envCode").val();
     var appName=$("#appName").val();
-
+    var templateKey=$("#templateKey").val();
     var tableId = "#dataTables-userInfo";
     $(tableId).dataTable().fnDestroy();
     $(tableId)
@@ -196,7 +181,7 @@ function loadData() {
         })
         .DataTable({
             ajax:{
-                url: "./admin/data/page?v="+new Date().getTime(),
+                url: "./admin/config/record/page?v="+new Date().getTime(),
                 type: "get",
                 dataType: "json",
                 data: function(data){
@@ -204,6 +189,7 @@ function loadData() {
                     data.pageSize = data.length;
                     data.envCode = envCode;
                     data.appName = appName;
+                    data.templateKey = templateKey;
                     delete  data.columns;
                     delete  data.search;
                 },
@@ -257,64 +243,40 @@ function loadData() {
                     className : "text-center",
                     render :dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
                 },{
-                    data : 'dataType',
+                    data : 'operationType',
                     bSortable : true,
                     width : "20px",
                     render : function (data, type, full, meta) {
-                        if (data==0){
-                            return "导入"
-                        }else if (data==1){
-                            return "导出"
-                        }else if (data==2){
-                            return "编辑"
-                        }else  if (data==3){
-
-                        }else if (data==4){
-
+                        if(full.operationType==1){
+                            return "新增";
+                        }else if(full.operationType==2){
+                            return "修改";
+                        }else if(full.operationType==3){
+                            return "删除";
+                        }else if(full.operationType==4){
+                            return "导入";
+                        }else if(full.operationType==5){
+                            return "发布全部";
+                        }else if(full.operationType==6){
+                            return "回滚";
+                        }else{
+                            return "";
                         }
-                        return html;
                     }
                 },{
-                    data : 'id',
-                    bSortable : true,
-                    width : "20px",
-                    render : function (data, type, full, meta) {
-                        if(full.endTime=='' || full.endTime==null){
-                            return '';
-                        }
-                        var html="";
-                        var nowTime=new Date();
-                        if(full.endTime!=null ) {
-                            var time=moment(full.endTime).format("YYYY-MM-DD HH:mm:ss")
-                            if(nowTime.getTime()>(new Date(full.endTime)).getTime()){
-                                html+="<span style='color:red;font-weight: bold;'>"+time+"</span>"
-                            }else{
-                                html+=time;
-                            }
-                        }
-                        return html;
-                    }
-                },
-                {
-                    data : 'description',
-                    bSortable : true,
-                    width : "20px",
-                    className : "text-center",
-                    render :function (data, type, full, meta) {
-                        if (full.status == "1") {
-                            return "开启";
-                        } else {
-                            return "<span style='color:red;font-weight: bold;'>停用</span>";
-                        }
-                    }
-                },
-                {
                     data : 'userName',
                     bSortable : true,
                     width : "20px",
                     className : "text-center",
                     render :dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
-                },  {
+                },{
+                    data : 'description',
+                    bSortable : true,
+                    width : "20px",
+                    className : "text-center",
+                    render :dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
+                },
+                  {
                     data : 'id',
                     bSortable : true,
                     width : "25px",
@@ -332,7 +294,7 @@ function loadData() {
                     visible: true,
                     width : '130px',
                     render: function (data, type, full) {
-                        return '<a class="btn btn-success btn-" onclick="queryByUserId(\'' + full.id + '\')"><i class="fa fa-edit">查看</i> </a>';
+                        return '<a class="btn btn-success btn-" onclick="queryByUserId(\'' + full.id + '\')"><i class="glyphicon glyphicon-eye-open"></i>查看 </a>';
                     }
                 }
             ]
@@ -360,89 +322,143 @@ function loadData() {
 
 
 
-
-
-
-    /*$('#dataTables-userInfo').dataTable().fnDestroy();
-    var table = $('#dataTables-userInfo').DataTable({
-        ajax:{
-            url: "../data/queryAllCustom",
-            type: "post",
-            dataType: "json",
-            data:{envCode:envCode,appName:appName}
-        },
-        language: {
-            "sProcessing": "处理中...",
-            "sLengthMenu": "显示 _MENU_ 项结果",
-            "sZeroRecords": "没有匹配结果",
-            "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
-            "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
-            "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
-            "sInfoPostFix": "",
-            "sUrl": "",
-            "sEmptyTable": "表中数据为空",
-            "sLoadingRecords": "载入中...",
-            "sInfoThousands": ",",
-            "oPaginate": {
-                "sFirst": "首页",
-                "sPrevious": "上页",
-                "sNext": "下页",
-                "sLast": "末页"
-            }
-        },
-        serverSide:true,
-        ordering:false,
-        stateSave: false,
-        searching: false,
-        paging: true,
-        info: false,
-        bAutoWidth: false,
-        lengthMenu: [[10, 20, 25, -1], [10, 20, 25, "All"]],
-        columnDefs: [
-
-            {
-                targets: 2, render: function (data, type, full, meta) {
-                    return full.envCode;
-                }
-            },
-            {
-                targets: 3, render: function (data, type, full, meta) {
-                    return full.appName;
-                }
-            },
-            {
-                targets: 4, render: function (data, type, full, meta) {
-                    return full.templateKey;
-                }
-            },
-            {
-                targets: 5, render: function (data, type, full, meta) {
-                    if (full.dataType == 0) {
-                        return "<span style='color: #55ea55'>导入</span>";
-                    } else {
-                        return "导出";
-                    }
-                }
-            },
-            {
-                targets: 1, render: function (data, type, full, meta) {
-                    return full.userName;
-                }
-            },
-            {
-                targets: 6, render: function (data, type, full, meta) {
-                    return moment(full.createTime).format("YYYY-MM-DD HH:mm:ss");
-                }
-            },
-            {
-                targets: 7, render: function (data, type, full, meta) {
-                    return '<a class="btn btn-success btn-" onclick="queryByUserId(\'' + full.id + '\')"><i class="fa fa-edit">查看</i> </a>'
-                        + '&nbsp;&nbsp;';
-                }
-            }
-        ]
-
-    });*/
-    //loaded();
-
 }
+
+var queryByUserId = function (id) {
+    loading();
+    $.ajax({
+        url: "../admin/config/record/selectById",
+        type: "post",
+        data: {"id": id},
+        //contentType: "application/json",
+        dataType: "json",
+        success: function (result) {
+            loaded();
+            if (result.code!=0){
+                alert(result.msg);
+                return false;
+            }
+           /* $("#editEnvCode").val(data.envCode);
+            $("#editAppName").val(data.appName);
+            $("#editDataType").val(data.dataType);
+            $("#editJson").val(formatJson(data.json));
+            $("#editModal").modal("show");*/
+            showConfig(result.data);
+        },error(){
+            loaded();
+            alert("请求失败");
+        }
+    });
+}
+
+
+function showConfig(row) {
+
+    var data = null;
+    var updateData = null;
+    if (!isNullObj(row.json)){
+        data =JSON.parse(row.json);
+    }
+    if (!isNullObj(row.newJson)){
+        updateData =JSON.parse(row.newJson);
+    }
+    $("#releaseId").val(row.id);
+    if (data!=null && updateData!=null){
+        $("#rollback").show();
+        $("#showDialogId").attr("style","width:800px;");
+        $("#configInfo").attr("style","width:49%;display:block;float:left;");
+        $("#newConfigInfo").attr("style","width:50%;display:block;float:right;");
+    }else{
+        $("#showDialogId").attr("style","width:500px;");
+        $("#rollback").hide();
+    }
+
+    if(data!=null && updateData==null){
+        $("#newConfigInfo").attr("style","display:none");
+        $("#configInfo").attr("style","width:100%;display:block;");
+    }
+    if (updateData!=null && data==null){
+        $("#configInfo").attr("style","display:none");
+        $("#newConfigInfo").attr("style","width:100%;display:block;");
+    }
+
+    /**
+     * 修改前 页面展示
+     */
+    loadConfigInfo(data);
+    /**
+     * 修改后 页面展示
+     */
+    loadNewConfigInfo(updateData);
+
+
+
+    $("#editModal").modal("show");
+}
+function loadConfigInfo(data) {
+    if (data!=null) {
+        var appName = data.appName;
+        manager.loadEnv("editEnvCode");
+        manager.loadApp("editAppName");
+        initDateTime("editStartTime");
+        initDateTime("editEndTime");
+        $("#editStatus").val(data.status);
+        $("#configId").val(data.id);
+        $("#editEnvCode").val(data.envCode);
+        $("#editAppName").val(data.appName);
+        $("#editPriority").val(data.priority);
+        $("#editDescription").val(data.description);
+        $("#editEnvId").val(data.envId);
+        $("#editConfigKey").val(data.configKey);
+        if (data.startTime!='' && data.startTime!=null){
+            $("#editStartTime").val(moment(data.startTime).format("YYYY-MM-DD HH:mm:ss"));
+        }else{
+            $("#editStartTime").val('');
+        }
+        if (data.endTime!='' && data.endTime!=null) {
+            $("#editEndTime").val(moment(data.endTime).format("YYYY-MM-DD HH:mm:ss"));
+        }else{
+            $("#editEndTime").val('');
+        }
+
+        loadPropertyAttrDiv("editPropertyDiv",data.templateKey,data.appName,"editPropertyClass",data.json,false,false);
+
+        $("#editTemplateKey").on("change",function () {
+            var templateKey =$("#editTemplateKey").val();
+            var appName=$("#editAppName").val();
+            if(templateKey!=null && templateKey!=''){
+                queryByTemplateKeyAndAppName(appName,data.templateKey,false);
+                loadPropertyAttrDiv("editPropertyDiv",templateKey,appName,"editPropertyClass",data.json,false,false);
+            }
+        });
+        manager.loadTemplate("editTemplateKey",data.appName);
+        $("#editTemplateKey").val(data.templateKey);
+    }
+}
+
+function loadNewConfigInfo(data) {
+    if (data!=null) {
+        $("#editStatus2").val(data.status);
+        //$("#editTitle").val(data.title);
+        $("#editPriority2").val(data.priority);
+        $("#editDescription2").val(data.description);
+        //$("#editEnvId").val(data.envId);
+        $("#editConfigKey2").val(data.configKey);
+        if (data.startTime != '' && data.startTime != null) {
+            $("#editStartTime2").val(moment(data.startTime).format("YYYY-MM-DD HH:mm:ss"));
+        } else {
+            $("#editStartTime2").val('');
+        }
+        if (data.endTime != '' && data.endTime != null) {
+            $("#editEndTime2").val(moment(data.endTime).format("YYYY-MM-DD HH:mm:ss"));
+        } else {
+            $("#editEndTime2").val('');
+        }
+
+
+        loadPropertyAttrDiv("editPropertyDiv2", data.templateKey, data.appName, "editPropertyClass2", data.json, false, true);
+    }
+}
+
+
+

@@ -99,5 +99,13 @@ public class ConfigRecordController {
         return RespVo.success();
     }
 
+    @ApiOperation("回滚配置")
+    @PostMapping("/rollBack")
+    @ResponseBody
+    public RespVo rollBack(ConfigRecordReq req){
+        configRecordService.rollBack(req);
+        return RespVo.success();
+    }
+
 
 }

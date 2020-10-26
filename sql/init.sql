@@ -237,6 +237,9 @@ INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id
 INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id`, `priority`, `code`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`) VALUES ('53', '属性列表', '2', '/admin/property/index', '51', '602', '', '1', '2020-10-12 16:53:58', NULL, NULL, '0');
 INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id`, `priority`, `code`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`) VALUES ('54', '配置数据管理', '1', '', '0', '700', '', '1', '2020-10-18 00:07:29', '1', '2020-10-18 00:07:40', '0');
 INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id`, `priority`, `code`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`) VALUES ('55', '配置数据列表', '2', '/admin/config/value/index', '54', '701', '', '1', '2020-10-18 00:08:06', NULL, NULL, '0');
+INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id`, `priority`, `code`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`) VALUES ('56', '环境变量列表', '2', '/admin/variable/index', '51', '690', '', '1', '2020-10-13 10:39:43', NULL, NULL, '0');
+INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id`, `priority`, `code`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`) VALUES ('57', '配置数据记录', '2', '/admin/config/record/index', '55', '800', '', '1', '2020-10-14 17:14:49', '1', '2020-10-22 17:27:04', '0');
+
 
 
 
@@ -338,10 +341,12 @@ CREATE TABLE `config_record` (
   `env_code` varchar(32) NOT NULL COMMENT '环境code',
   `app_name` varchar(32) NOT NULL COMMENT '应用名',
   `template_key` varchar(32) NOT NULL COMMENT '模板key',
+  `config_id` bigint(11) DEFAULT  NULL COMMENT '配置id',
   `json` text NOT NULL COMMENT '实例json',
   `new_json` text NOT NULL COMMENT '实例json',
   `user_name` varchar(32) DEFAULT NULL COMMENT '用户名',
-  `operation_type` tinyint(1) DEFAULT '0' COMMENT '操作类型 1编辑 2:删除',
+  `operation_type` tinyint(1) DEFAULT '0' COMMENT '操作类型 2编辑 3:删除',
+  `description` varchar(255) DEFAULT NULL COMMENT '描述',
   `create_id` bigint(11) NOT NULL COMMENT '创建者id',
   `create_date` datetime NOT NULL COMMENT '创建时间',
   `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',

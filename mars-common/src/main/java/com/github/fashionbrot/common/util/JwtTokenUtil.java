@@ -11,10 +11,8 @@ import com.github.fashionbrot.common.exception.MarsException;
 import com.github.fashionbrot.common.model.LoginModel;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.UnsupportedEncodingException;
+import java.util.*;
 
 
 @Slf4j
@@ -133,11 +131,17 @@ public class JwtTokenUtil {
             // token 校验失败, 抛出Token验证非法异常
             throw new MarsException(RespCode.SIGNATURE_MISMATCH);
         }
-        LoginModel model= LoginModel.builder()
-                .userId(userIdClaim.asLong())
-                .userName(realName.asString())
-                .superAdmin(superAdmin.asBoolean())
-                .build();
+
+        LoginModel model= null;
+        try {
+            model = LoginModel.builder()
+                    .userId(userIdClaim.asLong())
+                    .userName(new String(Base64.getDecoder().decode(realName.asString()),"utf-8"))
+                    .superAdmin(superAdmin.asBoolean())
+                    .build();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         if (roleName!=null){
             model.setRoleName(roleName.asString());
         }

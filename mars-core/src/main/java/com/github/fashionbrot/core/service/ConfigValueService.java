@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.github.cliftonlabs.json_simple.JsonObject;
+import com.github.fashionbrot.common.constant.MarsConst;
 import com.github.fashionbrot.common.enums.DateEnum;
 import com.github.fashionbrot.common.enums.OperationTypeEnum;
 import com.github.fashionbrot.common.enums.RespCode;
@@ -89,18 +90,15 @@ public class ConfigValueService  {
     public PageVo pageList(ConfigValueReq req){
 
 
-        List<PropertyEntity> propertyList = getPropertyList(req.getAppName(),req.getTemplateKey());
+        List<PropertyEntity> propertyList = propertyDao.getPropertyList(req.getAppName(),req.getTemplateKey());
 
         String tableName=req.getAppName()+"_"+req.getTemplateKey();
         req.setTableName(tableName);
         Page<?> page= PageHelper.startPage(req.getPage(),req.getPageSize());
         List<Map<String,Object>> list = configValueDao.configValueList(req);
         if (CollectionUtils.isNotEmpty(list)){
-
             for(Map<String,Object> map:list){
-                for(Map.Entry<String,Object> mm: map.entrySet()){
-                    formatDate(propertyList,mm,mm.getKey());
-                }
+                configValueDao.formatDate(propertyList,map);
             }
         }
 
@@ -110,40 +108,15 @@ public class ConfigValueService  {
                 .build();
     }
 
-    private void formatDate(List<PropertyEntity> list, Map.Entry<String, Object> map, String column){
-        if (CollectionUtils.isNotEmpty(list)){
-            for(PropertyEntity p: list){
-                DateEnum dateEnum = DateEnum.ofDateType(p.getPropertyType());
-                if (dateEnum==DateEnum.YEAR && p.getPropertyKey().equals(column)){
-                    java.sql.Date value= (java.sql.Date) map.getValue();
-                    map.setValue(DateUtil.getYear(value));
-                    break;
-                }
-                if (dateEnum==DateEnum.DATE && p.getPropertyKey().equals(column)){
-                    java.sql.Date value= (java.sql.Date) map.getValue();
-                    map.setValue(value.toString());
-                    break;
-                }
-                if (dateEnum==DateEnum.TIME && p.getPropertyKey().equals(column)){
-                    java.sql.Time value= (java.sql.Time) map.getValue();
-                    map.setValue(value.toString());
-                    break;
-                }
-                if (dateEnum!=null && p.getPropertyKey().equals(column)){
-                    Date value = (Date) map.getValue();
-                    if (value!=null){
-                        map.setValue(DateUtil.formatDate(dateEnum.getPattern(),value));
-                    }
-                    break;
-                }
-            }
-        }
-    }
 
-    private static Set<String> columnTypeString=new HashSet<>(Arrays.asList("datetime","date","time","year","varchar","text"));
+
 
     @Transactional(rollbackFor = Exception.class)
     public void insert(ConfigValueEntity entity) {
+
+
+
+
         if(!configValueDao.save(entity)){
             throw new CurdException(RespCode.SAVE_ERROR);
         }
@@ -160,7 +133,7 @@ public class ConfigValueService  {
 
         for (Map.Entry<String, Object> entry: jsonObject.entrySet()) {
             String columnType = getColumnType(columnList,entry.getKey());
-            if (columnTypeString.contains(columnType)){
+            if (MarsConst.columnTypeString.contains(columnType)){
                 sb.append(",").append(entry.getKey());
                 values.append(",'").append(entry.getValue()).append("'");
             }else{
@@ -190,38 +163,6 @@ public class ConfigValueService  {
 
 
 
-    private void setDate(ConfigValueEntity entity) {
-        LoginModel model = userLoginService.getLogin();
-        if (model!=null){
-
-            entity.setUserName(new String(Base64.getDecoder().decode(model.getUserName())));
-        }
-        String json = entity.getJson();
-        if (StringUtils.isEmpty(json)){
-            throw new MarsException("请配置模板属性");
-        }
-        JSONObject jsonObject = null;
-        try {
-            jsonObject = JSON.parseObject(json);
-        }catch (Exception e){
-            throw new MarsException("填写属性值格式有误，请检查");
-        }
-        /*if (jsonObject!=null && jsonObject.containsKey("startDate") && StringUtils.isNotEmpty(jsonObject.getString("startDate"))){
-            try {
-                entity.setStartTime(DateUtils.parseDate(jsonObject.getString("startDate"),"yyyy-MM-dd HH:mm:ss"));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        }
-        if (jsonObject!=null && jsonObject.containsKey("endDate") && StringUtils.isNotEmpty(jsonObject.getString("endDate"))){
-            try {
-                entity.setEndTime(DateUtils.parseDate(jsonObject.getString("endDate"),"yyyy-MM-dd HH:mm:ss"));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        }*/
-    }
-
 
     @Transactional(rollbackFor = Exception.class)
     public boolean insertBatch(Collection<ConfigValueEntity> entityList) {
@@ -244,50 +185,38 @@ public class ConfigValueService  {
 
     @Transactional(rollbackFor = Exception.class)
     public void updateById(ConfigValueEntity entity) {
-        ConfigValueEntity value = configValueDao.getById(entity.getId());
+        ConfigValueEntity value = configValueDao.queryById(entity.getId());
         if (value==null){
             throw new MarsException("配置不存在");
         }
-        setDate(entity);
+        LoginModel login = userLoginService.getLogin();
+
         entity.setReleaseStatus(0);
+        entity.setUserName(login.getUserName());
         if(!configValueDao.updateById(entity)){
             throw new CurdException(RespCode.UPDATE_ERROR);
         }
 
+        String sql  = configValueDao.getUpdateConfigSql(entity);
+        log.info("update sql:" +sql);
+        tableColumnMapper.updateTable(sql);
 
 
-        String tableName = entity.getAppName()+"_"+entity.getTemplateKey();
-        List<TableColumnEntity> columnList = tableColumnMapper.selectList(new QueryWrapper<TableColumnEntity>().eq("table_name",tableName));
+        List<PropertyEntity> propertyList = propertyDao.getPropertyList(entity.getAppName(),entity.getTemplateKey());
+        configValueDao.formatDate(propertyList,value.getValue());
 
-        StringBuilder sb =new StringBuilder();
-        sb.append("update  ").append(tableName).append(" set ");
-        JSONObject jsonObject = JSONObject.parseObject(entity.getJson());
-        boolean isFlag=false;
-        for (Map.Entry<String, Object> entry: jsonObject.entrySet()) {
-            if (isFlag){
-                sb.append(",");
-            }
-            String columnType = getColumnType(columnList,entry.getKey());
-            if (columnTypeString.contains(columnType)){
-                sb.append(entry.getKey()).append(" = ").append(" '").append(entry.getValue()).append("' ");
-            }else{
-                sb.append(entry.getKey()).append(" = ").append(" '").append(entry.getValue()).append("' ");
-            }
-            isFlag = true;
-        }
-        sb.append(" where  config_id = ").append(entity.getId());
-
-        log.info("update sql:" +sb.toString());
-        tableColumnMapper.updateTable(sb.toString());
-
-
+        value.setJson(JSON.toJSONString(value.getValue()));
+        value.setValue(null);
         ConfigRecordEntity record=ConfigRecordEntity.builder()
                 .appName(entity.getAppName())
                 .envCode(entity.getEnvCode())
                 .templateKey(entity.getTemplateKey())
+                .configId(value.getId())
                 .json(JSON.toJSONString(value))
                 .newJson(JSON.toJSONString(entity))
-                .operationType(OperationTypeEnum.DELETE.getCode())
+                .operationType(OperationTypeEnum.UPDATE.getCode())
+                .description(entity.getDescription())
+                .userName(login.getUserName())
                 .build();
         configRecordDao.save(record);
     }
@@ -316,11 +245,11 @@ public class ConfigValueService  {
         ConfigValueEntity configValue= configValueDao.getById(id);
         if (configValue!=null){
             configValue.setTableName(configValue.getAppName()+"_"+configValue.getTemplateKey());
-            List<PropertyEntity> list =  getPropertyList(configValue.getAppName(),configValue.getTemplateKey());
+            List<PropertyEntity> list =  propertyDao.getPropertyList(configValue.getAppName(),configValue.getTemplateKey());
             Map<String,Object> map = tableColumnMapper.selectTable(configValue);
             if (map!=null){
                 for(Map.Entry<String,Object> mm: map.entrySet()) {
-                    formatDate(list, mm,mm.getKey() );
+                    configValueDao.formatDate(list, mm,mm.getKey() );
                 }
             }
             configValue.setValue(map);
@@ -328,29 +257,28 @@ public class ConfigValueService  {
         return configValue;
     }
 
-    public List<PropertyEntity> getPropertyList(String appName,String templateKey){
-        QueryWrapper<PropertyEntity> queryWrapper=new QueryWrapper();
-        queryWrapper.eq("app_name",appName);
-        queryWrapper.eq("template_key",templateKey);
-        return propertyDao.list(queryWrapper);
-    }
 
     @Transactional(rollbackFor = Exception.class)
-    public void deleteById(Serializable id) {
-        ConfigValueEntity value = configValueDao.getById(id);
+    public void deleteById(Long id) {
+        ConfigValueEntity value = configValueDao.queryById(id);
         if (value==null){
             throw new MarsException("配置不存在");
         }
         if(!configValueDao.removeById(id)){
             throw new CurdException(RespCode.DELETE_ERROR);
         }
+        value.setJson(JSON.toJSONString(value.getValue()));
+        value.setValue(null);
+        LoginModel login = userLoginService.getLogin();
         ConfigRecordEntity record=ConfigRecordEntity.builder()
                 .appName(value.getAppName())
                 .envCode(value.getEnvCode())
                 .templateKey(value.getTemplateKey())
+                .configId(value.getId())
                 .json(JSON.toJSONString(value))
-                .newJson("")
                 .operationType(OperationTypeEnum.DELETE.getCode())
+                .description(value.getDescription())
+                .userName(login.getUserName())
                 .build();
         configRecordDao.save(record);
     }

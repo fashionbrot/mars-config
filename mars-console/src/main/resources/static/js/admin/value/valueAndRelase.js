@@ -33,8 +33,10 @@ function loadPropertyAttrDiv(id,templateKey,appName,className,json,flag,diff) {
                     var value;
                     var selectVariableKey;
                     if(json!=null && json!=''){
-                        var valueJson= json
-                        //var valueJson=strToJson(json);
+                        var valueJson= getFormatJson(json);
+                        /*if (id=="editPropertyDiv" || id=="editPropertyDiv2"){
+                            valueJson=eval('(' + json + ')');
+                        }*/
                         value=forJson(valueJson,row.propertyKey);
                         selectVariableKey=forJson(valueJson,row.propertyKey+"Prefix");
                     }
@@ -155,6 +157,19 @@ function loadPropertyAttrDiv(id,templateKey,appName,className,json,flag,diff) {
         }
     });
 }
+
+function getFormatJson(str) {
+    if (typeof str == 'string') {
+        try {
+            return JSON.parse(str);
+        } catch(e) {
+            console.log(e);
+            return false;
+        }
+    }
+    return str;
+}
+
 function getValue(map,key) {
     if (map!=null){
         $.each(map,function(n,item){  //.parseJSON（）方法把JSON字符串转换为javascript对象，不转换的话将会抛出错误。
@@ -311,7 +326,7 @@ function rollBack() {
     var id=$("#releaseId").val();
     loading();
     $.ajax({
-        url: "../config/rollBack",
+        url: "../admin/config/record/rollBack",
         type: "post",
         data:{"envCode":envCode,"appName":appName,"templateKey":templateKey,"operationType":6,"id":id},
         dataType: "json",

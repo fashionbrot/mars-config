@@ -1,15 +1,28 @@
 package com.github.fashionbrot.core.service;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.github.fashionbrot.common.enums.OperationTypeEnum;
 import com.github.fashionbrot.common.enums.RespCode;
 import com.github.fashionbrot.common.exception.CurdException;
+import com.github.fashionbrot.common.exception.MarsException;
+import com.github.fashionbrot.common.model.LoginModel;
 import com.github.fashionbrot.common.req.ConfigRecordReq;
 import com.github.fashionbrot.common.vo.PageVo;
+import com.github.fashionbrot.core.UserLoginService;
 import com.github.fashionbrot.dao.dao.ConfigRecordDao;
+import com.github.fashionbrot.dao.dao.ConfigValueDao;
+import com.github.fashionbrot.dao.dao.PropertyDao;
 import com.github.fashionbrot.dao.entity.ConfigRecordEntity;
+import com.github.fashionbrot.dao.entity.ConfigValueEntity;
+import com.github.fashionbrot.dao.entity.PropertyEntity;
+import com.github.fashionbrot.dao.mapper.TableColumnMapper;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,10 +40,20 @@ import java.util.Map;
  * @date 2020-10-22
  */
 @Service
+@Slf4j
 public class ConfigRecordService {
 
     @Autowired
     private ConfigRecordDao configRecordDao;
+
+    @Autowired
+    private ConfigValueDao configValueDao;
+
+    @Autowired
+    private TableColumnMapper tableColumnMapper;
+
+    @Autowired
+    private UserLoginService userLoginService;
 
 
     public Collection<ConfigRecordEntity> queryList(Map<String, Object> params) {
@@ -53,7 +76,15 @@ public class ConfigRecordService {
     */
     public PageVo pageList(ConfigRecordReq req){
         Page<?> page= PageHelper.startPage(req.getPage(),req.getPageSize());
-        List<ConfigRecordEntity> list = configRecordDao.list(null);
+        QueryWrapper<ConfigRecordEntity> q =new QueryWrapper();
+        q.eq("env_code",req.getEnvCode());
+        q.eq("app_name",req.getAppName());
+        String templateKey=req.getTemplateKey();
+        if (StringUtils.isNotEmpty(templateKey)) {
+            q.eq("template_key", templateKey);
+        }
+        q.orderByDesc("id");
+        List<ConfigRecordEntity> list = configRecordDao.list(q);
 
         return PageVo.builder()
                 .data(list)
@@ -148,5 +179,46 @@ public class ConfigRecordService {
     }
 
 
+    @Transactional(rollbackFor = Exception.class)
+    public void rollBack(ConfigRecordReq req) {
+        ConfigRecordEntity byId = configRecordDao.getById(req.getId());
+        if (byId==null){
+            throw new MarsException("记录不存在");
+        }
 
+        ConfigValueEntity valueEntity = configValueDao.getById(byId.getConfigId());
+        if (valueEntity==null){
+            throw new MarsException("配置信息已不存在");
+        }
+        String json = byId.getJson();
+        ConfigValueEntity newEntity = JSON.parseObject(json,ConfigValueEntity.class);
+        if (newEntity==null){
+            throw new MarsException("配置信息回滚失败，请联系管理员");
+        }
+
+        ConfigValueEntity update=ConfigValueEntity.builder().build();
+        update.setStatus(newEntity.getStatus());
+        update.setDescription(newEntity.getDescription());
+        configValueDao.update(update,new QueryWrapper<ConfigValueEntity>().eq("id",byId.getConfigId()));
+
+
+        String sql= configValueDao.getUpdateConfigSql(newEntity);
+        log.info("rollback sql:"+sql);
+        tableColumnMapper.updateTable(sql);
+
+        LoginModel login = userLoginService.getLogin();
+
+        ConfigRecordEntity record=ConfigRecordEntity.builder()
+                .appName(valueEntity.getAppName())
+                .envCode(valueEntity.getEnvCode())
+                .templateKey(valueEntity.getTemplateKey())
+                .configId(valueEntity.getId())
+                .json(byId.getNewJson())
+                .newJson(byId.getJson())
+                .operationType(OperationTypeEnum.ROLLBACK.getCode())
+                .description(valueEntity.getDescription())
+                .userName(login.getUserName())
+                .build();
+        configRecordDao.save(record);
+    }
 }

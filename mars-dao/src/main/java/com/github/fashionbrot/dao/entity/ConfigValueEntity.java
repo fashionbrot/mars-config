@@ -4,8 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import java.util.*;
 
@@ -20,6 +19,9 @@ import java.util.*;
 @Data
 @EqualsAndHashCode(callSuper=false)
 @TableName("config_value")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ConfigValueEntity extends BaseEntity {
 
 	@ApiModelProperty(value = "优先级")
@@ -54,7 +56,8 @@ public class ConfigValueEntity extends BaseEntity {
 	@TableField("release_status")
 	private Integer releaseStatus;
 
-	private transient String json;
+	@TableField(exist = false)
+	private String json;
 
 	private transient String tableName;
 

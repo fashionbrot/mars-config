@@ -44,6 +44,9 @@ public class ConfigRecordEntity {
 	@TableField("template_key")
 	private String templateKey;
 
+	@ApiModelProperty("配置id")
+	@TableField("config_id")
+	private Long configId;
 
 	@ApiModelProperty(value = "实例json")
 	@TableField("json")
@@ -57,9 +60,13 @@ public class ConfigRecordEntity {
 	@TableField("user_name")
 	private String userName;
 
-	@ApiModelProperty("操作类型 1编辑 2:删除")
+	@ApiModelProperty("操作类型 2编辑 3:删除")
 	@TableField("operation_type")
 	private Integer operationType;
+
+	@ApiModelProperty(value = "描述")
+	@TableField("description")
+	private String description;
 
 	@TableLogic(value = "0", delval = "1")
 	@TableField(value = "del_flag",fill = FieldFill.INSERT)
