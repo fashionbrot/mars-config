@@ -32,38 +32,8 @@
         ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
     </update>
 
-    
     <update id="dropTable" >
         DROP TABLE IF EXISTS ${tableName}
-    </update>
-
-    <update id="addTableColumn" parameterType="com.github.fashionbrot.dao.entity.PropertyEntity">
-        <if test="propertyType=='date' or propertyType=='year' or propertyType=='time' or propertyType=='datetime' or propertyType=='text' ">
-            alter table ${templateKey} add ${propertyKey}  ${propertyType} default null ;
-        </if>
-        <if test="propertyType=='decimal' or  propertyType=='double'">
-            alter table ${templateKey} add ${propertyKey} ${propertyType}(11,2) ;
-        </if>
-        <if test="propertyType=='varchar'  or propertyType=='int' or propertyType=='bigint' or propertyType=='tinyint'  ">
-            alter table ${templateKey} add ${propertyKey} ${propertyType}(${columnLength}) ;
-        </if>
-
-    </update>
-
-    <update id="dropTableColumn" parameterType="com.github.fashionbrot.dao.entity.PropertyEntity">
-        ALTER TABLE ${templateKey} drop COLUMN ${propertyKey};
-    </update>
-
-    <update id="updateTableColumn" parameterType="com.github.fashionbrot.dao.entity.PropertyEntity">
-        <if test="propertyType=='date' or propertyType=='year' or propertyType=='time' or propertyType=='datetime' or propertyType=='text' ">
-            alter table ${templateKey} modify ${propertyKey} ${propertyType} default null ;
-        </if>
-        <if test="propertyType=='decimal' or  propertyType=='double'">
-            alter table ${templateKey} modify ${propertyKey} ${propertyType}(11,2) ;
-        </if>
-        <if test="propertyType=='varchar'  or propertyType=='int' or propertyType=='bigint' or propertyType=='tinyint'  ">
-            alter table ${templateKey} modify ${propertyKey} ${propertyType}(${columnLength}) ;
-        </if>
     </update>
 
 

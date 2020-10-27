@@ -1,10 +1,13 @@
 package com.github.fashionbrot.core.service;
 
-import com.baomidou.mybatisplus.annotation.TableField;
+
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.github.fashionbrot.common.constant.MarsConst;
+import com.github.fashionbrot.common.enums.OptionEnum;
+import com.github.fashionbrot.dao.dao.TableColumnDao;
+import org.apache.commons.lang3.StringUtils;
 import com.github.fashionbrot.common.enums.RespCode;
 import com.github.fashionbrot.common.exception.CurdException;
 import com.github.fashionbrot.common.exception.MarsException;
@@ -43,6 +46,9 @@ public class PropertyService  {
     private PropertyDao propertyDao;
     @Autowired
     private TableColumnMapper tableColumnMapper;
+
+    @Autowired
+    private TableColumnDao tableColumnDao;
 
 
     public Collection<PropertyEntity> queryList(Map<String, Object> params) {
@@ -87,11 +93,14 @@ public class PropertyService  {
 
     @Transactional(rollbackFor = Exception.class)
     public void insert(PropertyEntity entity) {
+        if (MarsConst.propertySet.contains(entity.getPropertyKey())){
+            throw new MarsException("系统保留字段，请重新输入");
+        }
         if(!propertyDao.save(entity)){
             throw new CurdException(RespCode.SAVE_ERROR);
         }
-        entity.setTemplateKey(entity.getAppName()+"_"+entity.getTemplateKey());
-        tableColumnMapper.addTableColumn(entity);
+
+        tableColumnDao.operateTableColumn(entity, OptionEnum.ADD);
     }
 
 
@@ -116,11 +125,30 @@ public class PropertyService  {
 
     @Transactional(rollbackFor = Exception.class)
     public void updateById(PropertyEntity entity) {
+        if (MarsConst.propertySet.contains(entity.getPropertyKey())){
+            throw new MarsException("系统保留字段，请重新输入");
+        }
+
+        PropertyEntity byId = propertyDao.getById(entity.getId());
+        if (byId==null){
+            throw new MarsException("属性不存在");
+        }
         if(!propertyDao.updateById(entity)){
             throw new CurdException(RespCode.UPDATE_ERROR);
         }
-        entity.setTemplateKey(entity.getAppName()+"_"+entity.getTemplateKey());
-        tableColumnMapper.updateTableColumn(entity);
+
+        String tableName = entity.getAppName()+"_"+entity.getTemplateKey();
+        List<PropertyEntity> list=new ArrayList<>(2);
+        list.add(entity);
+        if (StringUtils.isNotEmpty(byId.getVariableKey()) && StringUtils.isEmpty(entity.getVariableKey())){
+            PropertyEntity p=PropertyEntity.builder()
+                    .templateKey(entity.getTemplateKey())
+                    .propertyKey(byId.getPropertyKey()+MarsConst.PROPERTY_PREFIX)
+                    .option(OptionEnum.DROP.getOption())
+                    .build();
+            list.add(p);
+        }
+        tableColumnDao.editTableColumn(tableName,list, OptionEnum.MODIFY);
     }
 
 
@@ -157,8 +185,18 @@ public class PropertyService  {
         if(!propertyDao.removeById(id)){
             throw new CurdException(RespCode.DELETE_ERROR);
         }
-        byId.setTemplateKey(byId.getAppName()+"_"+byId.getTemplateKey());
-        tableColumnMapper.updateTableColumn(byId);
+
+        String tableName = byId.getAppName()+"_"+byId.getTemplateKey();
+        List<PropertyEntity> list=new ArrayList<>(2);
+        list.add(byId);
+        if (StringUtils.isNotEmpty(byId.getVariableKey()) ){
+            PropertyEntity p=PropertyEntity.builder()
+                    .templateKey(byId.getTemplateKey())
+                    .propertyKey(byId.getPropertyKey()+ MarsConst.PROPERTY_PREFIX)
+                    .build();
+            list.add(p);
+        }
+        tableColumnDao.editTableColumn(tableName,list, OptionEnum.DROP);
     }
 
 
@@ -208,10 +246,24 @@ public class PropertyService  {
         }
         if (CollectionUtils.isNotEmpty(list)){
             propertyDao.saveBatch(list);
+
+
+            String tableName = appName+"_"+templateKey;
+            List<PropertyEntity> propertyList =new ArrayList<>();
+
             for(PropertyEntity pp : list){
-                pp.setTemplateKey(pp.getAppName()+"_"+pp.getTemplateKey());
-                tableColumnMapper.addTableColumn(pp);
+                propertyList.add(pp);
+                if(StringUtils.isNotEmpty(pp.getVariableKey())){
+                    PropertyEntity p=PropertyEntity.builder()
+                            .templateKey(pp.getTemplateKey())
+                            .propertyKey(pp.getPropertyKey()+ MarsConst.PROPERTY_PREFIX)
+                            .propertyType("varchar")
+                            .columnLength(200)
+                            .build();
+                    propertyList.add(p);
+                }
             }
+            tableColumnDao.editTableColumn(tableName,propertyList,OptionEnum.ADD);
         }
     }
 

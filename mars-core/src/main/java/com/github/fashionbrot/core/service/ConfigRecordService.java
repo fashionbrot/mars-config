@@ -16,6 +16,7 @@ import com.github.fashionbrot.core.UserLoginService;
 import com.github.fashionbrot.dao.dao.ConfigRecordDao;
 import com.github.fashionbrot.dao.dao.ConfigValueDao;
 import com.github.fashionbrot.dao.dao.PropertyDao;
+import com.github.fashionbrot.dao.dao.TableColumnDao;
 import com.github.fashionbrot.dao.entity.ConfigRecordEntity;
 import com.github.fashionbrot.dao.entity.ConfigValueEntity;
 import com.github.fashionbrot.dao.entity.PropertyEntity;
@@ -50,7 +51,7 @@ public class ConfigRecordService {
     private ConfigValueDao configValueDao;
 
     @Autowired
-    private TableColumnMapper tableColumnMapper;
+    private TableColumnDao tableColumnDao;
 
     @Autowired
     private UserLoginService userLoginService;
@@ -202,9 +203,9 @@ public class ConfigRecordService {
         configValueDao.update(update,new QueryWrapper<ConfigValueEntity>().eq("id",byId.getConfigId()));
 
 
-        String sql= configValueDao.getUpdateConfigSql(newEntity);
+        String sql= tableColumnDao.getUpdateConfigSql(newEntity);
         log.info("rollback sql:"+sql);
-        tableColumnMapper.updateTable(sql);
+        tableColumnDao.updateTable(sql);
 
         LoginModel login = userLoginService.getLogin();
 

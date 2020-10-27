@@ -1,5 +1,5 @@
 
-
+var PREFIX="_prefix"
 
 /**
  *
@@ -38,7 +38,7 @@ function loadPropertyAttrDiv(id,templateKey,appName,className,json,flag,diff) {
                             valueJson=eval('(' + json + ')');
                         }*/
                         value=forJson(valueJson,row.propertyKey);
-                        selectVariableKey=forJson(valueJson,row.propertyKey+"Prefix");
+                        selectVariableKey=forJson(valueJson,row.propertyKey+PREFIX);
                     }
                     if(value==null || value==''){
                         value='';
@@ -51,6 +51,7 @@ function loadPropertyAttrDiv(id,templateKey,appName,className,json,flag,diff) {
                     var labelType=row.labelType;
                     var labelValue=row.labelValue;
                     var variableKey=row.variableKey;
+                    var columnLength = row.columnLength;
 
                     /**
                      * 如果是编辑 把lableValue 赋值输入框内
@@ -66,7 +67,7 @@ function loadPropertyAttrDiv(id,templateKey,appName,className,json,flag,diff) {
                     if(labelType=='textarea'){
 
                         propertyHtml+=" placeholder='key:"+key+"  "+type+"类型'";
-                        var h ="<textarea type='text'   "+propertyHtml+" class='form-control "+className+"' >"+strValue+"</textarea>";
+                        var h ="<textarea type='text' maxlength='"+columnLength+"'  "+propertyHtml+" class='form-control "+className+"' >"+strValue+"</textarea>";
                         html+=lineHtmlArea(title,h);
                     }else if(labelType=='select'){
                         var selectId=(flag?"add":(diff?"edit":"edit2"))+"selectJson"+key;
@@ -101,7 +102,7 @@ function loadPropertyAttrDiv(id,templateKey,appName,className,json,flag,diff) {
                         }else if(type=='long'){
                             var onkeyup="this.value=this.value.replace(/\\D/g,\"\")";
                             var onafterpaste="this.value=this.value.replace(/\\D/g,\"\")";
-                            var h="<input type='text' onkeyup='"+onkeyup+"' onafterpaste='"+onafterpaste+"'  value='"+value+"' "+propertyHtml+" class='form-control "+className+"' />";
+                            var h="<input type='text' maxlength='"+columnLength+"' onkeyup='"+onkeyup+"' onafterpaste='"+onafterpaste+"'  value='"+value+"' "+propertyHtml+" class='form-control "+className+"' />";
                             html+=lineHtml(title,h);
                         }else if(type=='datetime' || type=="year" || type=="time" || type=="date") {
                             var dateId = key + "-date-datetime" + row.id;
@@ -119,17 +120,17 @@ function loadPropertyAttrDiv(id,templateKey,appName,className,json,flag,diff) {
                         }else if(type=='double'){
                             var onkeyup="if(isNaN(value))execCommand(\"undo\")";
                             var onafterpaste="if(isNaN(value))execCommand(\"undo\")";
-                            var h="<input type='text' onkeyup='"+onkeyup+"' onafterpaste='"+onafterpaste+"'  value='"+value+"' "+propertyHtml+" class='form-control "+className+"'  />";
+                            var h="<input type='text'  maxlength='"+columnLength+"'  onkeyup='"+onkeyup+"' onafterpaste='"+onafterpaste+"'  value='"+value+"' "+propertyHtml+" class='form-control "+className+"'  />";
                             html+=lineHtml(title,h);
                         }else{
 
 
                             if (variableKey!=null && variableKey!=''){
-                                var stringHtml="<input type='text' value='"+strValue+"'  "+propertyHtml+" style='width:70%' class='form-control btn-group "+className+"'  />";
+                                var stringHtml="<input type='text'  maxlength='"+columnLength+"'  value='"+strValue+"'  "+propertyHtml+" style='width:70%' class='form-control btn-group "+className+"'  />";
                                 var selectHtml=getVariableSelect(selectVariableKey,key,className);
                                 html+=lineHtml(title,selectHtml+stringHtml);
                             }else{
-                                var stringHtml="<input type='text' value='"+strValue+"' "+propertyHtml+" class='form-control "+className+"'  />";
+                                var stringHtml="<input type='text'  maxlength='"+columnLength+"'  value='"+strValue+"' "+propertyHtml+" class='form-control "+className+"'  />";
                                 html+=lineHtml(title,stringHtml);
                             }
 
@@ -229,7 +230,7 @@ function getVariableSelect(selectVariableKey,propertyKey,className) {
         var propertyKey =propertyKey;
         var className= className;
         var selectVariableKey=selectVariableKey;
-        var html="<select property-key='"+propertyKey+"Prefix' property-type='prefix' class='form-control btn-group "+className+"' style='width:30%;float: left;'>";
+        var html="<select property-key='"+propertyKey+PREFIX+"' property-type='prefix' class='form-control btn-group "+className+"' style='width:30%;float: left;'>";
 
         if(selectVariableKey=='-1'){
             html+="<option value='-1' selected='selected' >无前缀</option>";

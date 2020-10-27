@@ -9,6 +9,7 @@ import com.github.fashionbrot.common.exception.CurdException;
 import com.github.fashionbrot.common.exception.MarsException;
 import com.github.fashionbrot.common.req.TemplateReq;
 import com.github.fashionbrot.common.vo.PageVo;
+import com.github.fashionbrot.dao.dao.TableColumnDao;
 import com.github.fashionbrot.dao.dao.TemplateDao;
 import com.github.fashionbrot.dao.dao.TemplatePropertyRelationDao;
 import com.github.fashionbrot.dao.entity.TemplateEntity;
@@ -38,7 +39,7 @@ public class TemplateService {
     private TemplateDao templateDao;
 
     @Autowired
-    private TableColumnMapper tableColumnMapper;
+    private TableColumnDao tableColumnDao;
 
 
     public Collection<TemplateEntity> queryList(Map<String, Object> params) {
@@ -93,7 +94,7 @@ public class TemplateService {
         if(!templateDao.save(entity)){
             throw new CurdException(RespCode.SAVE_ERROR);
         }
-        tableColumnMapper.addTable(entity.getAppName()+"_"+entity.getTemplateKey());
+        tableColumnDao.addTable(entity.getAppName()+"_"+entity.getTemplateKey());
     }
 
 
@@ -157,7 +158,7 @@ public class TemplateService {
         if(!templateDao.removeById(id)){
             throw new CurdException(RespCode.DELETE_ERROR);
         }
-        tableColumnMapper.dropTable(byId.getAppName()+"_"+byId.getTemplateKey());
+        tableColumnDao.dropTable(byId.getAppName()+"_"+byId.getTemplateKey());
     }
 
 

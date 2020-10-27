@@ -21,6 +21,7 @@ import com.github.fashionbrot.core.UserLoginService;
 import com.github.fashionbrot.dao.dao.ConfigRecordDao;
 import com.github.fashionbrot.dao.dao.ConfigValueDao;
 import com.github.fashionbrot.dao.dao.PropertyDao;
+import com.github.fashionbrot.dao.dao.TableColumnDao;
 import com.github.fashionbrot.dao.entity.ConfigRecordEntity;
 import com.github.fashionbrot.dao.entity.ConfigValueEntity;
 import com.github.fashionbrot.dao.entity.PropertyEntity;
@@ -64,7 +65,7 @@ public class ConfigValueService  {
     private UserLoginService userLoginService;
 
     @Autowired
-    private TableColumnMapper tableColumnMapper;
+    private TableColumnDao tableColumnDao;
 
     @Autowired
     private PropertyDao propertyDao;
@@ -92,7 +93,7 @@ public class ConfigValueService  {
 
         List<PropertyEntity> propertyList = propertyDao.getPropertyList(req.getAppName(),req.getTemplateKey());
 
-        String tableName=req.getAppName()+"_"+req.getTemplateKey();
+        String tableName=MarsConst.TABLE_PREFIX+ req.getAppName()+"_"+req.getTemplateKey();
         req.setTableName(tableName);
         Page<?> page= PageHelper.startPage(req.getPage(),req.getPageSize());
         List<Map<String,Object>> list = configValueDao.configValueList(req);
@@ -114,41 +115,15 @@ public class ConfigValueService  {
     @Transactional(rollbackFor = Exception.class)
     public void insert(ConfigValueEntity entity) {
 
-
-
-
         if(!configValueDao.save(entity)){
             throw new CurdException(RespCode.SAVE_ERROR);
         }
 
-        String tableName = entity.getAppName()+"_"+entity.getTemplateKey();
-        List<TableColumnEntity> columnList = tableColumnMapper.selectList(new QueryWrapper<TableColumnEntity>().eq("table_name",tableName));
-        StringBuilder sb =new StringBuilder();
-        StringBuilder values =new StringBuilder();
-        sb.append("insert into ").append(tableName).append(" ");
-
-        JSONObject jsonObject = JSONObject.parseObject(entity.getJson());
-        sb.append(" ( config_id");
-        values.append("(").append(entity.getId());
-
-        for (Map.Entry<String, Object> entry: jsonObject.entrySet()) {
-            String columnType = getColumnType(columnList,entry.getKey());
-            if (MarsConst.columnTypeString.contains(columnType)){
-                sb.append(",").append(entry.getKey());
-                values.append(",'").append(entry.getValue()).append("'");
-            }else{
-                sb.append(",").append(entry.getKey());
-                values.append(",").append(entry.getValue());
-            }
+        String sql = tableColumnDao.getInsertSql(entity);
+        if (log.isDebugEnabled()) {
+            log.info("insert sql:" + sql);
         }
-        sb.append(" ) ");
-        values.append(" ) ");
-        sb.append(" values ");
-        sb.append(values.toString());
-        log.info("insert sql:" +sb.toString());
-        tableColumnMapper.insertTable(sb.toString());
-
-
+        tableColumnDao.insertTable(sql);
     }
     public String getColumnType(List<TableColumnEntity> list,String key){
         if (CollectionUtils.isNotEmpty(list)){
@@ -197,9 +172,9 @@ public class ConfigValueService  {
             throw new CurdException(RespCode.UPDATE_ERROR);
         }
 
-        String sql  = configValueDao.getUpdateConfigSql(entity);
+        String sql  = tableColumnDao.getUpdateConfigSql(entity);
         log.info("update sql:" +sql);
-        tableColumnMapper.updateTable(sql);
+        tableColumnDao.updateTable(sql);
 
 
         List<PropertyEntity> propertyList = propertyDao.getPropertyList(entity.getAppName(),entity.getTemplateKey());
@@ -215,7 +190,7 @@ public class ConfigValueService  {
                 .json(JSON.toJSONString(value))
                 .newJson(JSON.toJSONString(entity))
                 .operationType(OperationTypeEnum.UPDATE.getCode())
-                .description(entity.getDescription())
+                .description(value.getDescription())
                 .userName(login.getUserName())
                 .build();
         configRecordDao.save(record);
@@ -244,9 +219,10 @@ public class ConfigValueService  {
     public ConfigValueEntity selectById(Serializable id) {
         ConfigValueEntity configValue= configValueDao.getById(id);
         if (configValue!=null){
-            configValue.setTableName(configValue.getAppName()+"_"+configValue.getTemplateKey());
+
             List<PropertyEntity> list =  propertyDao.getPropertyList(configValue.getAppName(),configValue.getTemplateKey());
-            Map<String,Object> map = tableColumnMapper.selectTable(configValue);
+            configValue.setTableName(configValue.getAppName()+"_"+configValue.getTemplateKey());
+            Map<String,Object> map = tableColumnDao.selectTable(configValue);
             if (map!=null){
                 for(Map.Entry<String,Object> mm: map.entrySet()) {
                     configValueDao.formatDate(list, mm,mm.getKey() );

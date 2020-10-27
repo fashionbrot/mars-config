@@ -16,5 +16,11 @@ public class MarsConst {
 
     public final static RespVo RESP_VO = RespVo.builder().code(RespVo.SUCCESS).msg("成功").build();
 
-    public static Set<String> columnTypeString=new HashSet<>(Arrays.asList("datetime","date","time","year","varchar","text"));
+    public final static String PROPERTY_PREFIX = "_prefix";
+
+    public final static String TABLE_PREFIX = "mars_config_";
+
+    public final static Set<String> propertySet = new HashSet<>(Arrays.asList("status","startDate","endDate"
+            ,"asc","desc","priority","id","propertyName","property_name","propertyKey"
+            ,"property_key","app_name","appName","createDate","create_date"));
 }

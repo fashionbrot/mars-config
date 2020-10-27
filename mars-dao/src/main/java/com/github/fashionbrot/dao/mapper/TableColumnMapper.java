@@ -15,12 +15,6 @@ public interface TableColumnMapper extends BaseMapper<TableColumnEntity> {
 
     int dropTable(@Param("tableName")String tableName);
 
-    void addTableColumn(PropertyEntity entity);
-
-    void dropTableColumn(PropertyEntity entity);
-
-    void updateTableColumn(PropertyEntity entity);
-
     int insertTable(@Param("sql") String sql);
 
     int updateTable(@Param("sql") String sql);

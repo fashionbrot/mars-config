@@ -79,4 +79,8 @@ public class PropertyEntity {
 	@TableLogic(value = "0", delval = "1")
 	@TableField(value = "del_flag",fill = FieldFill.INSERT)
 	private int delFlag;
+
+
+	@TableField(exist = false)
+	private String option;
 }

@@ -30,8 +30,6 @@ public interface ConfigValueDao extends IService<ConfigValueEntity> {
 
     ConfigValueEntity queryById(Long id);
 
-    String getUpdateConfigSql(ConfigValueEntity entity);
-
     void formatDate(List<PropertyEntity> list, Map<String, Object> map);
 
     void formatDate(List<PropertyEntity> list, Map.Entry<String, Object> map, String column);

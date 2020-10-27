@@ -230,7 +230,7 @@ var queryByUserId = function (id) {
             var data=result.data;
             $("#editId").val(data.id);
             $("#editPriority").val(data.priority);
-            $("#editColumnLength").val(data.columnLength);
+
             $("#editPropertyName").val(data.propertyName);
             $("#editPropertyKey").val(data.propertyKey);
             $("#editPropertyType").val(data.propertyType);
@@ -252,9 +252,9 @@ var queryByUserId = function (id) {
                 $(".editLableSelectClass1").html(getforJsonHtml(valueJson));
 
             }else if(data.labelType=='input'){
-                inputHtml("editLableSelectClass","editLabelValue",data.labelValue);
+                inputHtml("editLableSelectClass","editLabelValue",data.labelValue,data.labelType);
             }else if(data.labelType=='textarea'){
-                inputHtml("editLableSelectClass","editLabelValue",data.labelValue);
+                inputHtml("editLableSelectClass","editLabelValue",data.labelValue,data.labelType);
             }
             changeLableType("editLabelType","editLableSelectClass");
             $("#editPropertyKey").attr("readonly","readonly");
@@ -268,7 +268,7 @@ var queryByUserId = function (id) {
             loadNoSearchSelect("editPropertyType");
 
             typeFlag(data.propertyType,"editPropertyTypeDiv");
-
+            $("#editColumnLength").val(data.columnLength);
             $("#editModal").modal("show");
 
         },error: function (e) {
@@ -519,14 +519,12 @@ function appNameChange(appNameId,templateKeyId) {
     loadNoSearchSelect(appNameId);
     manager.loadApp(appNameId,"公共应用");
 
+    var appName= $("#"+appNameId).val();
+    manager.loadTemplateCustom(templateKeyId, appName, "公共模板");
 
     $("#"+appNameId).on("change",function () {
         var appName= $("#"+appNameId).val();
-        if(appName=="-1") {
-            $("#"+templateKeyId).html("<option value=\"-1\" >公共模板</option>");
-        }else{
-            manager.loadTemplateCustom(templateKeyId, appName, "公共模板");
-        }
+        manager.loadTemplateCustom(templateKeyId, appName, "公共模板");
         loadSelect(templateKeyId);
     })
 }
@@ -556,9 +554,15 @@ function addDivClass(divClass) {
 function addSelectHtml(divClass) {
     $("."+divClass+"2").html("<button type='button' class='btn btn-block btn-success' style='margin-top: 10px;margin-bottom: 5px;' onclick='addPropertyButtom(\""+divClass+"\")' >添加</button>");
 }
-function inputHtml(divClass,labelValueId,labelValue) {
-    $("."+divClass+"1").html('标签默认值：<input type="text" name="labelValue" id="'+labelValueId+'" value="'+labelValue+'" class="form-control" />');
-    $("."+divClass+"2").html('');
+function inputHtml(divClass,labelValueId,labelValue,labelType) {
+    if (labelType=="input"){
+        $("."+divClass+"1").html('标签默认值：<input type="text" name="labelValue" id="'+labelValueId+'" value="'+labelValue+'" class="form-control" />');
+        $("."+divClass+"2").html('');
+    }else if (labelType=="textarea"){
+        $("."+divClass+"1").html('标签默认值：<textarea type="text" name="labelValue" id="'+labelValueId+'" value="'+labelValue+'" class="form-control" ></textarea>');
+        $("."+divClass+"2").html('');
+    }
+
 }
 
 function changeLableType(lableId,divClass) {
@@ -578,10 +582,10 @@ function initPropertyInfo(lableId,divClass) {
         addSelectHtml(divClass);
     }else if('input'==value){
         addDivClass(divClass);
-        inputHtml(divClass,"addLabelValue",'');
+        inputHtml(divClass,"addLabelValue",'',"input");
     }else{
         addDivClass(divClass);
-        inputHtml(divClass,"addLabelValue",'');
+        inputHtml(divClass,"addLabelValue",'',"textarea");
     }
 }
 
