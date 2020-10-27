@@ -203,9 +203,8 @@ public class PropertyService  {
     @Transactional(rollbackFor = Exception.class)
     public void deleteBatchIds(Collection<? extends Serializable> idList) {
         if (CollectionUtils.isNotEmpty(idList)){
-            boolean result = propertyDao.removeByIds(idList);
-            if (!result){
-                throw new CurdException(RespCode.DELETE_ERROR);
+            for (Serializable id:idList) {
+                deleteById(id);
             }
         }
     }
