@@ -91,7 +91,7 @@ public class ConfigValueService  {
     public PageVo pageList(ConfigValueReq req){
 
 
-        List<PropertyEntity> propertyList = propertyDao.getPropertyList(req.getAppName(),req.getTemplateKey());
+        /*List<PropertyEntity> propertyList = propertyDao.getPropertyList(req.getAppName(),req.getTemplateKey());
 
         String tableName=MarsConst.TABLE_PREFIX+ req.getAppName()+"_"+req.getTemplateKey();
         req.setTableName(tableName);
@@ -101,8 +101,10 @@ public class ConfigValueService  {
             for(Map<String,Object> map:list){
                 configValueDao.formatDate(propertyList,map);
             }
-        }
+        }*/
 
+        Page<?> page= PageHelper.startPage(req.getPage(),req.getPageSize());
+        List<Map<String,Object>> list = configValueDao.configValueList(req);
         return PageVo.builder()
                 .data(list)
                 .iTotalDisplayRecords(page.getTotal())
@@ -119,11 +121,11 @@ public class ConfigValueService  {
             throw new CurdException(RespCode.SAVE_ERROR);
         }
 
-        String sql = tableColumnDao.getInsertSql(entity);
+        /*String sql = tableColumnDao.getInsertSql(entity);
         if (log.isDebugEnabled()) {
             log.info("insert sql:" + sql);
         }
-        tableColumnDao.insertTable(sql);
+        tableColumnDao.insertTable(sql);*/
     }
     public String getColumnType(List<TableColumnEntity> list,String key){
         if (CollectionUtils.isNotEmpty(list)){
@@ -172,15 +174,15 @@ public class ConfigValueService  {
             throw new CurdException(RespCode.UPDATE_ERROR);
         }
 
-        String sql  = tableColumnDao.getUpdateConfigSql(entity);
+       /* String sql  = tableColumnDao.getUpdateConfigSql(entity);
         log.info("update sql:" +sql);
-        tableColumnDao.updateTable(sql);
+        tableColumnDao.updateTable(sql);*/
 
 
-        List<PropertyEntity> propertyList = propertyDao.getPropertyList(entity.getAppName(),entity.getTemplateKey());
-        configValueDao.formatDate(propertyList,value.getValue());
+        /*List<PropertyEntity> propertyList = propertyDao.getPropertyList(entity.getAppName(),entity.getTemplateKey());
+        configValueDao.formatDate(propertyList,value.getValue());*/
 
-        value.setJson(JSON.toJSONString(value.getValue()));
+        value.setJson(value.getJson());
         value.setValue(null);
         ConfigRecordEntity record=ConfigRecordEntity.builder()
                 .appName(entity.getAppName())
@@ -220,15 +222,15 @@ public class ConfigValueService  {
         ConfigValueEntity configValue= configValueDao.getById(id);
         if (configValue!=null){
 
-            List<PropertyEntity> list =  propertyDao.getPropertyList(configValue.getAppName(),configValue.getTemplateKey());
-            configValue.setTableName(configValue.getAppName()+"_"+configValue.getTemplateKey());
+           /* List<PropertyEntity> list =  propertyDao.getPropertyList(configValue.getAppName(),configValue.getTemplateKey());
+            //configValue.setTableName(configValue.getAppName()+"_"+configValue.getTemplateKey());
             Map<String,Object> map = tableColumnDao.selectTable(configValue);
             if (map!=null){
                 for(Map.Entry<String,Object> mm: map.entrySet()) {
                     configValueDao.formatDate(list, mm,mm.getKey() );
                 }
             }
-            configValue.setValue(map);
+            configValue.setValue(map);*/
         }
         return configValue;
     }
@@ -243,15 +245,14 @@ public class ConfigValueService  {
         if(!configValueDao.removeById(id)){
             throw new CurdException(RespCode.DELETE_ERROR);
         }
-        value.setJson(JSON.toJSONString(value.getValue()));
-        value.setValue(null);
+
         LoginModel login = userLoginService.getLogin();
         ConfigRecordEntity record=ConfigRecordEntity.builder()
                 .appName(value.getAppName())
                 .envCode(value.getEnvCode())
                 .templateKey(value.getTemplateKey())
                 .configId(value.getId())
-                .json(JSON.toJSONString(value))
+                .json(value.getJson())
                 .operationType(OperationTypeEnum.DELETE.getCode())
                 .description(value.getDescription())
                 .userName(login.getUserName())

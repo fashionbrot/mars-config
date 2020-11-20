@@ -94,7 +94,7 @@ public class TemplateService {
         if(!templateDao.save(entity)){
             throw new CurdException(RespCode.SAVE_ERROR);
         }
-        tableColumnDao.addTable(entity.getAppName()+"_"+entity.getTemplateKey());
+        //tableColumnDao.addTable(entity.getAppName()+"_"+entity.getTemplateKey());
     }
 
 
@@ -158,7 +158,7 @@ public class TemplateService {
         if(!templateDao.removeById(id)){
             throw new CurdException(RespCode.DELETE_ERROR);
         }
-        tableColumnDao.dropTable(byId.getAppName()+"_"+byId.getTemplateKey());
+        //tableColumnDao.dropTable(byId.getAppName()+"_"+byId.getTemplateKey());
     }
 
 

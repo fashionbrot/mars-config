@@ -202,7 +202,7 @@ var queryByUserId = function (id) {
                 $("#editEndTime").val('');
             }
 
-            loadPropertyAttrDiv("editPropertyDiv",data.templateKey,data.appName,"editPropertyClass",data.value,false,false);
+            loadPropertyAttrDiv("editPropertyDiv",data.templateKey,data.appName,"editPropertyClass",data.json,false,false);
 
             $("#editTemplateKey").on("change",function () {
                 var templateKey =$("#editTemplateKey").val();
@@ -338,7 +338,7 @@ function loadDataEnvAndApp(envCode,appName,templateKey,description) {
                     width : "20px",
                     className : "text-center",
                     render :dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
-                },{
+                },/*{
                     data : 'id',
                     bSortable : true,
                     width : "20px",
@@ -378,7 +378,7 @@ function loadDataEnvAndApp(envCode,appName,templateKey,description) {
                         }
                         return html;
                     }
-                },
+                },*/
                 {
                     data : 'description',
                     bSortable : true,
@@ -428,8 +428,8 @@ function loadDataEnvAndApp(envCode,appName,templateKey,description) {
                     visible: true,
                     width : '130px',
                     render: function (data, type, full) {
-                        return '<a class="btn btn-success btn-" onclick="queryByUserId(\'' + full.config_id + '\')"><i class="glyphicon glyphicon-edit"></i>修改</a>'
-                            + '&nbsp;&nbsp;<a class="btn btn-warning btn-circle" onclick="showModal(\'' + full.config_id + '\',this)"> <i class="glyphicon glyphicon-trash"></i>删除</a>';
+                        return '<a class="btn btn-success btn-" onclick="queryByUserId(\'' + full.id + '\')"><i class="glyphicon glyphicon-edit"></i>修改</a>'
+                            + '&nbsp;&nbsp;<a class="btn btn-warning btn-circle" onclick="showModal(\'' + full.id + '\',this)"> <i class="glyphicon glyphicon-trash"></i>删除</a>';
                     }
                 }
             ]

@@ -350,7 +350,7 @@ function loadData() {
                     bSortable: false,
                     visible: true,
                     width : '130px',
-                    render: function (data, type, full) {
+                    render: function (data, type, full,meta) {
                         return '<a class="btn btn-success btn-" onclick="queryByUserId(\'' + full.id + '\')"><i class="glyphicon glyphicon-edit"></i>修改</a>'
                             + '&nbsp;&nbsp;<a class="btn btn-warning btn-circle" onclick="showModal(\'' + full.id + '\',this)"> <i class="glyphicon glyphicon-trash"></i>删除</a>';
                     }
@@ -383,7 +383,7 @@ function loadData() {
 
 
 
-    $('#dataTables-userInfo').dataTable().fnDestroy();
+   /* $('#dataTables-userInfo').dataTable().fnDestroy();
     var table = $('#dataTables-userInfo').DataTable({
         ajax:{
             url: "../data/queryAllCustom",
@@ -462,12 +462,12 @@ function loadData() {
                 targets: 7, render: function (data, type, full, meta) {
                 return '<a class="btn btn-success btn-" onclick="queryByUserId(\'' + full.id + '\')"><i class="fa fa-edit">查看</i> </a>'
                     + '&nbsp;&nbsp;';
-                /*<a class="btn btn-warning btn-circle" onclick="showModal(\'' + full.id + '\',this)"> <i class="fa fa-times">删除</i></a>*/
+                /!*<a class="btn btn-warning btn-circle" onclick="showModal(\'' + full.id + '\',this)"> <i class="fa fa-times">删除</i></a>*!/
             }
             }
         ]
 
     });
-    loaded();
+    loaded();*/
 
 }

@@ -56,10 +56,9 @@ public class ConfigValueEntity extends BaseEntity {
 	@TableField("release_status")
 	private Integer releaseStatus;
 
-	@TableField(exist = false)
+	@ApiModelProperty("value json")
+	@TableField("json")
 	private String json;
-
-	private transient String tableName;
 
 	private transient Map<String,Object> value;
 

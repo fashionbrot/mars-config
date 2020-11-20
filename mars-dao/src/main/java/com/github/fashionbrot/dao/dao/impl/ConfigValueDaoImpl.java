@@ -38,9 +38,9 @@ public class ConfigValueDaoImpl  extends ServiceImpl<ConfigValueMapper, ConfigVa
     public ConfigValueEntity queryById(Long id) {
         ConfigValueEntity entity = configValueMapper.selectById(id);
         if (entity!=null){
-            entity.setTableName(entity.getAppName()+"_"+entity.getTemplateKey());
+            /*entity.setTableName(entity.getAppName()+"_"+entity.getTemplateKey());
             Map<String, Object> map = tableColumnDao.selectTable(entity);
-            entity.setValue(map);
+            entity.setValue(map);*/
         }
         return entity;
     }

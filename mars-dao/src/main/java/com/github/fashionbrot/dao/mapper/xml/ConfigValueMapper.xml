@@ -5,7 +5,7 @@
 
 
     <resultMap type="com.github.fashionbrot.dao.entity.ConfigValueEntity" id="configValueMap">
-            <result property="id" column="configId"/>
+            <result property="id" column="id"/>
             <result property="status" column="status"/>
             <result property="templateKey" column="template_key"/>
             <result property="description" column="description"/>
@@ -15,6 +15,7 @@
             <result property="userName" column="user_name"/>
             <result property="createId" column="create_id"/>
             <result property="createDate" column="create_date"/>
+            <result property="json" column="json"/>
     </resultMap>
 
 
@@ -23,29 +24,27 @@
     </sql>
 
 
-        <select id="configValueList" resultType="java.util.Map" parameterType="com.github.fashionbrot.common.req.ConfigValueReq">
-            select
-            a.status,a.template_key,a.description,a.priority,a.env_code,a.app_name,a.user_name,a.release_status
-            ,b.*
-            from config_value a
-            inner join ${tableName} b on b.config_id = a.id
-            where a.del_flag=0
 
-            <if test="envCode!=null and envCode!='-1'">
-                and a.env_code = #{envCode}
-            </if>
-            <if test="appName!=null and appName!='-1'">
-                and a.app_name=#{appName}
-            </if>
-            <if test="templateKey!=null and templateKey!=''">
-                and a.template_key =#{templateKey}
-            </if>
-            <if test="description!=null and description!=''">
-                    and a.description  LIKE concat('%',#{description},'%')
-            </if>
-            order by priority
+    <select id="configValueList" resultType="java.util.Map" parameterType="com.github.fashionbrot.common.req.ConfigValueReq">
+        select
+        a.id,a.status,a.template_key,a.description,a.priority,a.env_code,a.app_name,a.user_name,a.release_status,a.json
+        from config_value a
+        where a.del_flag=0
 
-        </select>
+        <if test="envCode!=null and envCode!='-1'">
+            and a.env_code = #{envCode}
+        </if>
+        <if test="appName!=null and appName!='-1'">
+            and a.app_name=#{appName}
+        </if>
+        <if test="templateKey!=null and templateKey!=''">
+            and a.template_key =#{templateKey}
+        </if>
+        <if test="description!=null and description!=''">
+            and a.description  LIKE concat('%',#{description},'%')
+        </if>
+        order by a.priority
+    </select>
     
 
 </mapper>
