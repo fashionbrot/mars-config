@@ -209,9 +209,6 @@ var userInfoEdit = function () {
 
 var queryByUserId = function (id) {
 
-
-
-
     loading();
     $.ajax({
         url: "../admin/property/selectById",
@@ -219,15 +216,14 @@ var queryByUserId = function (id) {
         data: {"id": id},
         dataType: "json",
         success: function (result) {
-
-
-
             loaded();
             if (result.code!=0){
                 alert(result.msg);
                 return false;
             }
             var data=result.data;
+            //
+            manager.loadApp("editAppName","公共应用");
             $("#editId").val(data.id);
             $("#editPriority").val(data.priority);
 
@@ -236,12 +232,16 @@ var queryByUserId = function (id) {
             $("#editPropertyType").val(data.propertyType);
             $("#editLabelType").val(data.labelType);
             $("#editAppName").val(data.appName);
-            manager.loadTemplateCustom("editTemplateKey",data.appName,"");
+            if (data.appName!="-1"){
+                manager.loadTemplateCustom("editTemplateKey",data.appName,"公共模板");
+            }else{
+                $("#editTemplateKey").html("<option value='-1'>公共模板</option>");
+            }
+            loadNoSearchSelect("editAppName");
             $("#editTemplateKey").val(data.templateKey);
+            loadNoSearchSelect("editTemplateKey");
             var json=data.labelValue;
             $("#editAttributeType").val(data.attributeType);
-
-
             manager.loadVariable("editVariableKey");
             $("#editVariableKey").val(data.variableKey);
 
@@ -259,14 +259,14 @@ var queryByUserId = function (id) {
             changeLableType("editLabelType","editLableSelectClass");
             $("#editPropertyKey").attr("readonly","readonly");
 
-            appNameChange("editAppName","editTemplateKey");
+
             $("#editAppName").val(data.appName);
             $("#editTemplateKey").val(data.templateKey);
 
             loadNoSearchSelect("editVariableKey");
             loadNoSearchSelect("editLabelType");
             loadNoSearchSelect("editPropertyType");
-
+            editAppNameChange("editAppName","editTemplateKey");
             typeFlag(data.propertyType,"editPropertyTypeDiv");
             $("#editColumnLength").val(data.columnLength);
             $("#editModal").modal("show");
@@ -494,7 +494,7 @@ function getVariable(variableData,variableKey) {
 function add() {
     $("input[name='addReset']").trigger("click");
 
-    appNameChange("addAppName","addTemplateKey");
+    appNameChange("addAppName","addTemplateKey","add");
 
     loadNoSearchSelect("addAttributeType");
     loadNoSearchSelect("addVariableKey");
@@ -513,19 +513,42 @@ function add() {
 }
 
 
-function appNameChange(appNameId,templateKeyId) {
+function appNameChange(appNameId,templateKeyId,flag) {
 
     loadSelect(templateKeyId);
     loadNoSearchSelect(appNameId);
     manager.loadApp(appNameId,"公共应用");
 
-    var appName= $("#"+appNameId).val();
-    manager.loadTemplateCustom(templateKeyId, appName, "公共模板");
+    if (flag=="add" ){
+        var appName= $("#"+appNameId).val();
+        if(appName=="-1"){
+            $("#"+templateKeyId).html("<option value='-1'>公共模板</option>");
+        }else{
+            manager.loadTemplateCustom(templateKeyId, appName, "公共模板");
+            loadSelect(templateKeyId);
+        }
+    }
+
 
     $("#"+appNameId).on("change",function () {
         var appName= $("#"+appNameId).val();
-        manager.loadTemplateCustom(templateKeyId, appName, "公共模板");
-        loadSelect(templateKeyId);
+        if(appName=="-1"){
+            $("#"+templateKeyId).html("<option value='-1'>公共模板</option>")
+        }else{
+            manager.loadTemplateCustom(templateKeyId, appName, "公共模板");
+            loadSelect(templateKeyId);
+        }
+    })
+}
+function editAppNameChange(appNameId,templateKeyId) {
+    $("#"+appNameId).on("change",function () {
+        var appName= $("#"+appNameId).val();
+        if(appName=="-1"){
+            $("#"+templateKeyId).html("<option value='-1'>公共模板</option>")
+        }else{
+            manager.loadTemplateCustom(templateKeyId, appName, "公共模板");
+            loadSelect(templateKeyId);
+        }
     })
 }
 
