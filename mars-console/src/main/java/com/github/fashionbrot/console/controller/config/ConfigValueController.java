@@ -101,5 +101,12 @@ public class ConfigValueController {
         return RespVo.success();
     }
 
+    @ApiOperation("发布")
+    @PostMapping("/release")
+    @ResponseBody
+    public RespVo release(ConfigValueReq req){
+        configValueService.release(req);
+        return RespVo.success();
+    }
 
 }

@@ -371,3 +371,11 @@ CREATE TABLE `value_data` (
   `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='导入导出记录表';
+
+CREATE TABLE `config_release` (
+  `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `env_code` varchar(32) NOT NULL COMMENT '环境code',
+  `app_name` varchar(32) NOT NULL COMMENT '应用名',
+  `version` varchar(32) NOT NULL COMMENT '版本',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='配置数据发布表';

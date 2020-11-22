@@ -509,7 +509,7 @@ function releaseConfig(releaseType) {
         alert("请选择应用");
         return false;
     }
-
+    releaseType=0;
     var tempalteText="";
     if(releaseType==1){
         tempalteText="-《已修改》模板";
@@ -521,7 +521,7 @@ function releaseConfig(releaseType) {
     if(res == true){
         loading();
         $.ajax({
-            url: "../release/release",
+            url: "/admin/config/value/release",
             type: "post",
             dataType: "json",
             data: {envCode: envCode, appName: appName,releaseType:releaseType},

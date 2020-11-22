@@ -16,6 +16,9 @@ import com.github.fashionbrot.common.exception.MarsException;
 import com.github.fashionbrot.common.model.LoginModel;
 import com.github.fashionbrot.common.req.ConfigValueReq;
 import com.github.fashionbrot.common.util.DateUtil;
+import com.github.fashionbrot.common.util.SnowflakeIdWorkerUtil;
+import com.github.fashionbrot.common.util.SystemUtil;
+import com.github.fashionbrot.common.vo.ConfigValueVo;
 import com.github.fashionbrot.common.vo.PageVo;
 import com.github.fashionbrot.core.UserLoginService;
 import com.github.fashionbrot.dao.dao.ConfigRecordDao;
@@ -43,6 +46,8 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * 配置数据表
@@ -281,6 +286,53 @@ public class ConfigValueService  {
         return configValueDao.remove(queryWrapper);
     }
 
+    private static Map<String,ConfigValueVo> cache = new ConcurrentHashMap<>();
+    private SnowflakeIdWorkerUtil snow = new SnowflakeIdWorkerUtil(SystemUtil.IP_LAST_POINT, 1);
+
+    @Transactional(rollbackFor = Exception.class)
+    public void release(ConfigValueReq req) {
+        QueryWrapper<ConfigValueEntity> q=new QueryWrapper();
+        q.eq("env_code",req.getEnvCode());
+        q.eq("app_name",req.getAppName());
+        q.eq("release_status",0);
+        q.select("template_key");
+        List<ConfigValueEntity> list = configValueDao.list(q);
+        if (CollectionUtils.isNotEmpty(list)){
+
+            List<String> releaseTemplateList = list.stream().distinct().map(m-> m.getTemplateKey()).collect(Collectors.toList());
+            if (CollectionUtils.isNotEmpty(releaseTemplateList)){
+                q =new QueryWrapper();
+                q.eq("env_code",req.getEnvCode());
+                q.eq("app_name",req.getAppName());
+                q.eq("release_status",0);
+                q.select("json");
+                q.orderByAsc("priority");
+                for(String templateKey : releaseTemplateList){
+                    q.eq("template_key",templateKey);
+
+                    List<ConfigValueEntity> valueList =  configValueDao.list(q);
+                    if (CollectionUtils.isNotEmpty(valueList)){
+                        List<JSONObject> json = valueList.stream().map(m -> JSONObject.parseObject(m.getJson())).collect(Collectors.toList());
+                        if (CollectionUtils.isNotEmpty(json)){
+                            String key = getKey(req.getEnvCode(),req.getAppName(),templateKey);
+                            cache.put(key, ConfigValueVo.builder().jsonList(json).version(snow.nextId()+"").build());
+                        }
+                    }
+                }
+            }
+            ConfigValueEntity update=new ConfigValueEntity();
+            update.setReleaseStatus(1);
+            QueryWrapper<ConfigValueEntity> qq=new QueryWrapper();
+            qq.eq("env_code",req.getEnvCode());
+            qq.eq("app_name",req.getAppName());
+            qq.eq("release_status",0);
+            configValueDao.update(update,qq);
+        }
+    }
+
+    private String getKey(String env,String app,String template){
+        return env+app+template;
+    }
 
 
 }

@@ -15,6 +15,7 @@
             <result property="userName" column="user_name"/>
             <result property="createId" column="create_id"/>
             <result property="createDate" column="create_date"/>
+            <result property="updateDate" column="update_date"/>
             <result property="json" column="json"/>
     </resultMap>
 
@@ -27,6 +28,7 @@
 
     <select id="configValueList" resultType="java.util.Map" parameterType="com.github.fashionbrot.common.req.ConfigValueReq">
         select
+        a.update_date,a.create_date,
         a.id,a.status,a.template_key,a.description,a.priority,a.env_code,a.app_name,a.user_name,a.release_status,a.json
         from config_value a
         where a.del_flag=0
