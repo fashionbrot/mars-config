@@ -64,7 +64,7 @@ public class MarsPropertySourcePostProcessor implements BeanDefinitionRegistryPo
         }
         ILoadBalancer loadBalancer = new BaseLoadBalancer();
         ServerHttpAgent.setServer(serverAddress, loadBalancer);
-        loadBalancer.setEnableLog(globalMarsProperties.isEnableErrorLog());
+
         Server server = loadBalancer.chooseServer();
         if (server == null) {
             ServerHttpAgent.loadLocalConfig(globalMarsProperties,environment);

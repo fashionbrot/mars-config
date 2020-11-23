@@ -14,11 +14,11 @@ public class ApiConsts {
 
     public static final String HTTPS = "https://";
 
-    public static final String CHECK_FOR_UPDATE_PATH ="/api/config/check-for-update";
+    public static final String CHECK_FOR_UPDATE_PATH ="/api/config/value/version";
 
-    public static final String HTTP_CHECK_FOR_UPDATE_PATH_PARAM =HTTP+"%s"+CHECK_FOR_UPDATE_PATH;
+    public static final String HTTP_CHECK_VERSION =HTTP+"%s"+CHECK_FOR_UPDATE_PATH;
 
-    public static final String HTTPS_CHECK_FOR_UPDATE_PATH_PARAM =HTTPS+"%s"+CHECK_FOR_UPDATE_PATH;
+    public static final String HTTPS_CHECK_VERSION =HTTPS+"%s"+CHECK_FOR_UPDATE_PATH;
 
     public static final String FOR_DATA ="/api/config/value/for-data";
 

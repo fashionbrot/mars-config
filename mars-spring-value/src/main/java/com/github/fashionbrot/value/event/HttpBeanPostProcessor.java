@@ -1,12 +1,15 @@
 package com.github.fashionbrot.value.event;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.fashionbrot.ribbon.loadbalancer.BaseLoadBalancer;
 import com.github.fashionbrot.ribbon.loadbalancer.ILoadBalancer;
 import com.github.fashionbrot.ribbon.loadbalancer.Server;
 import com.github.fashionbrot.value.GlobalMarsValueProperties;
 import com.github.fashionbrot.value.HttpService;
 import com.github.fashionbrot.value.consts.ApiConsts;
+import com.github.fashionbrot.value.model.Resp;
 import com.github.fashionbrot.value.util.BeanUtil;
+import com.github.fashionbrot.value.util.ObjectUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
@@ -24,6 +27,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 public class HttpBeanPostProcessor implements BeanFactoryAware, ApplicationEventPublisherAware, InitializingBean,
@@ -40,6 +44,7 @@ public class HttpBeanPostProcessor implements BeanFactoryAware, ApplicationEvent
 
     private GlobalMarsValueProperties properties;
 
+    private AtomicLong version = new AtomicLong(0);
     /**
      * listen long poll ScheduledExecutorService
      */
@@ -78,8 +83,16 @@ public class HttpBeanPostProcessor implements BeanFactoryAware, ApplicationEvent
                         return;
                     }
 
-                    String content = HttpService.getData(server,properties);
+                    if (!HttpService.checkVersion(server,properties)){
+                        String content = HttpService.getData(server,properties);
+                        if (ObjectUtils.isNotEmpty(content)){
+                            Resp resp = JSONObject.parseObject(content, Resp.class);
+                            if (resp!=null && resp.isSuccess()){
 
+                            }
+                        }
+
+                    }
 
                 }catch (Throwable e){
                     log.error("MarsTimerHttpBeanPostProcessor longPull error",e);

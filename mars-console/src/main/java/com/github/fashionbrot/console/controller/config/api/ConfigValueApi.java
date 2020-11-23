@@ -14,10 +14,15 @@ public class ConfigValueApi {
     @Autowired
     private ConfigValueService configValueService;
 
+    @PostMapping("/api/config/value/version")
+    @ResponseBody
+    public RespVo checkVersion(ConfigValueApiReq apiReq){
+        return RespVo.success(configValueService.checkVersion(apiReq));
+    }
+
     @PostMapping("/api/config/value/for-data")
     @ResponseBody
     public RespVo getData(ConfigValueApiReq apiReq){
-
         return RespVo.success(configValueService.getData(apiReq));
     }
 

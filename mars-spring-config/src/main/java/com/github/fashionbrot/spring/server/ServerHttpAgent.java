@@ -208,7 +208,7 @@ public class ServerHttpAgent {
             }
             HttpResult httpResult  = null;
             try {
-                httpResult  = HttpClientUtil.httpPost(url,null,params,GlobalConstants.ENCODE_UTF8,5000,5000,enableLog);
+                httpResult  = HttpClientUtil.httpPost(url,null,params,GlobalConstants.ENCODE_UTF8,5000,5000);
                 if (httpResult.isSuccess()){
                     return JsonUtil.parseObject(httpResult.getContent(),CheckForUpdateVo.class);
                 }
@@ -249,7 +249,7 @@ public class ServerHttpAgent {
                 url = String.format(ApiConstant.HTTPS_LOAD_DATA, server.getServerIp());
             }
             try {
-                HttpResult httpResult =  HttpClientUtil.httpPost(url,null,params,enableLog);
+                HttpResult httpResult =  HttpClientUtil.httpPost(url,null,params);
                 if (httpResult!=null && httpResult.isSuccess()){
                     return JsonUtil.parseObject(httpResult.getContent(),ForDataVo.class);
                 }

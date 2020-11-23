@@ -16,6 +16,6 @@ public class ConfigValueVo {
 
     private List<JSONObject> jsonList;
 
-    private String version;
+    private String templateKey;
 
 }

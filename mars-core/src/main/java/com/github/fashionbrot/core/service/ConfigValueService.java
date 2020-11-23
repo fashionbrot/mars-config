@@ -281,8 +281,8 @@ public class ConfigValueService  {
         return configValueDao.remove(queryWrapper);
     }
 
-    private static Map<String,Map<String,List>> cache = new ConcurrentHashMap<>();
-    private SnowflakeIdWorkerUtil snow = new SnowflakeIdWorkerUtil(SystemUtil.IP_LAST_POINT, 1);
+    private static Map<String,List<ConfigValueVo>> cache = new ConcurrentHashMap<>();
+
     @Autowired
     private ConfigReleaseDao configReleaseDao;
 
@@ -299,53 +299,63 @@ public class ConfigValueService  {
         }
 
 
+        loadValueCache(req.getEnvCode(),req.getAppName(),0);
+
+        ConfigValueEntity update=new ConfigValueEntity();
+        update.setReleaseStatus(1);
+        QueryWrapper<ConfigValueEntity> qq=new QueryWrapper();
+        qq.eq("env_code",req.getEnvCode());
+        qq.eq("app_name",req.getAppName());
+        qq.eq("release_status",0);
+        configValueDao.update(update,qq);
+
+        if (configReleaseEntity.getId()==null){
+            configReleaseDao.save(configReleaseEntity);
+        }else{
+            ConfigReleaseEntity updateRelease=ConfigReleaseEntity.builder()
+                    .version((Integer.valueOf(configReleaseEntity.getVersion())+1)+"")
+                    .build();
+            releaseQ.eq("version",configReleaseEntity.getVersion());
+            configReleaseDao.update(updateRelease,releaseQ);
+        }
+    }
+
+    private void loadValueCache(String envCode,String appName,Integer releaseStatus){
         QueryWrapper<ConfigValueEntity> q=new QueryWrapper();
-        q.eq("env_code",req.getEnvCode());
-        q.eq("app_name",req.getAppName());
-        q.eq("release_status",0);
+        q.eq("env_code",envCode);
+        q.eq("app_name",appName);
+        if (releaseStatus==0) {
+            q.eq("release_status", 0);
+        }
         q.select("template_key");
         List<ConfigValueEntity> list = configValueDao.list(q);
         if (CollectionUtils.isNotEmpty(list)){
 
             List<String> releaseTemplateList = list.stream().distinct().map(m-> m.getTemplateKey()).collect(Collectors.toList());
-            String key = getKey(req.getEnvCode(),req.getAppName());
+            String key = getKey(envCode,appName);
             if (CollectionUtils.isNotEmpty(releaseTemplateList)){
                 q =new QueryWrapper();
-                q.eq("env_code",req.getEnvCode());
-                q.eq("app_name",req.getAppName());
-                q.eq("release_status",0);
+                q.eq("env_code",envCode);
+                q.eq("app_name",appName);
+                if (releaseStatus==0) {
+                    q.eq("release_status", 0);
+                }
                 q.select("json");
                 q.orderByAsc("priority");
-                Map<String,List> map=new HashMap<>();
+                List<ConfigValueVo> allList= new ArrayList<>();
                 for(String templateKey : releaseTemplateList){
                     q.eq("template_key",templateKey);
                     List<ConfigValueEntity> valueList =  configValueDao.list(q);
                     if (CollectionUtils.isNotEmpty(valueList)){
                         List<JSONObject> json = valueList.stream().map(m -> JSONObject.parseObject(m.getJson())).collect(Collectors.toList());
                         if (CollectionUtils.isNotEmpty(json)){
-                            map.put(key+templateKey,json);
+                            allList.add(ConfigValueVo.builder()
+                                    .templateKey(templateKey)
+                                    .jsonList(json).build());
                         }
                     }
-
                 }
-                cache.put(key, map);
-            }
-            ConfigValueEntity update=new ConfigValueEntity();
-            update.setReleaseStatus(1);
-            QueryWrapper<ConfigValueEntity> qq=new QueryWrapper();
-            qq.eq("env_code",req.getEnvCode());
-            qq.eq("app_name",req.getAppName());
-            qq.eq("release_status",0);
-            configValueDao.update(update,qq);
-
-            if (configReleaseEntity.getId()==null){
-                configReleaseDao.save(configReleaseEntity);
-            }else{
-                ConfigReleaseEntity updateRelease=ConfigReleaseEntity.builder()
-                        .version((Integer.valueOf(configReleaseEntity.getVersion())+1)+"")
-                        .build();
-                releaseQ.eq("version",configReleaseEntity.getVersion());
-                configReleaseDao.update(updateRelease,releaseQ);
+                cache.put(key,allList );
             }
         }
     }
@@ -357,7 +367,23 @@ public class ConfigValueService  {
 
     public Object getData(ConfigValueApiReq req) {
         String key = getKey(req.getEnvCode(),req.getAppId());
-        return cache.get(key);
+        if(CollectionUtils.isEmpty(cache)){
+            loadValueCache(req.getEnvCode(),req.getAppId(),1);
+        }
+        if (cache.containsKey(key)) {
+            return cache.get(key);
+        }
+        return null;
     }
 
+    public Object checkVersion(ConfigValueApiReq req) {
+        QueryWrapper releaseQ = new QueryWrapper<ConfigReleaseEntity>()
+                .eq("env_code",req.getEnvCode())
+                .eq("app_name",req.getAppId());
+        ConfigReleaseEntity configReleaseEntity = configReleaseDao.getOne(releaseQ);
+        if (configReleaseEntity==null){
+            return 0;
+        }
+        return configReleaseEntity.getVersion();
+    }
 }
