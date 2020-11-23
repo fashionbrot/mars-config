@@ -377,5 +377,6 @@ CREATE TABLE `config_release` (
   `env_code` varchar(32) NOT NULL COMMENT '环境code',
   `app_name` varchar(32) NOT NULL COMMENT '应用名',
   `version` varchar(32) NOT NULL COMMENT '版本',
+  `update_date` datetime DEFAULT NULL COMMENT '最近更新时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='配置数据发布表';

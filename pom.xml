@@ -19,6 +19,7 @@
         <module>mars-core</module>
         <module>mars-console</module>
         <module>mars-common</module>
+        <module>mars-spring-value</module>
     </modules>
     <groupId>com.github.fashionbrot</groupId>
     <artifactId>mars-config</artifactId>

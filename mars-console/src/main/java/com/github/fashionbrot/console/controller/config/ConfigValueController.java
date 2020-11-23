@@ -43,6 +43,7 @@ public class ConfigValueController {
         return "/value/index";
     }
 
+
     @ApiOperation("数据列表—分页")
     @GetMapping("/page")
     @ResponseBody

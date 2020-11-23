@@ -29,7 +29,7 @@ public class HttpClientUtil {
      * @param connectTimeout    connectTimeout
      * @return HttpResult
      */
-    public static  HttpResult httpGet(String url, List<String> headers, List<String> paramValues,String encoding, int readTimeoutMs,int connectTimeout,boolean enableLog) {
+    public static  HttpResult httpGet(String url, List<String> headers, List<String> paramValues,String encoding, int readTimeoutMs,int connectTimeout) {
 
         String encodedContent = encodingParams(paramValues, encoding);
         url += (null == encodedContent) ? "" : ("?" + encodedContent);
@@ -59,9 +59,7 @@ public class HttpClientUtil {
             }
             return new HttpResult(respCode, resp);
         } catch (Exception e){
-            if (enableLog) {
-                log.error("httpGet error url:{} msg:{}", url, e.getMessage());
-            }
+            log.error("httpGet error url:{} msg:{}", url, e.getMessage());
             return new HttpResult(500, "Server Internal Error");
         } finally {
             if (conn != null) {
@@ -85,8 +83,8 @@ public class HttpClientUtil {
      * @param paramValues   value
      * @return HttpResult
      */
-    public static  HttpResult httpGet(String url, List<String> headers, List<String> paramValues,boolean enableLog){
-        return httpGet(url,headers,paramValues,GlobalConstants.ENCODE_UTF8,5000,5000,enableLog);
+    public static  HttpResult httpGet(String url, List<String> headers, List<String> paramValues){
+        return httpGet(url,headers,paramValues,GlobalConstants.ENCODE_UTF8,5000,5000);
     }
 
 
@@ -101,7 +99,7 @@ public class HttpClientUtil {
      * @return HttpResult
      */
     static public HttpResult httpPost(String url, List<String> headers, List<String> paramValues,
-                                      String encoding, int readTimeoutMs,int connectTimeout,boolean enableLog){
+                                      String encoding, int readTimeoutMs,int connectTimeout){
         String encodedContent = encodingParams(paramValues, encoding);
 
         HttpURLConnection conn = null;
@@ -138,9 +136,7 @@ public class HttpClientUtil {
 
             return new HttpResult(respCode, resp);
         }catch (Exception e){
-            if (enableLog) {
-                log.error("httpPost error url:{} msg:{}", url, e.getMessage());
-            }
+            log.error("httpPost error url:{} msg:{}", url, e.getMessage());
             return new HttpResult(500, "Server Internal Error");
         } finally {
             if (null != conn) {
@@ -170,8 +166,8 @@ public class HttpClientUtil {
      * @param paramValues   value
      * @return HttpResult
      */
-    public static  HttpResult httpPost(String url, List<String> headers, List<String> paramValues,boolean enableLog) {
-        return httpPost(url, headers, paramValues, GlobalConstants.ENCODE_UTF8, 5000,5000,enableLog);
+    public static  HttpResult httpPost(String url, List<String> headers, List<String> paramValues) {
+        return httpPost(url, headers, paramValues, GlobalConstants.ENCODE_UTF8, 5000,5000);
     }
 
     private static void setHeaders(HttpURLConnection conn, List<String> headers, String encoding) {

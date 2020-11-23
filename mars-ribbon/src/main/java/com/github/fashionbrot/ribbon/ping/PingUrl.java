@@ -18,15 +18,13 @@ public class PingUrl implements IPing {
 
 
     @Override
-    public boolean isAlive(Server server,boolean enableLog) {
+    public boolean isAlive(Server server) {
         String url = server.getServer();
         HttpResult httpResult;
         try {
-            httpResult = HttpClientUtil.httpGet(url,null,null, GlobalConstants.ENCODE_UTF8,2000,2000,enableLog);
+            httpResult = HttpClientUtil.httpGet(url,null,null, GlobalConstants.ENCODE_UTF8,2000,2000);
         } catch (Exception e) {
-            if (enableLog) {
-                log.error("pingUrl alive error:", e.getMessage());
-            }
+            log.error("pingUrl alive error:", e.getMessage());
             return false;
         }
         if (log.isDebugEnabled()){

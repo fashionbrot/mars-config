@@ -23,6 +23,8 @@ public interface ILoadBalancer {
      */
     void addServers(List<Server> newServers);
 
+    void setServer(String serverAddress,String healthUrl);
+
     /**
      * @return All known servers, both reachable and unreachable.
      */
@@ -37,12 +39,4 @@ public interface ILoadBalancer {
     void setPing(IPing ping);
 
     IPing getPing();
-
-    /**
-     *  enable log
-     * @return
-     */
-    boolean enableLog();
-
-    void setEnableLog(boolean enableLog);
 }

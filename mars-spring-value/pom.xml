@@ -2,15 +2,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
+    <parent>
+        <artifactId>mars-config</artifactId>
+        <groupId>com.github.fashionbrot</groupId>
+        <version>0.1.0</version>
+    </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.fashionbrot</groupId>
-    <artifactId>mars-ribbon</artifactId>
-    <version>0.1.2</version>
-    <packaging>jar</packaging>
-    <description>mars-ribbon api</description>
-    <name>mars-ribbon</name>
+    <artifactId>mars-spring-value</artifactId>
+
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
 
     <url>https://github.com/fashionbrot/mars-config</url>
     <licenses>
@@ -44,13 +49,15 @@
             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
-    
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>4.3.4.RELEASE</version>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -63,7 +70,27 @@
             <version>1.7.12</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.19</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.68</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.fashionbrot</groupId>
+            <artifactId>mars-ribbon</artifactId>
+            <version>0.1.2</version>
+        </dependency>
+
     </dependencies>
+
 
     <build>
         <plugins>
@@ -132,7 +159,7 @@
                 </executions>
             </plugin>
 
-            <!--<plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>1.1</version>
@@ -144,12 +171,11 @@
                             <goal>sign</goal>
                         </goals>
                     </execution>
-                    &lt;!&ndash; -Dgpg.passphrase='秘钥密码'或者-Darguments='gpg.passphrase=秘钥密码' &ndash;&gt;
+                    <!-- -Dgpg.passphrase='秘钥密码'或者-Darguments='gpg.passphrase=秘钥密码' -->
                 </executions>
-            </plugin>-->
+            </plugin>
         </plugins>
     </build>
-
 
 
 </project>

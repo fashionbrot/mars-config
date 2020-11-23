@@ -14,6 +14,7 @@ import com.github.fashionbrot.common.enums.RespCode;
 import com.github.fashionbrot.common.exception.CurdException;
 import com.github.fashionbrot.common.exception.MarsException;
 import com.github.fashionbrot.common.model.LoginModel;
+import com.github.fashionbrot.common.req.ConfigValueApiReq;
 import com.github.fashionbrot.common.req.ConfigValueReq;
 import com.github.fashionbrot.common.util.DateUtil;
 import com.github.fashionbrot.common.util.SnowflakeIdWorkerUtil;
@@ -21,14 +22,8 @@ import com.github.fashionbrot.common.util.SystemUtil;
 import com.github.fashionbrot.common.vo.ConfigValueVo;
 import com.github.fashionbrot.common.vo.PageVo;
 import com.github.fashionbrot.core.UserLoginService;
-import com.github.fashionbrot.dao.dao.ConfigRecordDao;
-import com.github.fashionbrot.dao.dao.ConfigValueDao;
-import com.github.fashionbrot.dao.dao.PropertyDao;
-import com.github.fashionbrot.dao.dao.TableColumnDao;
-import com.github.fashionbrot.dao.entity.ConfigRecordEntity;
-import com.github.fashionbrot.dao.entity.ConfigValueEntity;
-import com.github.fashionbrot.dao.entity.PropertyEntity;
-import com.github.fashionbrot.dao.entity.TableColumnEntity;
+import com.github.fashionbrot.dao.dao.*;
+import com.github.fashionbrot.dao.entity.*;
 import com.github.fashionbrot.dao.mapper.TableColumnMapper;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -286,11 +281,24 @@ public class ConfigValueService  {
         return configValueDao.remove(queryWrapper);
     }
 
-    private static Map<String,ConfigValueVo> cache = new ConcurrentHashMap<>();
+    private static Map<String,Map<String,List>> cache = new ConcurrentHashMap<>();
     private SnowflakeIdWorkerUtil snow = new SnowflakeIdWorkerUtil(SystemUtil.IP_LAST_POINT, 1);
+    @Autowired
+    private ConfigReleaseDao configReleaseDao;
 
     @Transactional(rollbackFor = Exception.class)
     public void release(ConfigValueReq req) {
+        QueryWrapper releaseQ = new QueryWrapper<ConfigReleaseEntity>().eq("env_code",req.getEnvCode()).eq("app_name",req.getAppName());
+        ConfigReleaseEntity configReleaseEntity = configReleaseDao.getOne(releaseQ);
+        if (configReleaseEntity==null){
+            configReleaseEntity = ConfigReleaseEntity.builder()
+                    .envCode(req.getEnvCode())
+                    .appName(req.getAppName())
+                    .version(1+"")
+                    .build();
+        }
+
+
         QueryWrapper<ConfigValueEntity> q=new QueryWrapper();
         q.eq("env_code",req.getEnvCode());
         q.eq("app_name",req.getAppName());
@@ -300,6 +308,7 @@ public class ConfigValueService  {
         if (CollectionUtils.isNotEmpty(list)){
 
             List<String> releaseTemplateList = list.stream().distinct().map(m-> m.getTemplateKey()).collect(Collectors.toList());
+            String key = getKey(req.getEnvCode(),req.getAppName());
             if (CollectionUtils.isNotEmpty(releaseTemplateList)){
                 q =new QueryWrapper();
                 q.eq("env_code",req.getEnvCode());
@@ -307,18 +316,19 @@ public class ConfigValueService  {
                 q.eq("release_status",0);
                 q.select("json");
                 q.orderByAsc("priority");
+                Map<String,List> map=new HashMap<>();
                 for(String templateKey : releaseTemplateList){
                     q.eq("template_key",templateKey);
-
                     List<ConfigValueEntity> valueList =  configValueDao.list(q);
                     if (CollectionUtils.isNotEmpty(valueList)){
                         List<JSONObject> json = valueList.stream().map(m -> JSONObject.parseObject(m.getJson())).collect(Collectors.toList());
                         if (CollectionUtils.isNotEmpty(json)){
-                            String key = getKey(req.getEnvCode(),req.getAppName(),templateKey);
-                            cache.put(key, ConfigValueVo.builder().jsonList(json).version(snow.nextId()+"").build());
+                            map.put(key+templateKey,json);
                         }
                     }
+
                 }
+                cache.put(key, map);
             }
             ConfigValueEntity update=new ConfigValueEntity();
             update.setReleaseStatus(1);
@@ -327,12 +337,27 @@ public class ConfigValueService  {
             qq.eq("app_name",req.getAppName());
             qq.eq("release_status",0);
             configValueDao.update(update,qq);
+
+            if (configReleaseEntity.getId()==null){
+                configReleaseDao.save(configReleaseEntity);
+            }else{
+                ConfigReleaseEntity updateRelease=ConfigReleaseEntity.builder()
+                        .version((Integer.valueOf(configReleaseEntity.getVersion())+1)+"")
+                        .build();
+                releaseQ.eq("version",configReleaseEntity.getVersion());
+                configReleaseDao.update(updateRelease,releaseQ);
+            }
         }
     }
 
-    private String getKey(String env,String app,String template){
-        return env+app+template;
+    private String getKey(String env,String app){
+        return env+app;
     }
 
+
+    public Object getData(ConfigValueApiReq req) {
+        String key = getKey(req.getEnvCode(),req.getAppId());
+        return cache.get(key);
+    }
 
 }
