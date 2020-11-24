@@ -376,7 +376,7 @@ public class ConfigValueService  {
         }
 
         String key = getKey(req.getEnvCode(),req.getAppId());
-        if(CollectionUtils.isEmpty(cache) || cache.containsKey(key)){
+        if(CollectionUtils.isEmpty(cache) || !cache.containsKey(key)){
             loadValueCache(req.getEnvCode(),req.getAppId(),1);
         }
         List<ConfigValueVo> list = null;
