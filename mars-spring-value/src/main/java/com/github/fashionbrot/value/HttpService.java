@@ -1,5 +1,6 @@
 package com.github.fashionbrot.value;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.fashionbrot.ribbon.enums.SchemeEnum;
 import com.github.fashionbrot.ribbon.loadbalancer.Server;
@@ -46,8 +47,12 @@ public class HttpService {
             } else {
                 url = String.format(ApiConsts.HTTPS_CHECK_VERSION, server.getServerIp());
             }
+
             try {
                 HttpResult httpResult =  HttpClientUtil.httpPost(url,null,params);
+                if (dataConfig.isEnableListenLog()){
+                    log.debug(" mars listen value for version  result:{}", JSON.toJSONString(httpResult));
+                }
                 if (httpResult!=null && httpResult.isSuccess()){
                     if (StringUtil.isNotEmpty(httpResult.getContent())) {
                         JSONObject jsonObject = JSONObject.parseObject(httpResult.getContent());

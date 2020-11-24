@@ -516,7 +516,7 @@ function releaseConfig(releaseType) {
     }else if(releaseType==0){
         tempalteText="-《全部》模板";
     }
-    var res = confirm("您确定要发布<"+$("#envCode option:selected").text()+">-<"+$("#appName option:selected").text()+"项目> "+tempalteText+" 吗?");
+    var res = confirm("您确定要发布<"+$("#envCode option:selected").text()+">-<"+$("#appName option:selected").text().trim()+"项目> "+tempalteText+" 吗?");
 
     if(res == true){
         loading();

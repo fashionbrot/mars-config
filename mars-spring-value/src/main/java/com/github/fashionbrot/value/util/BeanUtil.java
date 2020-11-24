@@ -38,6 +38,7 @@ public class BeanUtil {
                 .serverAddress(getProperties(globalProperties, "serverAddress"))
                 .listenLongPollMs(StringUtil.parseLong(getProperties(globalProperties, "listenLongPollMs"), 30000L))
                 .localCachePath(getProperties(globalProperties,"localCachePath"))
+                .enableListenLog(Boolean.parseBoolean(getProperties(globalProperties,"enableListenLog")))
                 .build();
         registerSingleton(registry, GlobalMarsValueProperties.BEAN_NAME, globalMarsProperties);
     }
@@ -49,26 +50,6 @@ public class BeanUtil {
     public static void registerHttpBeanPostProcessor(BeanDefinitionRegistry registry) {
         registerInfrastructureBeanIfAbsent(registry, HttpBeanPostProcessor.BEAN_NAME, HttpBeanPostProcessor.class);
     }
-
-
-
-    /*public static void registerMarsConfigurationPropertiesBindingPostProcessor(BeanDefinitionRegistry registry) {
-        registerInfrastructureBeanIfAbsent(registry, MarsConfigurationPropertiesBindingPostProcessor.BEAN_NAME, MarsConfigurationPropertiesBindingPostProcessor.class);
-    }
-
-    public static void registerApplicationContextHolder(BeanDefinitionRegistry registry) {
-        // Register applicationContextHolder Bean
-        registerInfrastructureBeanIfAbsent(registry, ApplicationContextHolder.BEAN_NAME, ApplicationContextHolder.class);
-    }
-
-    public static void registerMarsPropertySourcePostProcessor(BeanDefinitionRegistry registry) {
-        registerInfrastructureBeanIfAbsent(registry, MarsPropertySourcePostProcessor.BEAN_NAME, MarsPropertySourcePostProcessor.class);
-    }
-
-    public static void registerMarsTimerHttpBeanPostProcessor(BeanDefinitionRegistry registry) {
-        registerInfrastructureBeanIfAbsent(registry, MarsTimerHttpBeanPostProcessor.BEAN_NAME, MarsTimerHttpBeanPostProcessor.class);
-    }*/
-
 
     /**
      * Resolve placeholders of properties via specified {@link PropertyResolver} if present
@@ -117,16 +98,6 @@ public class BeanUtil {
         return null;
     }
 
-
-    /*public static void registerMarsValueAnnotationBeanPostProcessor(BeanDefinitionRegistry registry) {
-        registerInfrastructureBeanIfAbsent(registry, MarsValueAnnotationBeanPostProcessor.BEAN_NAME,
-                MarsValueAnnotationBeanPostProcessor.class);
-    }
-
-    public static void registerMarsListener(BeanDefinitionRegistry registry) {
-        registerInfrastructureBeanIfAbsent(registry, MarsConfigListenerMethodProcessor.BEAN_NAME, MarsConfigListenerMethodProcessor.class);
-    }
-*/
     /**
      * Register Infrastructure Bean if absent
      *

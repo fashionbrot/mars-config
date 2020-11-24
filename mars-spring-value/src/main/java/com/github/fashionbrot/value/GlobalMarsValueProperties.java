@@ -35,5 +35,7 @@ public class GlobalMarsValueProperties {
      */
     private long listenLongPollMs;
 
+    private boolean enableListenLog;
+
     private String localCachePath;
 }

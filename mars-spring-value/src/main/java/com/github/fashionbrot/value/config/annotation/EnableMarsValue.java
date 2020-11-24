@@ -52,6 +52,11 @@ public @interface EnableMarsValue {
     String listenLongPollMs() default "30000";
 
     /**
+     * 是否开启 http log 轮训日志
+     * @return
+     */
+    String enableListenLog() default "false";
+    /**
      * Local cache file path
      * @return
      */

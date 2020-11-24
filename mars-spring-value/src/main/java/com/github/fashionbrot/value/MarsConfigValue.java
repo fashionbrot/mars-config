@@ -49,7 +49,7 @@ public class MarsConfigValue implements BeanFactoryAware {
 
     public static void setCache(List<ConfigValue> data){
         if(CollectionUtil.isNotEmpty(data)){
-            for(int i=0;i<data.size();i++){
+                for(int i=0;i<data.size();i++){
                 ConfigValue value = data.get(i);
                 cache.put(value.getTemplateKey(),value.getJsonList());
             }

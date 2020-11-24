@@ -28,6 +28,10 @@ public class ConfigValueDaoImpl  extends ServiceImpl<ConfigValueMapper, ConfigVa
     private TableColumnDao tableColumnDao;
 
 
+    @Override
+    public int updateDelete(Long id) {
+        return configValueMapper.updateDelete(id);
+    }
 
     @Override
     public    List<Map<String,Object>> configValueList(ConfigValueReq req) {

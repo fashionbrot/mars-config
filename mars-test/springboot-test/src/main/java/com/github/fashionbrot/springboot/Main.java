@@ -9,7 +9,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 //@EnableMarsConfig
-@EnableMarsValue(envCode = "beta",appId = "app",serverAddress ="localhost:8889",listenLongPollMs ="5000")
+@EnableMarsValue(envCode = "beta",appId = "app",serverAddress ="localhost:8889",listenLongPollMs ="5000",enableListenLog = "true")
 public class Main  extends SpringBootServletInitializer {
 
     public static void main(String[] args) {

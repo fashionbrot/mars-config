@@ -118,6 +118,9 @@ public class ConfigValueService  {
 
     @Transactional(rollbackFor = Exception.class)
     public void insert(ConfigValueEntity entity) {
+        LoginModel login = userLoginService.getLogin();
+        entity.setReleaseStatus(0);
+        entity.setUserName(login.getUserName());
 
         if(!configValueDao.save(entity)){
             throw new CurdException(RespCode.SAVE_ERROR);
@@ -244,7 +247,9 @@ public class ConfigValueService  {
         if (value==null){
             throw new MarsException("配置不存在");
         }
-        if(!configValueDao.removeById(id)){
+        value.setReleaseStatus(0);
+        value.setDelFlag(1);
+        if(configValueDao.updateDelete(id)!=1){
             throw new CurdException(RespCode.DELETE_ERROR);
         }
 
@@ -336,17 +341,18 @@ public class ConfigValueService  {
             List<String> releaseTemplateList = list.stream().distinct().map(m-> m.getTemplateKey()).collect(Collectors.toList());
             String key = getKey(envCode,appName);
             if (CollectionUtils.isNotEmpty(releaseTemplateList)){
-                q =new QueryWrapper();
-                q.eq("env_code",envCode);
-                q.eq("app_name",appName);
-                if (releaseStatus==0) {
-                    q.eq("release_status", 0);
-                }
-                q.select("json");
-                q.orderByAsc("priority");
+
                 List<ConfigValueVo> allList= new ArrayList<>();
                 for(String templateKey : releaseTemplateList){
+
+                    q =new QueryWrapper();
+                    q.eq("env_code",envCode);
+                    q.eq("app_name",appName);
+
+                    q.select("json");
+                    q.orderByAsc("priority");
                     q.eq("template_key",templateKey);
+
                     List<ConfigValueEntity> valueList =  configValueDao.list(q);
                     if (CollectionUtils.isNotEmpty(valueList)){
                         List<JSONObject> json = valueList.stream().map(m -> JSONObject.parseObject(m.getJson())).collect(Collectors.toList());
@@ -355,6 +361,10 @@ public class ConfigValueService  {
                                     .templateKey(templateKey)
                                     .jsonList(json).build());
                         }
+                    }else{
+                        allList.add(ConfigValueVo.builder()
+                                .templateKey(templateKey)
+                                .jsonList(null).build());
                     }
                 }
                 cache.put(key,allList );

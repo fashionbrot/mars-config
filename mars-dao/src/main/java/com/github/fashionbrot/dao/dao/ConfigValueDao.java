@@ -9,6 +9,7 @@ import com.github.fashionbrot.common.req.ConfigValueReq;
 import com.github.fashionbrot.common.util.DateUtil;
 import com.github.fashionbrot.dao.entity.ConfigValueEntity;
 import com.github.fashionbrot.dao.entity.PropertyEntity;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.Map;
 
 public interface ConfigValueDao extends IService<ConfigValueEntity> {
 
+    int updateDelete(Long id);
 
     List<Map<String,Object>> configValueList(ConfigValueReq req);
 
