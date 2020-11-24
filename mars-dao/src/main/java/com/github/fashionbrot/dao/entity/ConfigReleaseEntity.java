@@ -38,5 +38,5 @@ public class ConfigReleaseEntity{
 
 	@ApiModelProperty(value = "版本")
 	@TableField("version")
-	private String version;
+	private Long version;
 }

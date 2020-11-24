@@ -19,8 +19,10 @@ import com.github.fashionbrot.common.req.ConfigValueReq;
 import com.github.fashionbrot.common.util.DateUtil;
 import com.github.fashionbrot.common.util.SnowflakeIdWorkerUtil;
 import com.github.fashionbrot.common.util.SystemUtil;
+import com.github.fashionbrot.common.vo.ApiRespVo;
 import com.github.fashionbrot.common.vo.ConfigValueVo;
 import com.github.fashionbrot.common.vo.PageVo;
+import com.github.fashionbrot.common.vo.RespVo;
 import com.github.fashionbrot.core.UserLoginService;
 import com.github.fashionbrot.dao.dao.*;
 import com.github.fashionbrot.dao.entity.*;
@@ -294,7 +296,7 @@ public class ConfigValueService  {
             configReleaseEntity = ConfigReleaseEntity.builder()
                     .envCode(req.getEnvCode())
                     .appName(req.getAppName())
-                    .version(1+"")
+                    .version(1L)
                     .build();
         }
 
@@ -313,7 +315,7 @@ public class ConfigValueService  {
             configReleaseDao.save(configReleaseEntity);
         }else{
             ConfigReleaseEntity updateRelease=ConfigReleaseEntity.builder()
-                    .version((Integer.valueOf(configReleaseEntity.getVersion())+1)+"")
+                    .version((configReleaseEntity.getVersion()+1))
                     .build();
             releaseQ.eq("version",configReleaseEntity.getVersion());
             configReleaseDao.update(updateRelease,releaseQ);
@@ -365,15 +367,23 @@ public class ConfigValueService  {
     }
 
 
-    public Object getData(ConfigValueApiReq req) {
+    public ApiRespVo getData(ConfigValueApiReq req) {
+
+        QueryWrapper releaseQ = new QueryWrapper<ConfigReleaseEntity>().eq("env_code",req.getEnvCode()).eq("app_name",req.getAppId());
+        ConfigReleaseEntity releaseEntity = configReleaseDao.getOne(releaseQ);
+        if (releaseEntity==null){
+            return ApiRespVo.builder().code(RespVo.SUCCESS).version(0L).build();
+        }
+
         String key = getKey(req.getEnvCode(),req.getAppId());
-        if(CollectionUtils.isEmpty(cache)){
+        if(CollectionUtils.isEmpty(cache) || cache.containsKey(key)){
             loadValueCache(req.getEnvCode(),req.getAppId(),1);
         }
+        List<ConfigValueVo> list = null;
         if (cache.containsKey(key)) {
-            return cache.get(key);
+            list = cache.get(key);
         }
-        return null;
+        return ApiRespVo.builder().code(RespVo.SUCCESS).version(releaseEntity.getVersion()).data(list).build();
     }
 
     public Object checkVersion(ConfigValueApiReq req) {

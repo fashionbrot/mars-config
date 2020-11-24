@@ -13,6 +13,7 @@ public class Resp{
     private int code;
     private String msg;
     private List<ConfigValue> data;
+    private Long version;
 
 
     public boolean isSuccess(){

@@ -8,8 +8,8 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
-@EnableMarsConfig
-@EnableMarsValue(envCode = "beta",appId = "app",serverAddress ="localhost:8889",listenLongPollMs ="1000")
+//@EnableMarsConfig
+@EnableMarsValue(envCode = "beta",appId = "app",serverAddress ="localhost:8889",listenLongPollMs ="5000")
 public class Main  extends SpringBootServletInitializer {
 
     public static void main(String[] args) {

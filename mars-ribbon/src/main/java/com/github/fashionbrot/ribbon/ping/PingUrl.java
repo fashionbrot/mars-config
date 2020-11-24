@@ -13,7 +13,8 @@ import lombok.extern.slf4j.Slf4j;
  * @date 2019/12/8 22:45
  */
 @Slf4j
-public class PingUrl implements IPing {
+public class
+PingUrl implements IPing {
 
 
 
@@ -27,9 +28,9 @@ public class PingUrl implements IPing {
             log.error("pingUrl alive error:", e.getMessage());
             return false;
         }
-        if (log.isDebugEnabled()){
+        /*if (log.isDebugEnabled()){
             log.debug("isAlive url:{} result:{}",url,httpResult.toString());
-        }
+        }*/
         if (httpResult.isSuccess()){
             return true;
         }

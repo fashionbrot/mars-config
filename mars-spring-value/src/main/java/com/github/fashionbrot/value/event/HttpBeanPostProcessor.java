@@ -6,6 +6,7 @@ import com.github.fashionbrot.ribbon.loadbalancer.ILoadBalancer;
 import com.github.fashionbrot.ribbon.loadbalancer.Server;
 import com.github.fashionbrot.value.GlobalMarsValueProperties;
 import com.github.fashionbrot.value.HttpService;
+import com.github.fashionbrot.value.MarsConfigValue;
 import com.github.fashionbrot.value.consts.ApiConsts;
 import com.github.fashionbrot.value.model.Resp;
 import com.github.fashionbrot.value.util.BeanUtil;
@@ -82,18 +83,9 @@ public class HttpBeanPostProcessor implements BeanFactoryAware, ApplicationEvent
                         log.error("loadBalancer server is null  rule:{} ping:{}", loadBalancer.getRule().getClass().getName(), loadBalancer.getPing().getClass().getName());
                         return;
                     }
-
                     if (!HttpService.checkVersion(server,properties)){
-                        String content = HttpService.getData(server,properties);
-                        if (ObjectUtils.isNotEmpty(content)){
-                            Resp resp = JSONObject.parseObject(content, Resp.class);
-                            if (resp!=null && resp.isSuccess()){
-
-                            }
-                        }
-
+                        HttpService.getData(server,properties);
                     }
-
                 }catch (Throwable e){
                     log.error("MarsTimerHttpBeanPostProcessor longPull error",e);
                 }

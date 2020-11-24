@@ -1,6 +1,7 @@
 package com.github.fashionbrot.console.controller.config.api;
 
 import com.github.fashionbrot.common.req.ConfigValueApiReq;
+import com.github.fashionbrot.common.vo.ApiRespVo;
 import com.github.fashionbrot.common.vo.RespVo;
 import com.github.fashionbrot.core.service.ConfigValueService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +23,8 @@ public class ConfigValueApi {
 
     @PostMapping("/api/config/value/for-data")
     @ResponseBody
-    public RespVo getData(ConfigValueApiReq apiReq){
-        return RespVo.success(configValueService.getData(apiReq));
+    public ApiRespVo getData(ConfigValueApiReq apiReq){
+        return configValueService.getData(apiReq);
     }
 
 }

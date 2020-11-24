@@ -392,12 +392,12 @@ function loadDataEnvAndApp(envCode,appName,templateKey,description) {
                         }
                     }
                 },{
-                    data : 'releaseType',
+                    data : 'release_status',
                     bSortable : true,
                     width : "20px",
                     className : "text-center",
                     render :function (data, type, full, meta) {
-                        if (full.releaseType == "1") {
+                        if (data == "1") {
                             return "已发布";
                         } else {
                             return "<span style='color:red;font-weight: bold;'>未发布</span>";
@@ -526,12 +526,10 @@ function releaseConfig(releaseType) {
             dataType: "json",
             data: {envCode: envCode, appName: appName,releaseType:releaseType},
             success: function (data) {
-
+                loaded();
                 if(data.code==0){
-                    loaded();
-                    alert("发布成功");
+                    loadData();
                 }else{
-                    loaded();
                     alert(data.msg);
                 }
             }
