@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.fashionbrot.common.enums.DateEnum;
 import com.github.fashionbrot.common.req.ConfigValueReq;
 import com.github.fashionbrot.common.util.DateUtil;
+import com.github.fashionbrot.common.vo.ConfigValueVo;
 import com.github.fashionbrot.dao.entity.ConfigValueEntity;
 import com.github.fashionbrot.dao.entity.PropertyEntity;
 import org.apache.ibatis.annotations.Param;
@@ -35,4 +36,6 @@ public interface ConfigValueDao extends IService<ConfigValueEntity> {
     void formatDate(List<PropertyEntity> list, Map<String, Object> map);
 
     void formatDate(List<PropertyEntity> list, Map.Entry<String, Object> map, String column);
+
+    List<ConfigValueVo> selectByJson(Map<String,Object> map);
 }

@@ -3,6 +3,7 @@ package com.github.fashionbrot.value.util;
 import com.github.fashionbrot.ribbon.util.StringUtil;
 import com.github.fashionbrot.value.GlobalMarsValueProperties;
 import com.github.fashionbrot.value.MarsConfigValue;
+import com.github.fashionbrot.value.event.ConfigPostProcessor;
 import com.github.fashionbrot.value.event.HttpBeanPostProcessor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanFactory;
@@ -41,6 +42,10 @@ public class BeanUtil {
                 .enableListenLog(Boolean.parseBoolean(getProperties(globalProperties,"enableListenLog")))
                 .build();
         registerSingleton(registry, GlobalMarsValueProperties.BEAN_NAME, globalMarsProperties);
+    }
+
+    public static void registerConfigPostProcessor(BeanDefinitionRegistry registry) {
+        registerInfrastructureBeanIfAbsent(registry, ConfigPostProcessor.BEAN_NAME, ConfigPostProcessor.class);
     }
 
     public static void registerMarsConfigValue(BeanDefinitionRegistry registry) {

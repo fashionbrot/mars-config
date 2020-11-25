@@ -84,7 +84,7 @@ public class HttpBeanPostProcessor implements BeanFactoryAware, ApplicationEvent
                         return;
                     }
                     if (!HttpService.checkVersion(server,properties)){
-                        HttpService.getData(server,properties);
+                        HttpService.getData(server,properties,false);
                     }
                 }catch (Throwable e){
                     log.error("MarsTimerHttpBeanPostProcessor longPull error",e);

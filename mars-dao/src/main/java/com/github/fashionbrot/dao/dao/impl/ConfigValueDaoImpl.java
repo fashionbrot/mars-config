@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.fashionbrot.common.enums.DateEnum;
 import com.github.fashionbrot.common.req.ConfigValueReq;
 import com.github.fashionbrot.common.util.DateUtil;
+import com.github.fashionbrot.common.vo.ConfigValueVo;
 import com.github.fashionbrot.dao.dao.ConfigValueDao;
 import com.github.fashionbrot.dao.dao.TableColumnDao;
 import com.github.fashionbrot.dao.entity.ConfigValueEntity;
@@ -87,6 +88,11 @@ public class ConfigValueDaoImpl  extends ServiceImpl<ConfigValueMapper, ConfigVa
                 }
             }
         }
+    }
+
+    @Override
+    public List<ConfigValueVo> selectByJson(Map<String,Object> map) {
+        return configValueMapper.selectByJson( map);
     }
 
 

@@ -3,6 +3,7 @@ package com.github.fashionbrot.dao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.github.fashionbrot.common.req.ConfigValueReq;
+import com.github.fashionbrot.common.vo.ConfigValueVo;
 import com.github.fashionbrot.dao.entity.ConfigValueEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -25,4 +26,6 @@ public interface ConfigValueMapper extends BaseMapper<ConfigValueEntity> {
     int updateDelete(@Param("id")Long id);
 
     List<Map<String,Object>> configValueList(ConfigValueReq req);
+
+    List<ConfigValueVo> selectByJson(Map<String,Object> map);
 }

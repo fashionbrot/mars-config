@@ -332,7 +332,8 @@ CREATE TABLE `config_value` (
   `update_id` bigint(11) DEFAULT NULL COMMENT '最近更新者id',
   `update_date` datetime DEFAULT NULL COMMENT '最近更新时间',
   `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `index_eat` (`env_code`,`app_name`,`template_key`) USING BTREE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='配置数据表';
 
 
@@ -376,10 +377,9 @@ CREATE TABLE `config_release` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `env_code` varchar(32) NOT NULL COMMENT '环境code',
   `app_name` varchar(32) NOT NULL COMMENT '应用名',
-  `version` varchar(32) NOT NULL COMMENT '版本',
   `template_keys` varchar(255) DEFAULT NULL COMMENT '模板keys',
   `update_date` datetime DEFAULT NULL COMMENT '最近更新时间',
   `release_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
   PRIMARY KEY (`id`),
-  KEY `index_envCode_appName_version` (`env_code`,`app_name`,`version`) USING BTREE
+  KEY `index_envCode_appName` (`env_code`,`app_name`) USING BTREE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='配置数据发布表';

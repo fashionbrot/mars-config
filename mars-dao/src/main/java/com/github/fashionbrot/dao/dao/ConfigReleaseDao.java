@@ -15,6 +15,6 @@ import com.github.fashionbrot.dao.entity.ConfigReleaseEntity;
 
 public interface ConfigReleaseDao extends IService<ConfigReleaseEntity> {
 
-
+    Long getTopReleaseId(String envCode,String appName,Integer releaseFlag);
 
 }

@@ -45,7 +45,38 @@
         <if test="description!=null and description!=''">
             and a.description  LIKE concat('%',#{description},'%')
         </if>
-        order by a.priority
+        order by a.priority desc
+    </select>
+
+
+
+
+    <resultMap type="com.github.fashionbrot.common.vo.ConfigValueVo" id="jsonMap">
+        <result property="templateKey" column="template_key"/>
+        <collection property="jsonList" ofType="com.github.fashionbrot.common.vo.JsonVo">
+            <result property="json" column="json"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectByJson" parameterType="java.util.Map" resultMap="jsonMap">
+        select
+        template_key,
+        json
+        from config_value a
+        where a.del_flag=0
+        <if test="envCode!=null and envCode!='-1'">
+            and a.env_code = #{envCode}
+        </if>
+        <if test="appName!=null and appName!='-1'">
+            and a.app_name=#{appName}
+        </if>
+        <if test="templateKeyList != null and templateKeyList.size()>0">
+            and a.template_key in
+            <foreach collection="templateKeyList" item="key" open="(" close=")" separator=",">
+                #{key}
+            </foreach>
+        </if>
+        order by template_key,a.priority desc
     </select>
     
 

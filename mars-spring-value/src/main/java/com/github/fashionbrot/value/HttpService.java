@@ -23,6 +23,8 @@ public class HttpService {
 
     private static AtomicLong version = new AtomicLong();
 
+    private static AtomicLong checkVersion = new AtomicLong();
+
     public static boolean checkVersion(Server server ,GlobalMarsValueProperties dataConfig){
         if (server==null){
             log.warn(" for data server is null");
@@ -58,10 +60,13 @@ public class HttpService {
                         JSONObject jsonObject = JSONObject.parseObject(httpResult.getContent());
                         if (jsonObject!=null && jsonObject.containsKey("data")){
                             Long v = jsonObject.getLong("data");
-                            if (v!=null && v==0){
+                            if (v!=null){
+                                checkVersion.set(v);
+                            }
+                            if (v!=null && v.longValue()==-1){
                                 return true;
                             }
-                            if (version.get() < v.longValue()){
+                            if (v!=null && version.get() < v.longValue()){
                                 return false;
                             }
                         }
@@ -75,7 +80,7 @@ public class HttpService {
         return true;
     }
 
-    public static void getData(Server server, GlobalMarsValueProperties dataConfig){
+    public static void getData(Server server, GlobalMarsValueProperties dataConfig,boolean all){
         if (server==null){
             log.warn(" for data server is null");
             return ;
@@ -83,14 +88,18 @@ public class HttpService {
 
         if (dataConfig!=null){
 
-            List<String> params =new ArrayList<>(4);
+
+            List<String> params =new ArrayList<>(all?8:6);
             params.add("envCode");
             params.add(dataConfig.getEnvCode());
             params.add("appId");
             params.add(dataConfig.getAppName());
-
-            /*params.add("version");
-            params.add(version.longValue()+"");*/
+            params.add("version");
+            params.add((version.longValue()+1)+"");//获取当前version+1 ，不能跳过已发布的配置
+            if (all){
+                params.add("all");
+                params.add("1");
+            }
 
 
             String url ;

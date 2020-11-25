@@ -15,5 +15,8 @@ public class ConfigReleaseDaoImpl extends ServiceImpl<ConfigReleaseMapper, Confi
     private ConfigReleaseMapper configReleaseMapper;
 
 
-
+    @Override
+    public Long getTopReleaseId(String envCode, String appName,Integer releaseFlag) {
+        return configReleaseMapper.getTopReleaseId(envCode,appName,releaseFlag);
+    }
 }

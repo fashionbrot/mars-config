@@ -9,8 +9,9 @@ public class ConfigValueApiReq {
 
     private String envCode;
 
-    private String version;
+    private Long version;
 
     private String templateKeys;
 
+    private String all;
 }

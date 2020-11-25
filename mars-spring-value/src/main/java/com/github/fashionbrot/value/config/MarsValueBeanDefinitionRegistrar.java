@@ -53,6 +53,7 @@ public class MarsValueBeanDefinitionRegistrar implements ImportBeanDefinitionReg
          */
         registerGlobalMarsValueProperties(attributes, registry, environment,beanFactory);
 
+        registerConfigPostProcessor(registry);
 
         registerMarsConfigValue(registry);
 

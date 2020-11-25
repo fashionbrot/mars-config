@@ -19,10 +19,7 @@ import com.github.fashionbrot.common.req.ConfigValueReq;
 import com.github.fashionbrot.common.util.DateUtil;
 import com.github.fashionbrot.common.util.SnowflakeIdWorkerUtil;
 import com.github.fashionbrot.common.util.SystemUtil;
-import com.github.fashionbrot.common.vo.ApiRespVo;
-import com.github.fashionbrot.common.vo.ConfigValueVo;
-import com.github.fashionbrot.common.vo.PageVo;
-import com.github.fashionbrot.common.vo.RespVo;
+import com.github.fashionbrot.common.vo.*;
 import com.github.fashionbrot.core.UserLoginService;
 import com.github.fashionbrot.dao.dao.*;
 import com.github.fashionbrot.dao.entity.*;
@@ -33,10 +30,14 @@ import com.mysql.fabric.xmlrpc.base.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -147,9 +148,21 @@ public class ConfigValueService  {
                 throw new CurdException(RespCode.FAIL);
             }
         }else{
+
+            String oldKeys = releaseEntity.getTemplateKeys();
+            if (StringUtils.isNotEmpty(oldKeys)){
+                oldKeys=oldKeys+","+templateKey;
+                List<String> keys = Arrays.stream(oldKeys.split(",")).distinct().collect(Collectors.toList());
+                if (CollectionUtils.isNotEmpty(keys)){
+                    oldKeys = String.join(",",keys);
+                }
+            }else{
+                oldKeys = templateKey;
+            }
+
             ConfigReleaseEntity update= new ConfigReleaseEntity();
-            update.setTemplateKeys(StringUtils.isEmpty(releaseEntity.getTemplateKeys())?templateKey:(releaseEntity.getTemplateKeys()+","+templateKey));
-            if(!configReleaseDao.update(releaseEntity,q)){
+            update.setTemplateKeys(oldKeys);
+            if(!configReleaseDao.update(update,q)){
                 throw new CurdException(RespCode.FAIL);
             }
         }
@@ -334,6 +347,8 @@ public class ConfigValueService  {
         if (!configReleaseDao.update(updateRelease,q)){
             throw new MarsException(RespCode.FAIL);
         }
+        String key = getKey(req.getEnvCode(),req.getAppName());
+        versionCache.put(key,configReleaseEntity.getId());
     }
 
     private void updateConfigValue(String envCode,String appName,Integer updateReleaseStatus,Integer whereReleaseStatus){
@@ -404,34 +419,91 @@ public class ConfigValueService  {
         return env+app;
     }
 
+    private List<JSONObject> format(List<JsonVo> jsonVos){
+        if (CollectionUtils.isNotEmpty(jsonVos)){
+            return jsonVos.stream().map(m-> JSONObject.parseObject(m.getJson()) ).collect(Collectors.toList());
+        }
+        return null;
+    }
 
     public ApiRespVo getData(ConfigValueApiReq req) {
-
-        QueryWrapper releaseQ = new QueryWrapper<ConfigReleaseEntity>().eq("env_code",req.getEnvCode()).eq("app_name",req.getAppId());
-        ConfigReleaseEntity releaseEntity = configReleaseDao.getOne(releaseQ);
-        if (releaseEntity==null){
-            return ApiRespVo.builder().code(RespVo.SUCCESS).version(0L).build();
-        }
-
         String key = getKey(req.getEnvCode(),req.getAppId());
-        if(CollectionUtils.isEmpty(cache) || !cache.containsKey(key)){
-            loadValueCache(req.getEnvCode(),req.getAppId(),false);
+        if ("1".equals(req.getAll())){
+            Map<String,Object> map =new HashMap<>();
+            map.put("envCode",req.getEnvCode());
+            map.put("appName",req.getAppId());
+            List<ConfigValueVo> jsonList = configValueDao.selectByJson(map);
+            if (CollectionUtils.isNotEmpty(jsonList)){
+                List<ConfigJsonVo> jj= jsonList.stream().map(m-> ConfigJsonVo.builder()
+                        .templateKey(m.getTemplateKey())
+                        .jsonList(format(m.getJsonList()))
+                        .build()).collect(Collectors.toList());
+
+                return ApiRespVo.builder().code(RespVo.SUCCESS).version(versionCache.get(key)).data(jj).build();
+            }
+
+        }else{
+            if (req.getVersion()!=null && req.getVersion().longValue()==-1L){
+                return ApiRespVo.builder().code(RespVo.FAILED).msg("应用未配置信息").build();
+            }
+            ConfigReleaseEntity release = configReleaseDao.getById(req.getVersion());
+            if (release==null){
+                return ApiRespVo.builder().code(RespVo.FAILED).msg("应用未配置信息").build();
+            }
+            if (StringUtils.isEmpty(release.getTemplateKeys())){
+                return ApiRespVo.builder().code(RespVo.SUCCESS).build();
+            }
+
+            if (!versionCache.containsKey(key)){
+                return ApiRespVo.builder().code(RespVo.FAILED).msg("应用未配置信息").build();
+            }
+
+            List<String> keyList = Arrays.stream(release.getTemplateKeys().split(",")).collect(Collectors.toList());
+            Map<String,Object> map =new HashMap<>();
+            map.put("envCode",release.getEnvCode());
+            map.put("appName",release.getAppName());
+
+            map.put("templateKeyList",keyList);
+            List<ConfigValueVo> jsonList = configValueDao.selectByJson(map);
+            if (CollectionUtils.isNotEmpty(jsonList)){
+                List<ConfigJsonVo> jj= jsonList.stream().map(m-> ConfigJsonVo.builder()
+                        .templateKey(m.getTemplateKey())
+                        .jsonList(format(m.getJsonList()))
+                        .build()).collect(Collectors.toList());
+                return ApiRespVo.builder().code(RespVo.SUCCESS).version(versionCache.get(key)).data(jj).build();
+            }
         }
-        List<ConfigValueVo> list = null;
-        if (cache.containsKey(key)) {
-            //list = cache.get(key);
-        }
-        return ApiRespVo.builder().code(RespVo.SUCCESS).version(1L).data(list).build();
+        return ApiRespVo.builder().code(RespVo.SUCCESS).version(versionCache.get(key)).data(Collections.EMPTY_LIST).build();
     }
+
+    private void loadConfigValue(String envCode,String appName){
+        QueryWrapper<ConfigValueEntity> q=new QueryWrapper();
+        q.eq("env_code",envCode);
+        q.eq("app_name",appName);
+        q.select("template_key");
+        List<ConfigValueEntity> list = configValueDao.list(q);
+    }
+
+    private Map<String,Long> versionCache = new ConcurrentHashMap<>();
 
     public Object checkVersion(ConfigValueApiReq req) {
-        QueryWrapper releaseQ = new QueryWrapper<ConfigReleaseEntity>()
-                .eq("env_code",req.getEnvCode())
-                .eq("app_name",req.getAppId());
-        ConfigReleaseEntity configReleaseEntity = configReleaseDao.getOne(releaseQ);
-        if (configReleaseEntity==null){
-            return 0;
+        String key =  getKey(req.getEnvCode(),req.getAppId());
+        if (versionCache.containsKey(key)){
+            return versionCache.get(key);
         }
-        return configReleaseEntity.getId();
+
+        Long version = configReleaseDao.getTopReleaseId(req.getEnvCode(),req.getAppId(),1);
+        if (version==null){
+            versionCache.put(key,-1L);
+            return -1;
+        }else{
+            versionCache.put(key,version);
+            return version;
+        }
     }
+
+
+
+
+
 }
