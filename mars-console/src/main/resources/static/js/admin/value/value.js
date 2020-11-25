@@ -399,8 +399,10 @@ function loadDataEnvAndApp(envCode,appName,templateKey,description) {
                     render :function (data, type, full, meta) {
                         if (data == "1") {
                             return "已发布";
-                        } else {
+                        } else if (data==0){
                             return "<span style='color:red;font-weight: bold;'>未发布</span>";
+                        }else if (data==2){
+                            return "<span style='color:red;font-weight: bold;'>已删除</span>";
                         }
                     }
                 },

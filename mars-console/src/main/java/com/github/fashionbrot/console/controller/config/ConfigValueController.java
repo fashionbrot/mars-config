@@ -85,6 +85,7 @@ public class ConfigValueController {
         configValueService.updateById(entity);
         return RespVo.success();
     }
+
     @ApiOperation("根据id删除")
     @PostMapping("/deleteById")
     @ResponseBody

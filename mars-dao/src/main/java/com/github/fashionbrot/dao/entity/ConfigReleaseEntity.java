@@ -36,7 +36,15 @@ public class ConfigReleaseEntity{
 	@TableField("app_name")
 	private String appName;
 
-	@ApiModelProperty(value = "版本")
+	/*@ApiModelProperty(value = "版本")
 	@TableField("version")
-	private Long version;
+	private Long version;*/
+
+	@ApiModelProperty("模板keys")
+	@TableField("template_keys")
+	private String templateKeys;
+
+	@ApiModelProperty("发布状态 1 发布 0未发布")
+	@TableField("release_flag")
+	private Integer releaseFlag;
 }
