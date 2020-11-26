@@ -27,4 +27,11 @@ public class ConfigValueApi {
         return configValueService.getData(apiReq);
     }
 
+
+    @PostMapping("/api/config/value/cluster/sync")
+    @ResponseBody
+    public Long clusterSync(ConfigValueApiReq apiReq){
+        return configValueService.clusterSync(apiReq);
+    }
+
 }

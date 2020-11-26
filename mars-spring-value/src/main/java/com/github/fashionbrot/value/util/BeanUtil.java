@@ -1,8 +1,9 @@
 package com.github.fashionbrot.value.util;
 
+import com.github.fashionbrot.ribbon.util.CollectionUtil;
 import com.github.fashionbrot.ribbon.util.StringUtil;
 import com.github.fashionbrot.value.GlobalMarsValueProperties;
-import com.github.fashionbrot.value.MarsConfigValue;
+import com.github.fashionbrot.value.event.MarsTemplateKeyMapping;
 import com.github.fashionbrot.value.event.ConfigPostProcessor;
 import com.github.fashionbrot.value.event.HttpBeanPostProcessor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,26 +31,44 @@ public class BeanUtil {
 
 
     public static void registerGlobalMarsValueProperties(AnnotationAttributes attributes, BeanDefinitionRegistry registry, PropertyResolver environment, ConfigurableListableBeanFactory beanFactory) {
-
-        Properties globalProperties = resolveProperties(attributes, environment);
-
-        GlobalMarsValueProperties globalMarsProperties = GlobalMarsValueProperties.builder()
-                .appName(getProperties(globalProperties, "appId"))
-                .envCode(getProperties(globalProperties, "envCode"))
-                .serverAddress(getProperties(globalProperties, "serverAddress"))
-                .listenLongPollMs(StringUtil.parseLong(getProperties(globalProperties, "listenLongPollMs"), 30000L))
-                .localCachePath(getProperties(globalProperties,"localCachePath"))
-                .enableListenLog(Boolean.parseBoolean(getProperties(globalProperties,"enableListenLog")))
-                .build();
+        GlobalMarsValueProperties globalMarsProperties = null;
+        if (CollectionUtil.isNotEmpty(attributes)){
+            Properties globalProperties = resolveProperties(attributes, environment);
+            globalMarsProperties = GlobalMarsValueProperties.builder()
+                    .appName(getProperties(globalProperties, "appId"))
+                    .envCode(getProperties(globalProperties, "envCode"))
+                    .serverAddress(getProperties(globalProperties, "serverAddress"))
+                    .listenLongPollMs(StringUtil.parseLong(getProperties(globalProperties, "listenLongPollMs"), 50000L))
+                    .localCachePath(getProperties(globalProperties,"localCachePath"))
+                    .enableListenLog(Boolean.parseBoolean(getProperties(globalProperties,"enableListenLog")))
+                    .build();
+        }else{
+            globalMarsProperties = GlobalMarsValueProperties.builder()
+                    .appName(getEnvValue(environment, "mars.value.app-id",""))
+                    .envCode(getEnvValue(environment, "mars.value.env-code",""))
+                    .serverAddress(getEnvValue(environment, "mars.value.server-address",""))
+                    .listenLongPollMs(StringUtil.parseLong(getEnvValue(environment, "mars.value.listen-long-poll-ms", "50000"),50000L))
+                    .localCachePath(getEnvValue(environment, "mars.value.local-cache-path",""))
+                    .enableListenLog(Boolean.parseBoolean(getEnvValue(environment,"mars.value.enable-listen-log","false")))
+                    .build();
+        }
         registerSingleton(registry, GlobalMarsValueProperties.BEAN_NAME, globalMarsProperties);
     }
 
-    public static void registerConfigPostProcessor(BeanDefinitionRegistry registry) {
-        registerInfrastructureBeanIfAbsent(registry, ConfigPostProcessor.BEAN_NAME, ConfigPostProcessor.class);
+    private static String getEnvValue(PropertyResolver environment,String key,String defaultValue){
+        if (environment!=null && environment.containsProperty(key)){
+            String value = environment.getProperty(key);
+            if (StringUtil.isEmpty(value)){
+                value = defaultValue;
+            }
+            return value;
+        }
+        return "";
     }
 
-    public static void registerMarsConfigValue(BeanDefinitionRegistry registry) {
-        registerInfrastructureBeanIfAbsent(registry, MarsConfigValue.BEAN_NAME, MarsConfigValue.class);
+
+    public static void registerConfigPostProcessor(BeanDefinitionRegistry registry) {
+        registerInfrastructureBeanIfAbsent(registry, ConfigPostProcessor.BEAN_NAME, ConfigPostProcessor.class);
     }
 
     public static void registerHttpBeanPostProcessor(BeanDefinitionRegistry registry) {

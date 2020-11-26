@@ -24,5 +24,18 @@ public class JsonUtil {
     }
 
 
+    public static  JSONObject parseObject(String json){
+        if (StringUtils.isEmpty(json)){
+            return null;
+        }
+        try {
+            return JSONObject.parseObject(json);
+        }catch (Exception e){
+            log.error("parseObject error json:{}",json,e);
+        }
+        return null;
+    }
+
+
 
 }

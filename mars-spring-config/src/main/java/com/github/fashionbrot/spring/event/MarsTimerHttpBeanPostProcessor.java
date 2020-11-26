@@ -104,9 +104,7 @@ public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,Applicat
                 try{
                     Server server = loadBalancer.chooseServer();
                     if (server==null){
-                        if (globalMarsProperties.isEnableErrorLog()) {
-                            log.error("loadBalancer is null  rule:{} ping:{}", loadBalancer.getRule().getClass().getName(), loadBalancer.getPing().getClass().getName());
-                        }
+                        log.error("loadBalancer is null  rule:{} ping:{}", loadBalancer.getRule().getClass().getName(), loadBalancer.getPing().getClass().getName());
                         return;
                     }
                     checkForUpdate(server,globalMarsProperties);
@@ -122,12 +120,10 @@ public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,Applicat
     public  void checkForUpdate(Server server, GlobalMarsProperties globalMarsProperties){
         String appId = globalMarsProperties.getAppName();
         String envCode = globalMarsProperties.getEnvCode();
-        if (globalMarsProperties.isEnableErrorLog()){
-            log.info("mars long pull server:{} appId:{} envCode:{}",server.getServerIp(),appId,envCode );
-        }
+
         String versions = getVersion();
 
-        CheckForUpdateVo checkForUpdateVo = ServerHttpAgent.checkForUpdate(server, envCode, appId,versions,globalMarsProperties.isEnableErrorLog());
+        CheckForUpdateVo checkForUpdateVo = ServerHttpAgent.checkForUpdate(server, envCode, appId,versions);
         if (checkForUpdateVo != null &&
                 ApiResultEnum.codeOf(checkForUpdateVo.getResultCode()) == ApiResultEnum.SUCCESS_UPDATE) {
 
@@ -140,7 +136,7 @@ public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,Applicat
                             .appId(appId)
                             .fileName(file)
                             .build();
-                    buildMarsPropertySource(server,dataConfig,globalMarsProperties.isEnableErrorLog());
+                    buildMarsPropertySource(server,dataConfig);
                     versionMap.put(file,dataConfig.getVersion());
                 }
             }
@@ -162,8 +158,8 @@ public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,Applicat
         return null;
     }
 
-    private  void buildMarsPropertySource(final Server server,MarsDataConfig dataConfig,boolean enableLog){
-        ForDataVo forDataVo = ServerHttpAgent.getData(server, dataConfig,enableLog);
+    private  void buildMarsPropertySource(final Server server,MarsDataConfig dataConfig){
+        ForDataVo forDataVo = ServerHttpAgent.getData(server, dataConfig);
 
         if (forDataVo == null) {
             if (log.isDebugEnabled()) {

@@ -63,7 +63,7 @@ public class ServerHttpAgent {
         String appId = globalMarsProperties.getAppName();
         String envCode = globalMarsProperties.getEnvCode();
 
-        CheckForUpdateVo checkForUpdateVo = ServerHttpAgent.checkForUpdate(server, envCode, appId,null,globalMarsProperties.isEnableErrorLog());
+        CheckForUpdateVo checkForUpdateVo = ServerHttpAgent.checkForUpdate(server, envCode, appId,null);
         if ((checkForUpdateVo == null ||  ApiResultEnum.codeOf(checkForUpdateVo.getResultCode()) == ApiResultEnum.FAILED)
             && globalMarsProperties.isEnableLocalCache()) {
 
@@ -86,7 +86,7 @@ public class ServerHttpAgent {
     }
 
     private static void buildMarsPropertySource(final Server server,GlobalMarsProperties globalMarsProperties,MarsDataConfig dataConfig,ConfigurableEnvironment environment){
-        ForDataVo forDataVo = ServerHttpAgent.getData(server, dataConfig,globalMarsProperties.isEnableErrorLog());
+        ForDataVo forDataVo = ServerHttpAgent.getData(server, dataConfig);
 
         if (forDataVo == null) {
             if (log.isDebugEnabled()) {
@@ -185,7 +185,7 @@ public class ServerHttpAgent {
     }
 
 
-    public static CheckForUpdateVo checkForUpdate(Server server, String env, String appId,String versions,boolean enableLog) {
+    public static CheckForUpdateVo checkForUpdate(Server server, String env, String appId,String versions) {
 
 
         String serverAddress =server.getServer();
@@ -214,9 +214,9 @@ public class ServerHttpAgent {
                 }
                 return CheckForUpdateVo.builder().resultCode(ApiResultEnum.FAILED.getResultCode()).build();
             } catch (Exception e) {
-                if (enableLog) {
-                    log.error("checkForUpdate error url:{} httpCode:{} error:{}", url, httpResult != null ? httpResult.getCode() : "未知", e.getMessage());
-                }
+
+                log.error("checkForUpdate error url:{} httpCode:{} error:{}", url, httpResult != null ? httpResult.getCode() : "未知", e.getMessage());
+
                 return CheckForUpdateVo.builder().resultCode(ApiResultEnum.FAILED.getResultCode()).build();
             }
         }
@@ -225,7 +225,7 @@ public class ServerHttpAgent {
 
 
 
-    public static ForDataVo getData(Server server, MarsDataConfig dataConfig,boolean enableLog){
+    public static ForDataVo getData(Server server, MarsDataConfig dataConfig){
         if (server==null){
             log.warn(" for data server is null");
             return null;
@@ -255,9 +255,7 @@ public class ServerHttpAgent {
                 }
                 return null;
             }catch (Exception e) {
-                if (enableLog) {
-                    log.error("for-data error  message:{}", e.getMessage());
-                }
+                log.error("for-data error  message:{}", e.getMessage());
             }
         }
         return null;

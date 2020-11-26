@@ -20,6 +20,7 @@
         <module>mars-console</module>
         <module>mars-common</module>
         <module>mars-spring-value</module>
+        <module>mars-value-springboot-starter</module>
     </modules>
     <groupId>com.github.fashionbrot</groupId>
     <artifactId>mars-config</artifactId>

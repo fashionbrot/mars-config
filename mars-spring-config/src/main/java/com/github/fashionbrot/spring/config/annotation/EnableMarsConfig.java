@@ -30,10 +30,10 @@ public @interface EnableMarsConfig {
      */
     String LOCAL_CACHE_PATH = "${mars.config.local-cache-path}";
 
-    /**
-     * listen long poll log enabled
-     */
-    String ENABLE_ERROR_LOG = "${mars.config.enable-error-log}";
+
+    String LISTEN_LONG_POLL_MS = "${mars.config.listen-long-poll-ms}";
+
+
 
     /**
      * project name
@@ -54,14 +54,9 @@ public @interface EnableMarsConfig {
     String serverAddress() default SERVER_ADDRESS;
 
     /**
-     * listen long poll timeout  default 30000 ms
+     * listen long poll timeout  default 50000 ms
      */
-    String listenLongPollMs() default "30000";
-
-    /**
-     * listen long poll log enabled
-     */
-    String enableErrorLog() default ENABLE_ERROR_LOG;
+    String listenLongPollMs() default LISTEN_LONG_POLL_MS;
 
     /**
      * Whether to enable local caching

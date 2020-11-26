@@ -3,8 +3,10 @@ package com.github.fashionbrot.value.event;
 import com.github.fashionbrot.ribbon.loadbalancer.BaseLoadBalancer;
 import com.github.fashionbrot.ribbon.loadbalancer.ILoadBalancer;
 import com.github.fashionbrot.ribbon.loadbalancer.Server;
+import com.github.fashionbrot.ribbon.util.CollectionUtil;
 import com.github.fashionbrot.value.GlobalMarsValueProperties;
 import com.github.fashionbrot.value.HttpService;
+import com.github.fashionbrot.value.MarsConfigValueCache;
 import com.github.fashionbrot.value.consts.ApiConsts;
 import com.github.fashionbrot.value.util.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -13,20 +15,39 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.Ordered;
+
+import java.util.Iterator;
+import java.util.Map;
+import java.util.ServiceLoader;
 
 /**
  * spring 容器初始化过程，第二个执行当前类的bean 前置操作
  */
 @Slf4j
-public class ConfigPostProcessor implements BeanFactoryAware,BeanFactoryPostProcessor, Ordered {
+public  class ConfigPostProcessor  implements BeanFactoryAware,BeanFactoryPostProcessor, Ordered {
 
     public static final String BEAN_NAME="marsValue-ConfigPostProcessor";
 
     private BeanFactory beanFactory;
 
+
+
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+        String[] beanNamesForType = beanFactory.getBeanNamesForType(MarsTemplateKeyMapping.class);
+        if (beanNamesForType!=null && beanNamesForType.length>0) {
+            MarsTemplateKeyMapping marsTemplateKeyMapping = beanFactory.getBean(MarsTemplateKeyMapping.class);
+            if (marsTemplateKeyMapping != null) {
+                Map<String, Class> stringClassMap = marsTemplateKeyMapping.initTemplateKeyClass();
+                if (CollectionUtil.isNotEmpty(stringClassMap)) {
+                    MarsConfigValueCache.setFormatClass(stringClassMap);
+                }
+            }
+        }
+
         if (log.isInfoEnabled()) {
             log.info(BEAN_NAME+" postProcessBeanFactory ");
         }
@@ -51,9 +72,10 @@ public class ConfigPostProcessor implements BeanFactoryAware,BeanFactoryPostProc
     }
 
 
+
     @Override
     public int getOrder() {
-        return Ordered.HIGHEST_PRECEDENCE+2;
+        return Ordered.HIGHEST_PRECEDENCE+3;
     }
 
 
@@ -61,4 +83,7 @@ public class ConfigPostProcessor implements BeanFactoryAware,BeanFactoryPostProc
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
         this.beanFactory = beanFactory;
     }
+
+
+
 }

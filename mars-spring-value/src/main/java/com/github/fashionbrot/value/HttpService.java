@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
@@ -113,7 +112,7 @@ public class HttpService {
                 if (httpResult!=null && httpResult.isSuccess() && ObjectUtils.isNotEmpty(httpResult.getContent())){
                     Resp resp = JsonUtil.parseObject(httpResult.getContent(),Resp.class);
                     if (resp!=null && resp.isSuccess()){
-                        MarsConfigValue.setCache(resp.getData());
+                        MarsConfigValueCache.setCache(resp.getData());
                         if (resp.getVersion()!=null) {
                             version.set(resp.getVersion());
                         }

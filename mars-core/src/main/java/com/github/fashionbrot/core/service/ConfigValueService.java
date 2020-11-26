@@ -1,14 +1,10 @@
 package com.github.fashionbrot.core.service;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.github.cliftonlabs.json_simple.JsonObject;
-import com.github.fashionbrot.common.constant.MarsConst;
-import com.github.fashionbrot.common.enums.DateEnum;
 import com.github.fashionbrot.common.enums.OperationTypeEnum;
 import com.github.fashionbrot.common.enums.RespCode;
 import com.github.fashionbrot.common.exception.CurdException;
@@ -16,35 +12,28 @@ import com.github.fashionbrot.common.exception.MarsException;
 import com.github.fashionbrot.common.model.LoginModel;
 import com.github.fashionbrot.common.req.ConfigValueApiReq;
 import com.github.fashionbrot.common.req.ConfigValueReq;
-import com.github.fashionbrot.common.util.DateUtil;
-import com.github.fashionbrot.common.util.SnowflakeIdWorkerUtil;
 import com.github.fashionbrot.common.util.SystemUtil;
 import com.github.fashionbrot.common.vo.*;
 import com.github.fashionbrot.core.UserLoginService;
 import com.github.fashionbrot.dao.dao.*;
 import com.github.fashionbrot.dao.entity.*;
-import com.github.fashionbrot.dao.mapper.TableColumnMapper;
+import com.github.fashionbrot.ribbon.enums.SchemeEnum;
+import com.github.fashionbrot.ribbon.loadbalancer.Server;
+import com.github.fashionbrot.ribbon.util.HttpClientUtil;
+import com.github.fashionbrot.ribbon.util.HttpResult;
+import com.github.fashionbrot.ribbon.util.StringUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.mysql.fabric.xmlrpc.base.Value;
+import com.sun.net.httpserver.HttpServer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
-import org.apache.logging.log4j.util.Strings;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.Ordered;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.PostConstruct;
 import java.io.Serializable;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 /**
@@ -67,11 +56,6 @@ public class ConfigValueService  {
     @Autowired
     private UserLoginService userLoginService;
 
-    @Autowired
-    private TableColumnDao tableColumnDao;
-
-    @Autowired
-    private PropertyDao propertyDao;
 
     public Collection<ConfigValueEntity> queryList(Map<String, Object> params) {
         return configValueDao.listByMap(params);
@@ -92,19 +76,6 @@ public class ConfigValueService  {
     * @return
     */
     public PageVo pageList(ConfigValueReq req){
-
-
-        /*List<PropertyEntity> propertyList = propertyDao.getPropertyList(req.getAppName(),req.getTemplateKey());
-
-        String tableName=MarsConst.TABLE_PREFIX+ req.getAppName()+"_"+req.getTemplateKey();
-        req.setTableName(tableName);
-        Page<?> page= PageHelper.startPage(req.getPage(),req.getPageSize());
-        List<Map<String,Object>> list = configValueDao.configValueList(req);
-        if (CollectionUtils.isNotEmpty(list)){
-            for(Map<String,Object> map:list){
-                configValueDao.formatDate(propertyList,map);
-            }
-        }*/
 
         Page<?> page= PageHelper.startPage(req.getPage(),req.getPageSize());
         List<Map<String,Object>> list = configValueDao.configValueList(req);
@@ -167,18 +138,6 @@ public class ConfigValueService  {
             }
         }
     }
-
-    public String getColumnType(List<TableColumnEntity> list,String key){
-        if (CollectionUtils.isNotEmpty(list)){
-            for(TableColumnEntity p:list){
-                if (p.getColumnName().equals(key)){
-                    return p.getDataType();
-                }
-            }
-        }
-        return "";
-    }
-
 
 
 
@@ -256,16 +215,6 @@ public class ConfigValueService  {
     public ConfigValueEntity selectById(Serializable id) {
         ConfigValueEntity configValue= configValueDao.getById(id);
         if (configValue!=null){
-
-           /* List<PropertyEntity> list =  propertyDao.getPropertyList(configValue.getAppName(),configValue.getTemplateKey());
-            //configValue.setTableName(configValue.getAppName()+"_"+configValue.getTemplateKey());
-            Map<String,Object> map = tableColumnDao.selectTable(configValue);
-            if (map!=null){
-                for(Map.Entry<String,Object> mm: map.entrySet()) {
-                    configValueDao.formatDate(list, mm,mm.getKey() );
-                }
-            }
-            configValue.setValue(map);*/
         }
         return configValue;
     }
@@ -277,9 +226,8 @@ public class ConfigValueService  {
         if (value==null){
             throw new MarsException("配置不存在");
         }
-        value.setReleaseStatus(0);
-        value.setDelFlag(0);
-        if(configValueDao.updateDelete(id)!=1){
+        value.setReleaseStatus(2);
+        if(!configValueDao.updateById(value)){
             throw new CurdException(RespCode.DELETE_ERROR);
         }
 
@@ -326,6 +274,11 @@ public class ConfigValueService  {
     @Autowired
     private ConfigReleaseDao configReleaseDao;
 
+    @Autowired
+    private Environment environment;
+
+    private static final String CLUSTER="mars.value.cluster";
+
     @Transactional(rollbackFor = Exception.class)
     public void release(ConfigValueReq req) {
         QueryWrapper q = new QueryWrapper<ConfigReleaseEntity>()
@@ -349,6 +302,75 @@ public class ConfigValueService  {
         }
         String key = getKey(req.getEnvCode(),req.getAppName());
         versionCache.put(key,configReleaseEntity.getId());
+
+        if (environment.containsProperty(CLUSTER)){
+            String cluster = environment.getProperty(CLUSTER);
+            if (StringUtils.isEmpty(cluster)){
+                return;
+            }
+            List<String> serverList = getServerList(cluster);
+            int count = serverList.size();
+            if (count<=0){
+                return;
+            }
+
+            ExecutorService executorService = new ThreadPoolExecutor(count, count, 0L, TimeUnit.MILLISECONDS,
+                    new LinkedBlockingQueue<Runnable>(count),
+                    new RejectedExecutionHandler() {
+                        @Override
+                        public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+                            if (!executor.isShutdown()) {
+                                //再尝试入队
+                                executor.execute(r);
+                            }
+                        }
+                    });
+            List<String> params = new ArrayList<>();
+            params.add("envCode");
+            params.add(req.getEnvCode());
+            params.add("appId");
+            params.add(req.getAppName());
+            params.add("version");
+            params.add(configReleaseEntity.getId()+"");
+
+            for(String s : serverList){
+                executorService.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        for(int i=0;i<3;i++){
+                            HttpResult httpResult = HttpClientUtil.httpPost(s, null,params,"UTF-8",2000,2000);
+                            if (httpResult!=null && httpResult.isSuccess() && (configReleaseEntity.getId().longValue()+"").equals(httpResult.getContent())){
+                                break;
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    private List<String> getServerList(String serverStr){
+
+        String serverAddress = serverStr;
+        String[] server = serverAddress.split(",");
+        List<String> serverList=new ArrayList<>(server.length);
+        if (StringUtil.isNotEmpty(serverAddress)) {
+            for (String s : server) {
+                String[] svr = s.split(":");
+                int port = 80;
+                if (svr.length == 2) {
+                    port = StringUtil.parseInteger(svr[1], 80);
+                }
+                String ip = svr[0];
+                if (!ip.startsWith("http")){
+                    ip="http://"+ip;
+                }
+                ip = ip+":"+port+"/api/config/value/cluster/sync";
+                serverList.add(ip);
+            }
+            return serverList;
+        }
+        return serverList;
     }
 
     private void updateConfigValue(String envCode,String appName,Integer updateReleaseStatus,Integer whereReleaseStatus){
@@ -368,107 +390,108 @@ public class ConfigValueService  {
         configValueDao.remove(qq);
     }
 
-    private void loadValueCache(String envCode,String appName,boolean release){
-        QueryWrapper<ConfigValueEntity> q=new QueryWrapper();
-        q.eq("env_code",envCode);
-        q.eq("app_name",appName);
-        if (release) {
-            q.in("release_status", Arrays.asList(0,2));
-        }
-        q.select("template_key");
-        List<ConfigValueEntity> list = configValueDao.list(q);
-
-
-        if (CollectionUtils.isNotEmpty(list)){
-            List<String> releaseTemplateList = list.stream().distinct().map(m-> m.getTemplateKey()).collect(Collectors.toList());
-            String key = getKey(envCode,appName);
-            if (CollectionUtils.isNotEmpty(releaseTemplateList)){
-
-
-                Map<String,List> tMap = new HashMap<>();
-                for(String templateKey : releaseTemplateList){
-
-                    q =new QueryWrapper();
-                    q.eq("env_code",envCode);
-                    q.eq("app_name",appName);
-
-                    q.select("json,template_key");
-                    q.orderByAsc("priority");
-                    q.eq("template_key",templateKey);
-
-                    List<ConfigValueEntity> valueList =  configValueDao.list(q);
-                    if (CollectionUtils.isNotEmpty(valueList)){
-                        List<JSONObject> json = valueList.stream().filter(m-> m!=null&&StringUtils.isNotEmpty(m.getJson()) ).map(m -> JSONObject.parseObject(m.getJson())).collect(Collectors.toList());
-                        if (CollectionUtils.isNotEmpty(json)){
-                            tMap.put(templateKey,json);
-                        }else{
-                            tMap.put(templateKey,Collections.EMPTY_LIST);
-                        }
-                    }else{
-                        tMap.put(templateKey,Collections.EMPTY_LIST);
-                    }
-
-
-                }
-                cache.put(key,tMap );
-            }
-        }
-    }
 
     private String getKey(String env,String app){
         return env+app;
     }
 
-    private List<JSONObject> format(List<JsonVo> jsonVos){
+    private List<JSONObject> format(List<JsonVo> jsonVos,String envCode,List<EnvVariableRelationEntity> variableRelationList){
         if (CollectionUtils.isNotEmpty(jsonVos)){
-            return jsonVos.stream().map(m-> JSONObject.parseObject(m.getJson()) ).collect(Collectors.toList());
+            return jsonVos.stream().map(m-> formatVariable(m.getJson(),envCode,variableRelationList) ).collect(Collectors.toList());
         }
         return null;
     }
 
+    @Autowired
+    private EnvVariableRelationDao envVariableRelationDao;
+
+    private JSONObject formatVariable(String json,String envCode,List<EnvVariableRelationEntity> variableRelationList){
+
+        if (StringUtils.isNotEmpty(json)){
+
+
+            try {
+                JSONObject map= JSONObject.parseObject(json);
+                if (CollectionUtils.isNotEmpty(map)){
+                    map.forEach((k,v)->{
+                        String keyPrefix=k+"_prefix";
+                        if (map.containsKey(keyPrefix)){
+                            String valuePrefix= (String) map.get(keyPrefix);
+                            /**
+                             * 判断选择的是无前缀
+                             */
+                            if (StringUtils.isNotEmpty(valuePrefix) && !"-1".equals(valuePrefix)){
+                                String  variableValue=getEnvVariableRelation(variableRelationList,envCode,valuePrefix);
+                                if (StringUtils.isNotEmpty(variableValue)) {
+                                    map.put(k, (variableValue + v.toString()));
+                                }
+                            }
+                        }
+                    });
+                    return map;
+                }
+            }catch (Exception e){
+                log.error("formatVariable error json:{}",json,e);
+            }
+        }
+        return null;
+    }
+
+    private String getEnvVariableRelation(List<EnvVariableRelationEntity> envVariableRelationList,String envCode,String variableKey){
+        if (CollectionUtils.isNotEmpty(envVariableRelationList)){
+            for(EnvVariableRelationEntity var: envVariableRelationList){
+                if (envCode.equals(var.getEnvCode()) && variableKey.equals(var.getVariableKey())){
+                    return var.getVariableValue();
+                }
+            }
+        }
+        return "";
+    }
+
     public ApiRespVo getData(ConfigValueApiReq req) {
-        String key = getKey(req.getEnvCode(),req.getAppId());
-        if ("1".equals(req.getAll())){
-            Map<String,Object> map =new HashMap<>();
-            map.put("envCode",req.getEnvCode());
-            map.put("appName",req.getAppId());
+        String key = getKey(req.getEnvCode(), req.getAppId());
+        List<EnvVariableRelationEntity> variableRelationList = envVariableRelationDao.list(null);
+        if ("1".equals(req.getAll())) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("envCode", req.getEnvCode());
+            map.put("appName", req.getAppId());
             List<ConfigValueVo> jsonList = configValueDao.selectByJson(map);
-            if (CollectionUtils.isNotEmpty(jsonList)){
-                List<ConfigJsonVo> jj= jsonList.stream().map(m-> ConfigJsonVo.builder()
+            if (CollectionUtils.isNotEmpty(jsonList)) {
+                List<ConfigJsonVo> jj = jsonList.stream().map(m -> ConfigJsonVo.builder()
                         .templateKey(m.getTemplateKey())
-                        .jsonList(format(m.getJsonList()))
+                        .jsonList(format(m.getJsonList(), req.getEnvCode(),variableRelationList))
                         .build()).collect(Collectors.toList());
 
                 return ApiRespVo.builder().code(RespVo.SUCCESS).version(versionCache.get(key)).data(jj).build();
             }
 
-        }else{
-            if (req.getVersion()!=null && req.getVersion().longValue()==-1L){
+        } else {
+            if (req.getVersion() != null && req.getVersion().longValue() == -1L) {
                 return ApiRespVo.builder().code(RespVo.FAILED).msg("应用未配置信息").build();
             }
             ConfigReleaseEntity release = configReleaseDao.getById(req.getVersion());
-            if (release==null){
+            if (release == null) {
                 return ApiRespVo.builder().code(RespVo.FAILED).msg("应用未配置信息").build();
             }
-            if (StringUtils.isEmpty(release.getTemplateKeys())){
+            if (StringUtils.isEmpty(release.getTemplateKeys())) {
                 return ApiRespVo.builder().code(RespVo.SUCCESS).build();
             }
 
-            if (!versionCache.containsKey(key)){
+            if (!versionCache.containsKey(key)) {
                 return ApiRespVo.builder().code(RespVo.FAILED).msg("应用未配置信息").build();
             }
 
             List<String> keyList = Arrays.stream(release.getTemplateKeys().split(",")).collect(Collectors.toList());
-            Map<String,Object> map =new HashMap<>();
-            map.put("envCode",release.getEnvCode());
-            map.put("appName",release.getAppName());
+            Map<String, Object> map = new HashMap<>();
+            map.put("envCode", release.getEnvCode());
+            map.put("appName", release.getAppName());
 
-            map.put("templateKeyList",keyList);
+            map.put("templateKeyList", keyList);
             List<ConfigValueVo> jsonList = configValueDao.selectByJson(map);
-            if (CollectionUtils.isNotEmpty(jsonList)){
-                List<ConfigJsonVo> jj= jsonList.stream().map(m-> ConfigJsonVo.builder()
+            if (CollectionUtils.isNotEmpty(jsonList)) {
+                List<ConfigJsonVo> jj = jsonList.stream().map(m -> ConfigJsonVo.builder()
                         .templateKey(m.getTemplateKey())
-                        .jsonList(format(m.getJsonList()))
+                        .jsonList(format(m.getJsonList(), req.getEnvCode(),variableRelationList))
                         .build()).collect(Collectors.toList());
                 return ApiRespVo.builder().code(RespVo.SUCCESS).version(versionCache.get(key)).data(jj).build();
             }
@@ -476,13 +499,7 @@ public class ConfigValueService  {
         return ApiRespVo.builder().code(RespVo.SUCCESS).version(versionCache.get(key)).data(Collections.EMPTY_LIST).build();
     }
 
-    private void loadConfigValue(String envCode,String appName){
-        QueryWrapper<ConfigValueEntity> q=new QueryWrapper();
-        q.eq("env_code",envCode);
-        q.eq("app_name",appName);
-        q.select("template_key");
-        List<ConfigValueEntity> list = configValueDao.list(q);
-    }
+
 
     private Map<String,Long> versionCache = new ConcurrentHashMap<>();
 
@@ -503,7 +520,16 @@ public class ConfigValueService  {
     }
 
 
-
-
-
+    public Long clusterSync(ConfigValueApiReq req) {
+        String key = getKey(req.getEnvCode(),req.getAppId());
+        long version =req.getVersion().longValue();
+        long v = 0;
+        if (versionCache.containsKey(key)){
+            v = versionCache.get(key).longValue();
+        }
+        if(v<version){
+            versionCache.put(key,req.getVersion());
+        }
+        return versionCache.get(key);
+    }
 }

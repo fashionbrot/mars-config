@@ -1,5 +1,6 @@
 package com.github.fashionbrot.spring.util;
 
+import com.github.fashionbrot.ribbon.util.CollectionUtil;
 import com.github.fashionbrot.ribbon.util.StringUtil;
 import com.github.fashionbrot.spring.config.GlobalMarsProperties;
 import com.github.fashionbrot.spring.context.ApplicationContextHolder;
@@ -32,20 +33,43 @@ public class BeanUtil {
 
 
     public static void registerGlobalMarsProperties(AnnotationAttributes attributes, BeanDefinitionRegistry registry, PropertyResolver environment, ConfigurableListableBeanFactory beanFactory) {
+        GlobalMarsProperties globalMarsProperties = null;
+        if (CollectionUtil.isNotEmpty(attributes)){
+            Properties globalProperties = resolveProperties(attributes, environment);
 
-        Properties globalProperties = resolveProperties(attributes, environment);
+             globalMarsProperties = GlobalMarsProperties.builder()
+                    .appName(getProperties(globalProperties, "appId"))
+                    .envCode(getProperties(globalProperties, "envCode"))
+                    .serverAddress(getProperties(globalProperties, "serverAddress"))
+                    .listenLongPollMs(StringUtil.parseLong(getProperties(globalProperties, "listenLongPollMs"), 30000L))
+                    .enableLocalCache(StringUtil.parseBoolean(getProperties(globalProperties,"enableLocalCache"),false))
+                    .localCachePath(getProperties(globalProperties,"localCachePath"))
+                    .build();
+        }else{
+            globalMarsProperties = GlobalMarsProperties.builder()
+                    .appName(getEnvValue(environment, "mars.config.app-id",""))
+                    .envCode(getEnvValue(environment, "mars.config.env-code",""))
+                    .serverAddress(getEnvValue(environment, "mars.config.server-address",""))
+                    .listenLongPollMs(StringUtil.parseLong(getEnvValue(environment, "mars.config.listen-long-poll-ms", "50000"),50000L))
+                    .enableLocalCache(StringUtil.parseBoolean(getEnvValue(environment,"mars.config.enable-local-cache","false"),false))
+                    .localCachePath(getEnvValue(environment,"mars.config.local-cache-path",""))
+                    .build();
+        }
 
-        GlobalMarsProperties globalMarsProperties = GlobalMarsProperties.builder()
-                .appName(getProperties(globalProperties, "appId"))
-                .envCode(getProperties(globalProperties, "envCode"))
-                .serverAddress(getProperties(globalProperties, "serverAddress"))
-                .listenLongPollMs(StringUtil.parseLong(getProperties(globalProperties, "listenLongPollMs"), 30000L))
-                .enableErrorLog(StringUtil.parseBoolean(getProperties(globalProperties,"enableErrorLog"),false))
-                .enableLocalCache(StringUtil.parseBoolean(getProperties(globalProperties,"enableLocalCache"),false))
-                .localCachePath(getProperties(globalProperties,"localCachePath"))
-                .build();
         registerSingleton(registry, GlobalMarsProperties.BEAN_NAME, globalMarsProperties);
     }
+
+    private static String getEnvValue(PropertyResolver environment,String key,String defaultValue){
+        if (environment!=null && environment.containsProperty(key)){
+            String value = environment.getProperty(key);
+            if (StringUtil.isEmpty(value)){
+                value = defaultValue;
+            }
+            return value;
+        }
+        return "";
+    }
+
 
     public static void registerMarsConfigurationPropertiesBindingPostProcessor(BeanDefinitionRegistry registry) {
         registerInfrastructureBeanIfAbsent(registry, MarsConfigurationPropertiesBindingPostProcessor.BEAN_NAME, MarsConfigurationPropertiesBindingPostProcessor.class);

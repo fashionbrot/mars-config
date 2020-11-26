@@ -38,4 +38,5 @@ public class GlobalMarsValueProperties {
     private boolean enableListenLog;
 
     private String localCachePath;
+
 }

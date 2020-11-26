@@ -7,7 +7,7 @@ import java.util.List;
 @Data
 public class ConfigValue {
 
-    private List<JSONObject> jsonList;
+    private List<String> jsonList;
 
     private String templateKey;
 

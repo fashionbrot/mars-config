@@ -22,11 +22,13 @@ public @interface EnableMarsValue {
 
     String SERVER_ADDRESS = "${mars.value.http.server-address}";
 
-    /**
-     * Local cache file path
-     */
     String LOCAL_CACHE_PATH = "${mars.value.local-cache-path}";
 
+    String LISTEN_LONG_POLL_MS = "${mars.value.listen-long-poll-ms}";
+
+    String ENABLE_LISTEN_LOG = "${mars.value.enable-listen_log}";
+
+    String CLUSTER = "mars.value.cluster";
 
     /**
      * project name
@@ -47,16 +49,24 @@ public @interface EnableMarsValue {
     String serverAddress() default SERVER_ADDRESS;
 
     /**
-     * listen long poll timeout  default 30000 ms
+     * listen long poll timeout  default 50000 ms
      */
-    String listenLongPollMs() default "30000";
+    String listenLongPollMs() default LISTEN_LONG_POLL_MS;
 
     /**
      * 是否开启 http log 轮训日志
      * @return
      */
-    String enableListenLog() default "false";
+    String enableListenLog() default ENABLE_LISTEN_LOG;
+
     /**
+     * 集群配置
+     * @return
+     */
+    String cluster() default CLUSTER;
+
+    /**
+     * 预留方法
      * Local cache file path
      * @return
      */

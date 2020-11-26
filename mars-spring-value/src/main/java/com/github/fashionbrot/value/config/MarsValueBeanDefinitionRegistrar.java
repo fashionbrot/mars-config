@@ -55,9 +55,6 @@ public class MarsValueBeanDefinitionRegistrar implements ImportBeanDefinitionReg
 
         registerConfigPostProcessor(registry);
 
-        registerMarsConfigValue(registry);
-
-
         registerHttpBeanPostProcessor(registry);
     }
 
