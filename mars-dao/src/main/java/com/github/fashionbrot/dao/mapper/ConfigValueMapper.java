@@ -25,7 +25,7 @@ public interface ConfigValueMapper extends BaseMapper<ConfigValueEntity> {
     @Update("update config_value set release_status=0  , del_flag=1 where id=#{id} ")
     int updateDelete(@Param("id")Long id);
 
-    List<Map<String,Object>> configValueList(ConfigValueReq req);
+    List<ConfigValueEntity> configValueList(ConfigValueReq req);
 
     List<ConfigValueVo> selectByJson(Map<String,Object> map);
 }

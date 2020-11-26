@@ -52,7 +52,7 @@ public class HttpService {
             try {
                 HttpResult httpResult =  HttpClientUtil.httpPost(url,null,params);
                 if (dataConfig.isEnableListenLog()){
-                    log.debug(" mars listen value for version  result:{}", JSON.toJSONString(httpResult));
+                    log.debug(" mars listen value for version url:{}  result:{}",server.getServerIp(), JSON.toJSONString(httpResult));
                 }
                 if (httpResult!=null && httpResult.isSuccess()){
                     if (StringUtil.isNotEmpty(httpResult.getContent())) {

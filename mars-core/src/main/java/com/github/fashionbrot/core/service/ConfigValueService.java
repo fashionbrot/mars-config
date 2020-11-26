@@ -12,19 +12,15 @@ import com.github.fashionbrot.common.exception.MarsException;
 import com.github.fashionbrot.common.model.LoginModel;
 import com.github.fashionbrot.common.req.ConfigValueApiReq;
 import com.github.fashionbrot.common.req.ConfigValueReq;
-import com.github.fashionbrot.common.util.SystemUtil;
+import com.github.fashionbrot.common.util.HttpClientUtil;
+import com.github.fashionbrot.common.util.HttpResult;
+import com.github.fashionbrot.common.util.StringUtil;
 import com.github.fashionbrot.common.vo.*;
 import com.github.fashionbrot.core.UserLoginService;
 import com.github.fashionbrot.dao.dao.*;
 import com.github.fashionbrot.dao.entity.*;
-import com.github.fashionbrot.ribbon.enums.SchemeEnum;
-import com.github.fashionbrot.ribbon.loadbalancer.Server;
-import com.github.fashionbrot.ribbon.util.HttpClientUtil;
-import com.github.fashionbrot.ribbon.util.HttpResult;
-import com.github.fashionbrot.ribbon.util.StringUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.sun.net.httpserver.HttpServer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +74,7 @@ public class ConfigValueService  {
     public PageVo pageList(ConfigValueReq req){
 
         Page<?> page= PageHelper.startPage(req.getPage(),req.getPageSize());
-        List<Map<String,Object>> list = configValueDao.configValueList(req);
+        List<ConfigValueEntity> list = configValueDao.configValueList(req);
         return PageVo.builder()
                 .data(list)
                 .iTotalDisplayRecords(page.getTotal())
@@ -279,6 +275,18 @@ public class ConfigValueService  {
 
     private static final String CLUSTER="mars.value.cluster";
 
+    private ExecutorService executorService = new ThreadPoolExecutor(5, 5, 0L, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<Runnable>(5),
+            new RejectedExecutionHandler() {
+                @Override
+                public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+                    if (!executor.isShutdown()) {
+                        //再尝试入队
+                        executor.execute(r);
+                    }
+                }
+            });
+
     @Transactional(rollbackFor = Exception.class)
     public void release(ConfigValueReq req) {
         QueryWrapper q = new QueryWrapper<ConfigReleaseEntity>()
@@ -314,17 +322,7 @@ public class ConfigValueService  {
                 return;
             }
 
-            ExecutorService executorService = new ThreadPoolExecutor(count, count, 0L, TimeUnit.MILLISECONDS,
-                    new LinkedBlockingQueue<Runnable>(count),
-                    new RejectedExecutionHandler() {
-                        @Override
-                        public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-                            if (!executor.isShutdown()) {
-                                //再尝试入队
-                                executor.execute(r);
-                            }
-                        }
-                    });
+
             List<String> params = new ArrayList<>();
             params.add("envCode");
             params.add(req.getEnvCode());
@@ -349,9 +347,8 @@ public class ConfigValueService  {
         }
     }
 
-    private List<String> getServerList(String serverStr){
+    private List<String> getServerList(String serverAddress){
 
-        String serverAddress = serverStr;
         String[] server = serverAddress.split(",");
         List<String> serverList=new ArrayList<>(server.length);
         if (StringUtil.isNotEmpty(serverAddress)) {
@@ -455,6 +452,7 @@ public class ConfigValueService  {
             Map<String, Object> map = new HashMap<>();
             map.put("envCode", req.getEnvCode());
             map.put("appName", req.getAppId());
+            map.put("status",1);
             List<ConfigValueVo> jsonList = configValueDao.selectByJson(map);
             if (CollectionUtils.isNotEmpty(jsonList)) {
                 List<ConfigJsonVo> jj = jsonList.stream().map(m -> ConfigJsonVo.builder()
@@ -485,7 +483,7 @@ public class ConfigValueService  {
             Map<String, Object> map = new HashMap<>();
             map.put("envCode", release.getEnvCode());
             map.put("appName", release.getAppName());
-
+            map.put("status",1);
             map.put("templateKeyList", keyList);
             List<ConfigValueVo> jsonList = configValueDao.selectByJson(map);
             if (CollectionUtils.isNotEmpty(jsonList)) {

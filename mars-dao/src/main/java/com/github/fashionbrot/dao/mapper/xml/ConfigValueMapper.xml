@@ -26,10 +26,10 @@
 
 
 
-    <select id="configValueList" resultType="java.util.Map" parameterType="com.github.fashionbrot.common.req.ConfigValueReq">
+    <select id="configValueList" resultMap="configValueMap" parameterType="com.github.fashionbrot.common.req.ConfigValueReq">
         select
         a.update_date,a.create_date,
-        a.id,a.status,a.template_key,a.description,a.priority,a.env_code,a.app_name,a.user_name,a.release_status,a.json
+        a.id,a.status,a.template_key,a.description,a.priority,a.env_code,a.app_name,a.user_name,a.release_status
         from config_value a
         where a.del_flag=0
 
@@ -70,6 +70,10 @@
         <if test="appName!=null and appName!='-1'">
             and a.app_name=#{appName}
         </if>
+        <if test="status!=null">
+            and a.status=#{status}
+        </if>
+
         <if test="templateKeyList != null and templateKeyList.size()>0">
             and a.template_key in
             <foreach collection="templateKeyList" item="key" open="(" close=")" separator=",">

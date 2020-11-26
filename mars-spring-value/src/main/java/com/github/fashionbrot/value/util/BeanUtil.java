@@ -38,7 +38,7 @@ public class BeanUtil {
                     .appName(getProperties(globalProperties, "appId"))
                     .envCode(getProperties(globalProperties, "envCode"))
                     .serverAddress(getProperties(globalProperties, "serverAddress"))
-                    .listenLongPollMs(StringUtil.parseLong(getProperties(globalProperties, "listenLongPollMs"), 50000L))
+                    .listenLongPollMs(StringUtil.parseLong(getProperties(globalProperties, "listenLongPollMs"), 5000L))
                     .localCachePath(getProperties(globalProperties,"localCachePath"))
                     .enableListenLog(Boolean.parseBoolean(getProperties(globalProperties,"enableListenLog")))
                     .build();
@@ -47,7 +47,7 @@ public class BeanUtil {
                     .appName(getEnvValue(environment, "mars.value.app-id",""))
                     .envCode(getEnvValue(environment, "mars.value.env-code",""))
                     .serverAddress(getEnvValue(environment, "mars.value.server-address",""))
-                    .listenLongPollMs(StringUtil.parseLong(getEnvValue(environment, "mars.value.listen-long-poll-ms", "50000"),50000L))
+                    .listenLongPollMs(StringUtil.parseLong(getEnvValue(environment, "mars.value.listen-long-poll-ms", "5000"),5000L))
                     .localCachePath(getEnvValue(environment, "mars.value.local-cache-path",""))
                     .enableListenLog(Boolean.parseBoolean(getEnvValue(environment,"mars.value.enable-listen-log","false")))
                     .build();

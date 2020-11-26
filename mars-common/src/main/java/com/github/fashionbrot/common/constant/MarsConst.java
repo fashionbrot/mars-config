@@ -8,6 +8,8 @@ import java.util.Set;
 
 public class MarsConst {
 
+    public final static String ENCODE_UTF8="UTF-8";
+
     public final static String AUTH_KEY = "Authorization";
 
     public final static String ROLE_NAME = "qazxsw";

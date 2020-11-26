@@ -35,7 +35,7 @@ public class ConfigValueDaoImpl  extends ServiceImpl<ConfigValueMapper, ConfigVa
     }
 
     @Override
-    public    List<Map<String,Object>> configValueList(ConfigValueReq req) {
+    public    List<ConfigValueEntity> configValueList(ConfigValueReq req) {
         return configValueMapper.configValueList(req);
     }
 

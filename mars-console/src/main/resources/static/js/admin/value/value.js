@@ -392,7 +392,7 @@ function loadDataEnvAndApp(envCode,appName,templateKey,description) {
                         }
                     }
                 },{
-                    data : 'release_status',
+                    data : 'releaseStatus',
                     bSortable : true,
                     width : "20px",
                     className : "text-center",
@@ -407,7 +407,7 @@ function loadDataEnvAndApp(envCode,appName,templateKey,description) {
                     }
                 },
                 {
-                    data : 'user_name',
+                    data : 'userName',
                     bSortable : true,
                     width : "20px",
                     className : "text-center",

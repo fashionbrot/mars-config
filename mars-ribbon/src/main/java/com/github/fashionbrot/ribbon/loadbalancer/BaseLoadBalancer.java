@@ -44,7 +44,7 @@ public class BaseLoadBalancer  implements ILoadBalancer {
 
     @Override
     public void setServer(String serverAddress,String healthUrl) {
-        serverAddress = serverAddress.replaceAll("https://", "").replaceAll("http://", "");
+
         String[] server = serverAddress.split(",");
         List<Server> serverList = new ArrayList<>(server.length);
         if (StringUtil.isNotEmpty(serverAddress)) {
@@ -55,7 +55,7 @@ public class BaseLoadBalancer  implements ILoadBalancer {
                     port = StringUtil.parseInteger(svr[1], 80);
                 }
                 serverList.add(Server.builder()
-                        .host(svr[0])
+                        .host(svr[0].replaceAll("https://", "").replaceAll("http://", ""))
                         .scheme(svr[0].startsWith("https") ? SchemeEnum.HTTPS : SchemeEnum.HTTP)
                         .port(port)
                         .path(healthUrl)

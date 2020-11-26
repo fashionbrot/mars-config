@@ -30,6 +30,16 @@ public class ConfigValueController extends  MarsTemplateKeyMapping{
         return list;
     }
 
+    @RequestMapping("get2")
+    @ResponseBody
+    public Object test2(String templateKey){
+
+        List<TestModel> list = MarsConfigValueCache.getTemplateObject(templateKey);
+
+        return list;
+    }
+
+
     public Map<String,Class> initTemplateKeyClass() {
         Map<String,Class> map=new HashMap<>();
         map.put("test", TestModel.class);

@@ -33,4 +33,44 @@ public class MarsConfigValueConfigurationProperties {
      * 轮训日志是否开启
      */
     private boolean enableListenLog=false;
+
+    public String getEnvCode() {
+        return envCode;
+    }
+
+    public void setEnvCode(String envCode) {
+        this.envCode = envCode;
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
+
+    public String getServerAddress() {
+        return serverAddress;
+    }
+
+    public void setServerAddress(String serverAddress) {
+        this.serverAddress = serverAddress;
+    }
+
+    public Long getListenLongPollMs() {
+        return listenLongPollMs;
+    }
+
+    public void setListenLongPollMs(Long listenLongPollMs) {
+        this.listenLongPollMs = listenLongPollMs;
+    }
+
+    public boolean isEnableListenLog() {
+        return enableListenLog;
+    }
+
+    public void setEnableListenLog(boolean enableListenLog) {
+        this.enableListenLog = enableListenLog;
+    }
 }

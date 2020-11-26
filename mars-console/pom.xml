@@ -11,10 +11,8 @@
 
     <groupId>com.github.fashionbrot</groupId>
     <artifactId>mars-console</artifactId>
-    <packaging>war</packaging>
-    <properties>
-        <profiles.dir>src/profiles</profiles.dir>
-    </properties>
+    <packaging>jar</packaging>
+
 
     <dependencies>
         <dependency>
@@ -80,7 +78,6 @@
                 <filtering>false</filtering>
             </resource>
         </resources>
-
     </build>
 
 </project>

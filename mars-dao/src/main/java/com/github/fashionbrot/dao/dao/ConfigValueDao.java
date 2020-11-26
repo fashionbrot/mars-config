@@ -29,7 +29,7 @@ public interface ConfigValueDao extends IService<ConfigValueEntity> {
 
     int updateDelete(Long id);
 
-    List<Map<String,Object>> configValueList(ConfigValueReq req);
+    List<ConfigValueEntity> configValueList(ConfigValueReq req);
 
     ConfigValueEntity queryById(Long id);
 
