@@ -66,12 +66,19 @@ spring mvc 、springboot 动态配置系统。http 轮询方式 更新 动态配
 |mars.config.enable-error-log|是否开启http轮询访问日志|否|
 
 ```xml
+<!-- spring 引入 --!>
 <dependency>
     <groupId>com.github.fashionbrot</groupId>
     <artifactId>mars-spring-config</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.4</version>
 </dependency>
 
+<!-- springboot 引入 --!>
+<dependency>
+    <groupId>com.github.fashionbrot</groupId>
+    <artifactId>mars-config-springboot-starter</artifactId>
+    <version>0.1.4</version>
+</dependency>
 ```
 
 1. 在启动类上使用 @EnableMarsConfig 开启功能使用
