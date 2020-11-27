@@ -14,8 +14,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class RespVo implements Serializable{
 
-    public static final int SUCCESS = RespCode.SUCCESS.getCode();
-    public static final int FAILED = RespCode.FAIL.getCode();
 
     private int code;
     private String msg;
@@ -23,7 +21,7 @@ public class RespVo implements Serializable{
 
 
     public static  RespVo fail(String msg){
-        return RespVo.builder().code(FAILED).msg(msg).build();
+        return RespVo.builder().code(MarsConst.FAILED).msg(msg).build();
     }
 
     public static  RespVo fail(String msg, int code){
@@ -31,7 +29,7 @@ public class RespVo implements Serializable{
     }
 
     public static RespVo success(Object data){
-        return RespVo.builder().code(SUCCESS).msg("成功").data(data).build();
+        return RespVo.builder().code(MarsConst.SUCCESS).msg("成功").data(data).build();
     }
 
     public static RespVo success(){

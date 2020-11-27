@@ -55,7 +55,7 @@ public class Interceptor implements HandlerInterceptor {
                     HandlerMethod handlerMethod = (HandlerMethod) handler;
                     if ( handlerMethod.hasMethodAnnotation(ResponseBody.class)){
                         returnJson(response, RespVo.builder()
-                                .code(RespVo.FAILED)
+                                .code(MarsConst.FAILED)
                                 .msg(RespCode.NOT_PERMISSION_ERROR.getMsg())
                                 .build());
                         return false;

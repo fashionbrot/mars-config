@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.github.fashionbrot.common.constant.MarsConst;
 import com.github.fashionbrot.common.enums.OperationTypeEnum;
 import com.github.fashionbrot.common.enums.RespCode;
 import com.github.fashionbrot.common.exception.CurdException;
@@ -461,23 +462,23 @@ public class ConfigValueService  {
                         .jsonList(format(m.getJsonList(), req.getEnvCode(),variableRelationList))
                         .build()).collect(Collectors.toList());
 
-                return ApiRespVo.builder().code(RespVo.SUCCESS).version(versionCache.get(key)).data(jj).build();
+                return ApiRespVo.builder().code(MarsConst.SUCCESS).version(versionCache.get(key)).data(jj).build();
             }
 
         } else {
             if (req.getVersion() != null && req.getVersion().longValue() == -1L) {
-                return ApiRespVo.builder().code(RespVo.FAILED).msg("应用未配置信息").build();
+                return ApiRespVo.builder().code(MarsConst.FAILED).msg("应用未配置信息").build();
             }
             ConfigReleaseEntity release = configReleaseDao.getById(req.getVersion());
             if (release == null) {
-                return ApiRespVo.builder().code(RespVo.FAILED).msg("应用未配置信息").build();
+                return ApiRespVo.builder().code(MarsConst.FAILED).msg("应用未配置信息").build();
             }
             if (StringUtils.isEmpty(release.getTemplateKeys())) {
-                return ApiRespVo.builder().code(RespVo.SUCCESS).build();
+                return ApiRespVo.builder().code(MarsConst.SUCCESS).build();
             }
 
             if (!versionCache.containsKey(key)) {
-                return ApiRespVo.builder().code(RespVo.FAILED).msg("应用未配置信息").build();
+                return ApiRespVo.builder().code(MarsConst.FAILED).msg("应用未配置信息").build();
             }
 
             List<String> keyList = Arrays.stream(release.getTemplateKeys().split(",")).collect(Collectors.toList());
@@ -502,9 +503,9 @@ public class ConfigValueService  {
                                         .build()
                         ).collect(Collectors.toList());
             }
-            return ApiRespVo.builder().code(RespVo.SUCCESS).version(versionCache.get(key)).data(listVo).build();
+            return ApiRespVo.builder().code(MarsConst.SUCCESS).version(versionCache.get(key)).data(listVo).build();
         }
-        return ApiRespVo.builder().code(RespVo.SUCCESS).version(versionCache.get(key)).data(Collections.EMPTY_LIST).build();
+        return ApiRespVo.builder().code(MarsConst.SUCCESS).version(versionCache.get(key)).data(Collections.EMPTY_LIST).build();
     }
 
 
