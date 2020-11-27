@@ -162,6 +162,28 @@ var userInfoDel = function () {
 
 }
 
+function unDel(id) {
+
+    loading();
+    $.ajax({
+        url: "../admin/config/value/unDeleteById",
+        type: "post",
+        data: {"id": id},
+        dataType: "json",
+        success: function (data) {
+            loaded();
+            if (data.code == "0") {
+                loadData(true);
+            } else {
+                alert(data.msg);
+            }
+        }
+    });
+
+
+}
+
+
 
 
 var queryByUserId = function (id) {
@@ -403,6 +425,8 @@ function loadDataEnvAndApp(envCode,appName,templateKey,description) {
                             return "<span style='color:red;font-weight: bold;'>未发布</span>";
                         }else if (data==2){
                             return "<span style='color:red;font-weight: bold;'>已删除</span>";
+                        }else if (data==3){
+                            return "<span style='color:red;font-weight: bold;'>新增</span>";
                         }
                     }
                 },
@@ -430,8 +454,16 @@ function loadDataEnvAndApp(envCode,appName,templateKey,description) {
                     visible: true,
                     width : '130px',
                     render: function (data, type, full) {
-                        return '<a class="btn btn-success btn-" onclick="queryByUserId(\'' + full.id + '\')"><i class="glyphicon glyphicon-edit"></i>修改</a>'
-                            + '&nbsp;&nbsp;<a class="btn btn-warning btn-circle" onclick="showModal(\'' + full.id + '\',this)"> <i class="glyphicon glyphicon-trash"></i>删除</a>';
+                        var releaseStatus= full.releaseStatus;
+                        if(releaseStatus==0 || releaseStatus==3){
+                            return '<a class="btn btn-success btn-" onclick="queryByUserId(\'' + full.id + '\')"><i class="glyphicon glyphicon-edit"></i>修改</a>';
+                        }else if (releaseStatus==2){
+                            return '<a class="btn btn-success btn-" onclick="unDel(\'' + full.id + '\')"><i class="glyphicon glyphicon-star-empty"></i>撤销</a>';
+                        }else{
+                            return '<a class="btn btn-success btn-" onclick="queryByUserId(\'' + full.id + '\')"><i class="glyphicon glyphicon-edit"></i>修改</a>'
+                                + '&nbsp;&nbsp;<a class="btn btn-warning btn-circle" onclick="showModal(\'' + full.id + '\',this)"> <i class="glyphicon glyphicon-trash"></i>删除</a>';
+                        }
+
                     }
                 }
             ]

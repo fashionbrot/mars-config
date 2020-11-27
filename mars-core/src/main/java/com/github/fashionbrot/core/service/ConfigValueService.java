@@ -87,7 +87,7 @@ public class ConfigValueService  {
     @Transactional(rollbackFor = Exception.class)
     public void insert(ConfigValueEntity entity) {
         LoginModel login = userLoginService.getLogin();
-        entity.setReleaseStatus(0);
+        entity.setReleaseStatus(3);
         entity.setUserName(login.getUserName());
 
         if(!configValueDao.save(entity)){
@@ -299,6 +299,7 @@ public class ConfigValueService  {
         }
 
         updateConfigValue(req.getEnvCode(),req.getAppName(),1,0);
+        updateConfigValue(req.getEnvCode(),req.getAppName(),1,3);
         deleteByReleaseStatus(req.getEnvCode(),req.getAppName(),2);
 
 
@@ -486,13 +487,22 @@ public class ConfigValueService  {
             map.put("status",1);
             map.put("templateKeyList", keyList);
             List<ConfigValueVo> jsonList = configValueDao.selectByJson(map);
+            List<ConfigJsonVo> listVo=null;
             if (CollectionUtils.isNotEmpty(jsonList)) {
-                List<ConfigJsonVo> jj = jsonList.stream().map(m -> ConfigJsonVo.builder()
+                listVo = jsonList.stream().map(m -> ConfigJsonVo.builder()
                         .templateKey(m.getTemplateKey())
                         .jsonList(format(m.getJsonList(), req.getEnvCode(),variableRelationList))
                         .build()).collect(Collectors.toList());
-                return ApiRespVo.builder().code(RespVo.SUCCESS).version(versionCache.get(key)).data(jj).build();
+
+            }else{
+                listVo =  keyList.stream().map(k->
+                                ConfigJsonVo.builder()
+                                        .templateKey(k)
+                                        .jsonList(Collections.EMPTY_LIST)
+                                        .build()
+                        ).collect(Collectors.toList());
             }
+            return ApiRespVo.builder().code(RespVo.SUCCESS).version(versionCache.get(key)).data(listVo).build();
         }
         return ApiRespVo.builder().code(RespVo.SUCCESS).version(versionCache.get(key)).data(Collections.EMPTY_LIST).build();
     }
@@ -529,5 +539,16 @@ public class ConfigValueService  {
             versionCache.put(key,req.getVersion());
         }
         return versionCache.get(key);
+    }
+
+    public void unDeleteById(Long id) {
+        ConfigValueEntity value = configValueDao.queryById(id);
+        if (value==null){
+            throw new MarsException("配置不存在");
+        }
+        value.setReleaseStatus(1);
+        if(!configValueDao.updateById(value)){
+            throw new CurdException(RespCode.DELETE_ERROR);
+        }
     }
 }

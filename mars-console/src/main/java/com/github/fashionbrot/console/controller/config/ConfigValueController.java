@@ -94,6 +94,16 @@ public class ConfigValueController {
         return RespVo.success();
     }
 
+    @ApiOperation("撤销删除")
+    @PostMapping("/unDeleteById")
+    @ResponseBody
+    public RespVo unDeleteById(Long id){
+        configValueService.unDeleteById(id);
+        return RespVo.success();
+    }
+
+
+
 
     @ApiOperation("批量删除")
     @PostMapping("/deleteByIds")
