@@ -50,7 +50,7 @@ public class BeanUtil {
                     .appName(getEnvValue(environment, "mars.config.app-id",""))
                     .envCode(getEnvValue(environment, "mars.config.env-code",""))
                     .serverAddress(getEnvValue(environment, "mars.config.server-address",""))
-                    .listenLongPollMs(StringUtil.parseLong(getEnvValue(environment, "mars.config.listen-long-poll-ms", "50000"),50000L))
+                    .listenLongPollMs(StringUtil.parseLong(getEnvValue(environment, "mars.config.listen-long-poll-ms", "30000"),30000L))
                     .enableLocalCache(StringUtil.parseBoolean(getEnvValue(environment,"mars.config.enable-local-cache","false"),false))
                     .localCachePath(getEnvValue(environment,"mars.config.local-cache-path",""))
                     .build();

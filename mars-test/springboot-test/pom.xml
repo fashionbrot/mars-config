@@ -33,15 +33,10 @@
 
         <dependency>
             <groupId>com.github.fashionbrot</groupId>
-            <artifactId>mars-spring-config</artifactId>
+            <artifactId>mars-config-springboot-starter</artifactId>
             <version>0.1.4</version>
         </dependency>
 
-        <!--<dependency>
-            <groupId>com.github.fashionbrot</groupId>
-            <artifactId>mars-spring-value</artifactId>
-            <version>0.1.0</version>
-        </dependency>-->
         <dependency>
             <groupId>com.github.fashionbrot</groupId>
             <artifactId>mars-value-springboot-starter</artifactId>
