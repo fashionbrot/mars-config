@@ -27,7 +27,7 @@ public class MarsConfigValueConfigurationProperties {
     /**
      * 客户端轮训毫秒数
      */
-    private Long listenLongPollMs=5000L;
+    private Long listenLongPollMs=10000L;
 
     /**
      * 轮训日志是否开启
