@@ -1,5 +1,6 @@
 package com.github.fashionbrot.springboot.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.fashionbrot.ribbon.util.CollectionUtil;
 import com.github.fashionbrot.springboot.model.TestModel;
 import com.github.fashionbrot.value.MarsConfigValueCache;
@@ -21,7 +22,7 @@ public class ConfigValueController extends  MarsTemplateKeyMapping{
     @ResponseBody
     public Object test(String templateKey){
 
-        List<TestModel> list = MarsConfigValueCache.getTemplateObject(templateKey);
+        List<TestModel> list = MarsConfigValueCache.getDeepTemplateObject(templateKey);
         if (CollectionUtil.isNotEmpty(list)){
             for(TestModel t: list){
                 t.setTest(t.getTest()+"你好");
@@ -34,10 +35,28 @@ public class ConfigValueController extends  MarsTemplateKeyMapping{
     @ResponseBody
     public Object test2(String templateKey){
 
-        List<TestModel> list = MarsConfigValueCache.getTemplateObject(templateKey);
+        List<JSONObject> list = MarsConfigValueCache.getTemplateObject(templateKey);
+        if (CollectionUtil.isNotEmpty(list)) {
+            JSONObject jsonObject = list.get(0);
+            if (jsonObject.containsKey("title")){
+                jsonObject.put("title","哈哈 ："+jsonObject.get("title"));
+            }
 
+        }
         return list;
     }
+
+    @RequestMapping("get3")
+    @ResponseBody
+    public List test3(String templateKey){
+
+        List list = MarsConfigValueCache.getTemplateObject(templateKey);
+        if (CollectionUtil.isNotEmpty(list)) {
+
+        }
+        return list;
+    }
+
 
 
     public Map<String,Class> initTemplateKeyClass() {

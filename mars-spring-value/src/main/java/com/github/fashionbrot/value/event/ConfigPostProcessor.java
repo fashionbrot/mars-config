@@ -52,6 +52,7 @@ public  class ConfigPostProcessor  implements BeanFactoryAware,BeanFactoryPostPr
             return;
         }
 
+
         ILoadBalancer loadBalancer = new BaseLoadBalancer();
         loadBalancer.setServer(properties.getServerAddress(), ApiConsts.HEALTH);
 

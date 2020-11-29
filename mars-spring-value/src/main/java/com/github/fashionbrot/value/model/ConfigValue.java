@@ -1,6 +1,5 @@
 package com.github.fashionbrot.value.model;
 
-import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 import java.util.List;
 

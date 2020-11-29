@@ -5,6 +5,12 @@ import com.github.fashionbrot.ribbon.util.StringUtil;
 import com.github.fashionbrot.value.model.ConfigValue;
 import com.github.fashionbrot.value.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -26,11 +32,26 @@ public  class MarsConfigValueCache {
      */
     public static  <E> List<E> getTemplateObject(String templateKey){
         if (cache.containsKey(templateKey)){
-            return  cache.get(templateKey);
+            return cache.get(templateKey);
         }
         return Collections.EMPTY_LIST;
     }
 
+    /**
+     * 深度 copy cache
+     * @param templateKey
+     * @param <E>
+     * @return
+     */
+    public static  <E> List<E> getDeepTemplateObject(String templateKey){
+        if (cache.containsKey(templateKey)){
+            List<E> cacheList = cache.get(templateKey);
+            if (CollectionUtil.isNotEmpty(cacheList)) {
+                return deepCopy(cacheList);
+            }
+        }
+        return Collections.EMPTY_LIST;
+    }
 
     public static void setCache(List<ConfigValue> data) {
 
@@ -66,5 +87,19 @@ public  class MarsConfigValueCache {
         }
     }
 
+    public static <T> List<T> deepCopy(List<T> src)  {
+        try {
+            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+            ObjectOutputStream out = new ObjectOutputStream(byteOut);
+            out.writeObject(src);
+
+            ByteArrayInputStream byteIn = new ByteArrayInputStream(byteOut.toByteArray());
+            ObjectInputStream in = new ObjectInputStream(byteIn);
+            return (List<T>) in.readObject();
+        }catch (Exception e){
+            log.error("deepCopy error",e);
+        }
+        return null;
+    }
 
 }

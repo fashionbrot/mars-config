@@ -6,6 +6,10 @@ import java.util.Map;
 
 public abstract class MarsTemplateKeyMapping implements Ordered {
 
+    /**
+     * class 必须实现序列化
+     * @return
+     */
     public abstract Map<String,Class> initTemplateKeyClass();
 
     @Override
