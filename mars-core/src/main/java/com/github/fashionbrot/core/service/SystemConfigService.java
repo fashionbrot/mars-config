@@ -1,25 +1,35 @@
 package com.github.fashionbrot.core.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.github.fashionbrot.common.constant.MarsConst;
+import com.github.fashionbrot.common.enums.ApiResultEnum;
+import com.github.fashionbrot.common.enums.OperationTypeEnum;
 import com.github.fashionbrot.common.enums.RespCode;
 import com.github.fashionbrot.common.enums.SystemConfigRoleEnum;
 import com.github.fashionbrot.common.exception.MarsException;
+import com.github.fashionbrot.common.model.LoginModel;
 import com.github.fashionbrot.common.req.DataConfigReq;
 import com.github.fashionbrot.common.vo.CheckForUpdateVo;
 import com.github.fashionbrot.common.vo.ForDataVo;
 import com.github.fashionbrot.common.vo.PageDataVo;
+import com.github.fashionbrot.common.vo.RespVo;
+import com.github.fashionbrot.core.UserLoginService;
 import com.github.fashionbrot.dao.dao.SystemConfigDao;
 import com.github.fashionbrot.dao.dao.SystemConfigHistoryDao;
 import com.github.fashionbrot.dao.dao.SystemConfigRoleRelationDao;
+import com.github.fashionbrot.dao.dao.SystemReleaseDao;
 import com.github.fashionbrot.dao.entity.SystemConfigHistoryInfo;
 import com.github.fashionbrot.dao.entity.SystemConfigInfo;
+import com.github.fashionbrot.dao.entity.UserInfo;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -55,7 +65,73 @@ public class SystemConfigService {
     }
 
 
+    @Autowired
+    private UserLoginService userLoginService;
+
+    @Transactional(rollbackFor = Exception.class)
     public void update(SystemConfigInfo systemConfigInfo) {
+
+        systemConfigRoleRelationDao.checkRole(systemConfigInfo.getId(), SystemConfigRoleEnum.EDIT);
+
+        SystemConfigInfo systemConfigInfoPre = systemConfigDao.selectById(systemConfigInfo.getId());
+        if (systemConfigInfoPre == null) {
+            throw new MarsException(RespCode.EXIST_SYSTEM_CONFIG_ERROR);
+        }
+
+        //TODO 需要验证
+         /*try {
+         if ("yaml".equalsIgnoreCase(systemConfigInfo.getFileType())) {
+         }
+         }catch (Exception e){
+         log.error(" update parse content error",e);
+         throw new MarsException("填写格式错误,请检查输入格式（ymal填写时不能有 TAB 换行）");
+         }*/
+        String json = systemConfigInfoPre.getJson();
+        int flag = 0;
+        String preFileJson = systemConfigInfoPre.getJson();
+        if (OperationTypeEnum.UPDATE == OperationTypeEnum.ROLLBACK) {
+            flag = systemConfigInfoPre.getJson().compareTo(json);
+            preFileJson = json;
+        } else {
+            flag = systemConfigInfoPre.getJson().compareTo(systemConfigInfo.getJson());
+        }
+
+        if (flag != 0) {
+            systemConfigInfoPre.setStatus(0);
+        }
+
+
+        LoginModel userInfo = userLoginService.getLogin();
+        if (userInfo != null) {
+            systemConfigInfoPre.setModifier(userInfo.getUserName());
+        }
+
+
+        systemConfigInfoPre.setUpdateDate(new Date());
+        systemConfigInfoPre.setFileDesc(systemConfigInfo.getFileDesc());
+        systemConfigInfoPre.setJson(systemConfigInfo.getJson());
+        systemConfigInfoPre.setFileType(systemConfigInfo.getFileType());
+
+        QueryWrapper updateWrapper = new QueryWrapper<SystemConfigInfo>();
+        updateWrapper.eq("id",systemConfigInfoPre.getId());
+        if (systemConfigInfo.getNowUpdateDate()!=null){
+            updateWrapper.eq("update_date",new Date(systemConfigInfo.getNowUpdateDate().longValue()));
+        }
+
+        /*int result = systemConfigDao.update(systemConfigInfoPre,updateWrapper);
+        //判断乐观锁
+        if (result==0){
+            Integer count = systemConfigMapper.selectCount(updateWrapper);
+            if (count==null || count==0){
+                throw new MarsException(RespCode.UPDATE_REFRESH_ERROR);
+            }
+        }
+        if (flag != 0) {
+            systemConfigHistoryDao.insert(generateHistoryInfo(systemConfigInfoPre, preFileJson, operationTypeEnum));
+        }
+        return result;*/
+
+
         if (systemConfigDao.update(systemConfigInfo) != 1) {
             throw new MarsException(RespCode.UPDATE_ERROR);
         }
@@ -150,8 +226,33 @@ public class SystemConfigService {
         }
     }
 
+    @Autowired
+    private SystemConfigCacheService systemConfigCacheService;
+    @Autowired
+    private SystemReleaseDao systemReleaseDao;
 
-    public CheckForUpdateVo checkForUpdate(DataConfigReq dataConfig) {
+    public CheckForUpdateVo checkForUpdate(DataConfigReq req) {
+
+
+        String key =  systemConfigCacheService.getKey(req.getEnvCode(),req.getAppId());
+        if (!systemConfigCacheService.containsKey(key)){
+            return CheckForUpdateVo.builder()
+                    .code(MarsConst.SUCCESS)
+                    .version(-1L)
+                    .build();
+        }
+
+        Long version = systemReleaseDao.getTopReleaseId(req.getEnvCode(),req.getAppId(),1);
+        if (version==null){
+            version = 0L;
+        }
+        systemConfigCacheService.setCache(key,version);
+
+        return CheckForUpdateVo.builder()
+                .code(MarsConst.SUCCESS)
+                .version(version)
+                .build();
+
         /*if (dataConfig != null && StringUtils.isEmpty(dataConfig.getToken())) {
             return null;
         }*/
@@ -160,7 +261,7 @@ public class SystemConfigService {
         if (!token.equals(dataConfig.getToken())){
             return null;
         }*/
-        return systemConfigDao.checkForUpdate(dataConfig);
+        //return systemConfigDao.checkForUpdate(req);
     }
 
 

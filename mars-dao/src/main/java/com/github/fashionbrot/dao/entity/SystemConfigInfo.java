@@ -53,7 +53,7 @@ public class SystemConfigInfo extends BaseEntity {
     private String fileType;
 
     @TableField(value = "status")
-    private int status;
+    private Integer status;
 
     @TableField(value = "version")
     private String version;
