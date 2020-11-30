@@ -148,7 +148,11 @@ public class ConfigRecordService {
 
 
     public ConfigRecordEntity selectById(Serializable id) {
-        return configRecordDao.getById(id);
+        ConfigRecordEntity configRecordEntity=  configRecordDao.getById(id);
+        if (configRecordEntity!=null){
+
+        }
+        return configRecordEntity;
     }
 
 

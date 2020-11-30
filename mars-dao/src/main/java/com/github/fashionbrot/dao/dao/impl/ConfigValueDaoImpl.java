@@ -9,9 +9,11 @@ import com.github.fashionbrot.common.util.DateUtil;
 import com.github.fashionbrot.common.vo.ConfigValueVo;
 import com.github.fashionbrot.dao.dao.ConfigValueDao;
 import com.github.fashionbrot.dao.dao.TableColumnDao;
+import com.github.fashionbrot.dao.dto.ConfigValueDto;
 import com.github.fashionbrot.dao.entity.ConfigValueEntity;
 import com.github.fashionbrot.dao.entity.PropertyEntity;
 import com.github.fashionbrot.dao.mapper.ConfigValueMapper;
+import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -95,5 +97,8 @@ public class ConfigValueDaoImpl  extends ServiceImpl<ConfigValueMapper, ConfigVa
         return configValueMapper.selectByJson( map);
     }
 
-
+    @Override
+    public void updateRelease(ConfigValueDto dto) {
+        configValueMapper.updateRelease(dto);
+    }
 }

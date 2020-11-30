@@ -420,9 +420,9 @@ function loadDataEnvAndApp(envCode,appName,templateKey,description) {
                     className : "text-center",
                     render :function (data, type, full, meta) {
                         if (data == "1") {
-                            return "已发布";
+                            return "<span style='color:dodgerblue;font-weight: bold;'>已发布</span>";
                         } else if (data==0){
-                            return "<span style='color:red;font-weight: bold;'>未发布</span>";
+                            return "<span style='color:red;font-weight: bold;'>已修改</span>";
                         }else if (data==2){
                             return "<span style='color:red;font-weight: bold;'>已删除</span>";
                         }else if (data==3){

@@ -31,7 +31,7 @@
         a.update_date,a.create_date,
         a.id,a.status,a.template_key,a.description,a.priority,a.env_code,a.app_name,a.user_name,a.release_status
         from config_value a
-        where a.del_flag=0
+        where 1=1
 
         <if test="envCode!=null and envCode!='-1'">
             and a.env_code = #{envCode}
@@ -63,7 +63,7 @@
         template_key,
         json
         from config_value a
-        where a.del_flag=0
+        where 1=1
         <if test="envCode!=null and envCode!='-1'">
             and a.env_code = #{envCode}
         </if>
@@ -82,6 +82,16 @@
         </if>
         order by template_key,a.priority desc
     </select>
-    
+
+
+    <update id="updateRelease" parameterType="com.github.fashionbrot.dao.dto.ConfigValueDto">
+        update config_value set json=temp_json , release_status=#{updateReleaseStatus},temp_json=null where env_code=#{envCode} and app_name=#{appName}
+        <if test="whereReleaseStatus != null and whereReleaseStatus.size()>0">
+            and release_status in
+            <foreach collection="whereReleaseStatus" item="key" open="(" close=")" separator=",">
+                #{key}
+            </foreach>
+        </if>
+    </update>
 
 </mapper>

@@ -19,6 +19,7 @@ import com.github.fashionbrot.common.util.StringUtil;
 import com.github.fashionbrot.common.vo.*;
 import com.github.fashionbrot.core.UserLoginService;
 import com.github.fashionbrot.dao.dao.*;
+import com.github.fashionbrot.dao.dto.ConfigValueDto;
 import com.github.fashionbrot.dao.entity.*;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -173,8 +174,11 @@ public class ConfigValueService  {
 
         updateRelease(entity.getEnvCode(),entity.getAppName(),entity.getTemplateKey());
 
-        value.setJson(value.getJson());
+        /*value.setJson(value.getTempJson());
+        */
         value.setValue(null);
+
+        entity.setJson(entity.getTempJson());
         ConfigRecordEntity record=ConfigRecordEntity.builder()
                 .appName(entity.getAppName())
                 .envCode(entity.getEnvCode())
@@ -211,7 +215,8 @@ public class ConfigValueService  {
 
     public ConfigValueEntity selectById(Serializable id) {
         ConfigValueEntity configValue= configValueDao.getById(id);
-        if (configValue!=null){
+        if (configValue!=null && (configValue.getReleaseStatus().intValue()==0 || configValue.getReleaseStatus().intValue()==3)){
+            configValue.setJson(configValue.getTempJson());
         }
         return configValue;
     }
@@ -299,8 +304,13 @@ public class ConfigValueService  {
             throw new MarsException("没有要发布的应用");
         }
 
-        updateConfigValue(req.getEnvCode(),req.getAppName(),1,0);
-        updateConfigValue(req.getEnvCode(),req.getAppName(),1,3);
+        configValueDao.updateRelease(ConfigValueDto.builder()
+                .envCode(req.getEnvCode())
+                .appName(req.getAppName())
+                .updateReleaseStatus(1)
+                .whereReleaseStatus(Arrays.asList(0,3))
+                .build());
+
         deleteByReleaseStatus(req.getEnvCode(),req.getAppName(),2);
 
 
@@ -372,15 +382,7 @@ public class ConfigValueService  {
         return serverList;
     }
 
-    private void updateConfigValue(String envCode,String appName,Integer updateReleaseStatus,Integer whereReleaseStatus){
-        ConfigValueEntity update=new ConfigValueEntity();
-        update.setReleaseStatus(updateReleaseStatus);
-        QueryWrapper<ConfigValueEntity> qq=new QueryWrapper();
-        qq.eq("env_code",envCode);
-        qq.eq("app_name",appName);
-        qq.eq("release_status",whereReleaseStatus);
-        configValueDao.update(update,qq);
-    }
+
     private void deleteByReleaseStatus(String envCode,String appName,Integer whereReleaseStatus){
         QueryWrapper<ConfigValueEntity> qq=new QueryWrapper();
         qq.eq("env_code",envCode);
