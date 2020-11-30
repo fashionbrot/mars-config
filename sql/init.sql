@@ -238,7 +238,7 @@ INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id
 INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id`, `priority`, `code`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`) VALUES ('54', '配置数据管理', '1', '', '0', '700', '', '1', '2020-10-18 00:07:29', '1', '2020-10-18 00:07:40', '0');
 INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id`, `priority`, `code`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`) VALUES ('55', '配置数据列表', '2', '/admin/config/value/index', '54', '701', '', '1', '2020-10-18 00:08:06', NULL, NULL, '0');
 INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id`, `priority`, `code`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`) VALUES ('56', '环境变量列表', '2', '/admin/variable/index', '51', '690', '', '1', '2020-10-13 10:39:43', NULL, NULL, '0');
-INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id`, `priority`, `code`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`) VALUES ('57', '配置数据记录', '2', '/admin/config/record/index', '55', '800', '', '1', '2020-10-14 17:14:49', '1', '2020-10-22 17:27:04', '0');
+INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id`, `priority`, `code`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`) VALUES ('57', '配置数据记录', '2', '/admin/config/record/index', '54', '800', '', '1', '2020-10-14 17:14:49', '1', '2020-10-22 17:27:04', '0');
 
 
 

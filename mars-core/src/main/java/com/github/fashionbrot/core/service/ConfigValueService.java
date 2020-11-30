@@ -100,7 +100,7 @@ public class ConfigValueService  {
     }
 
 
-    private void updateRelease(String envCode,String appName,String templateKey){
+    public void updateRelease(String envCode,String appName,String templateKey){
         QueryWrapper q = new QueryWrapper<ConfigReleaseEntity>()
                 .eq("env_code",envCode)
                 .eq("app_name",appName)
@@ -165,8 +165,9 @@ public class ConfigValueService  {
             throw new MarsException("配置不存在");
         }
         LoginModel login = userLoginService.getLogin();
-
-        entity.setReleaseStatus(0);
+        if (value.getReleaseStatus().intValue() == 1) {
+            entity.setReleaseStatus(0);
+        }
         entity.setUserName(login.getUserName());
         if(!configValueDao.updateById(entity)){
             throw new CurdException(RespCode.UPDATE_ERROR);
@@ -174,6 +175,9 @@ public class ConfigValueService  {
 
         updateRelease(entity.getEnvCode(),entity.getAppName(),entity.getTemplateKey());
 
+        if (value.getReleaseStatus().intValue() == 3){
+            return;
+        }
         /*value.setJson(value.getTempJson());
         */
         value.setValue(null);
@@ -187,7 +191,7 @@ public class ConfigValueService  {
                 .json(JSON.toJSONString(value))
                 .newJson(JSON.toJSONString(entity))
                 .operationType(OperationTypeEnum.UPDATE.getCode())
-                .description(value.getDescription())
+                .description(entity.getDescription())
                 .userName(login.getUserName())
                 .build();
         configRecordDao.save(record);
@@ -234,14 +238,14 @@ public class ConfigValueService  {
         }
 
         updateRelease(value.getEnvCode(),value.getAppName(),value.getTemplateKey());
-
+        value.setTempJson(null);
         LoginModel login = userLoginService.getLogin();
         ConfigRecordEntity record=ConfigRecordEntity.builder()
                 .appName(value.getAppName())
                 .envCode(value.getEnvCode())
                 .templateKey(value.getTemplateKey())
                 .configId(value.getId())
-                .json(value.getJson())
+                .json(JSON.toJSONString(value))
                 .operationType(OperationTypeEnum.DELETE.getCode())
                 .description(value.getDescription())
                 .userName(login.getUserName())

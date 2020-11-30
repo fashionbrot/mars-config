@@ -369,8 +369,9 @@ function showConfig(row) {
         $("#configInfo").attr("style","width:49%;display:block;float:left;");
         $("#newConfigInfo").attr("style","width:50%;display:block;float:right;");
     }else{
+        $("#rollback").show();
         $("#showDialogId").attr("style","width:500px;");
-        $("#rollback").hide();
+        /*$("#rollback").hide();*/
     }
 
     if(data!=null && updateData==null){

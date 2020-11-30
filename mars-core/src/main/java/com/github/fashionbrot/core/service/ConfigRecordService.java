@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -183,6 +184,8 @@ public class ConfigRecordService {
         return configRecordDao.remove(queryWrapper);
     }
 
+    @Autowired
+    private ConfigValueService configValueService;
 
     @Transactional(rollbackFor = Exception.class)
     public void rollBack(ConfigRecordReq req) {
@@ -191,39 +194,38 @@ public class ConfigRecordService {
             throw new MarsException("记录不存在");
         }
 
-        ConfigValueEntity valueEntity = configValueDao.getById(byId.getConfigId());
-        if (valueEntity==null){
-            throw new MarsException("配置信息已不存在");
-        }
         String json = byId.getJson();
         ConfigValueEntity newEntity = JSON.parseObject(json,ConfigValueEntity.class);
         if (newEntity==null){
             throw new MarsException("配置信息回滚失败，请联系管理员");
         }
 
-        ConfigValueEntity update=ConfigValueEntity.builder().build();
-        update.setStatus(newEntity.getStatus());
-        update.setDescription(newEntity.getDescription());
-        configValueDao.update(update,new QueryWrapper<ConfigValueEntity>().eq("id",byId.getConfigId()));
-
-
-        String sql= tableColumnDao.getUpdateConfigSql(newEntity);
-        log.info("rollback sql:"+sql);
-        tableColumnDao.updateTable(sql);
-
         LoginModel login = userLoginService.getLogin();
 
-        ConfigRecordEntity record=ConfigRecordEntity.builder()
-                .appName(valueEntity.getAppName())
-                .envCode(valueEntity.getEnvCode())
-                .templateKey(valueEntity.getTemplateKey())
-                .configId(valueEntity.getId())
-                .json(byId.getNewJson())
-                .newJson(byId.getJson())
-                .operationType(OperationTypeEnum.ROLLBACK.getCode())
-                .description(valueEntity.getDescription())
-                .userName(login.getUserName())
-                .build();
-        configRecordDao.save(record);
+        if (byId.getOperationType().intValue() == OperationTypeEnum.DELETE.getCode()){
+            newEntity.setId(null);
+            newEntity.setTempJson(newEntity.getJson());
+            newEntity.setJson("");
+            newEntity.setReleaseStatus(3);
+            newEntity.setUserName(login.getUserName());
+            newEntity.setCreateDate(new Date());
+            newEntity.setCreateId(login.getUserId());
+            newEntity.setUpdateDate(null);
+            newEntity.setUpdateId(null);
+            configValueDao.save(newEntity);
+        }else if(byId.getOperationType().intValue() == OperationTypeEnum.UPDATE.getCode()){
+            ConfigValueEntity configValueEntity = configValueDao.getById(newEntity.getId());
+            if (configValueEntity==null){
+                throw new MarsException("你要回滚的配置，已删除");
+            }
+            configValueEntity.setTempJson(newEntity.getJson());
+            configValueEntity.setReleaseStatus(0);
+            configValueEntity.setUserName(login.getUserName());
+            configValueEntity.setUpdateDate(new Date());
+            configValueEntity.setUpdateId(login.getUserId());
+            configValueEntity.setDescription(newEntity.getDescription());
+            configValueDao.updateById(configValueEntity);
+        }
+        configValueService.updateRelease(byId.getEnvCode(),byId.getAppName(),byId.getTemplateKey());
     }
 }
