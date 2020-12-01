@@ -6,6 +6,7 @@ import com.github.fashionbrot.common.constant.MarsConst;
 import com.github.fashionbrot.common.enums.OperationTypeEnum;
 import com.github.fashionbrot.common.enums.RespCode;
 import com.github.fashionbrot.common.enums.SystemConfigRoleEnum;
+import com.github.fashionbrot.common.enums.SystemStatusEnum;
 import com.github.fashionbrot.common.exception.CurdException;
 import com.github.fashionbrot.common.exception.MarsException;
 import com.github.fashionbrot.common.model.LoginModel;
@@ -109,9 +110,9 @@ public class SystemConfigService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void add(SystemConfigInfo systemConfigInfo) {
+    public void add(SystemConfigInfo info) {
         try {
-            if ("yaml".equalsIgnoreCase(systemConfigInfo.getFileType())) {
+            if ("yaml".equalsIgnoreCase(info.getFileType())) {
                 //TODO 需要验证 数据格式
             }
         } catch (Exception e) {
@@ -119,25 +120,28 @@ public class SystemConfigService {
             throw new MarsException("填写格式错误,请检查输入格式（ymal填写时不能有 TAB 换行）");
         }
 
-        if (isFileHasExisted(systemConfigInfo)) {
+        if (isFileHasExisted(info)) {
             throw new MarsException("配置文件已存在");
         }
+        info.setTempJson(info.getJson());
+        info.setJson("");
+        info.setStatus(SystemStatusEnum.ADD.getCode());
         LoginModel login = userLoginService.getLogin();
         if (login != null) {
-            systemConfigInfo.setModifier(login.getUserName());
+            info.setModifier(login.getUserName());
         }
-        systemConfigDao.save(systemConfigInfo);
-        updateRelease(systemConfigInfo.getEnvCode(),systemConfigInfo.getAppName(),systemConfigInfo.getFileName());
+        systemConfigDao.save(info);
+        updateRelease(info.getEnvCode(),info.getAppName(),info.getFileName());
     }
 
 
     @Transactional(rollbackFor = Exception.class)
-    public void update(SystemConfigInfo systemConfigInfo) {
+    public void update(SystemConfigInfo info) {
 
-        systemConfigRoleRelationDao.checkRole(systemConfigInfo.getId(), SystemConfigRoleEnum.EDIT);
+        systemConfigRoleRelationDao.checkRole(info.getId(), SystemConfigRoleEnum.EDIT);
 
-        SystemConfigInfo systemConfigInfoPre = systemConfigDao.getById(systemConfigInfo.getId());
-        if (systemConfigInfoPre == null) {
+        SystemConfigInfo old = systemConfigDao.getById(info.getId());
+        if (old == null) {
             throw new MarsException(RespCode.EXIST_SYSTEM_CONFIG_ERROR);
         }
 
@@ -149,41 +153,30 @@ public class SystemConfigService {
          log.error(" update parse content error",e);
          throw new MarsException("填写格式错误,请检查输入格式（ymal填写时不能有 TAB 换行）");
          }*/
-        String json = systemConfigInfoPre.getJson();
-        int flag = 0;
-        String preFileJson = systemConfigInfoPre.getJson();
-        if (OperationTypeEnum.UPDATE == OperationTypeEnum.ROLLBACK) {
-            flag = systemConfigInfoPre.getJson().compareTo(json);
-            preFileJson = json;
-        } else {
-            flag = systemConfigInfoPre.getJson().compareTo(systemConfigInfo.getJson());
-        }
-        if (flag != 0) {
-            systemConfigInfoPre.setStatus(0);
-        }
 
+        int flag = old.getJson().compareTo(info.getJson());
+        if (flag != 0) {
+            old.setStatus(SystemStatusEnum.UPDATE.getCode());
+            old.setTempJson(info.getJson());
+        }
         LoginModel userInfo = userLoginService.getLogin();
         if (userInfo != null) {
-            systemConfigInfoPre.setModifier(userInfo.getUserName());
+            old.setModifier(userInfo.getUserName());
+        }
+        old.setFileDesc(info.getFileDesc());
+        old.setFileType(info.getFileType());
+        QueryWrapper updateWrapper = new QueryWrapper<SystemConfigInfo>();
+        updateWrapper.eq("id", old.getId());
 
-            systemConfigInfoPre.setFileDesc(systemConfigInfo.getFileDesc());
-            systemConfigInfoPre.setJson(systemConfigInfo.getJson());
-            systemConfigInfoPre.setFileType(systemConfigInfo.getFileType());
-
-            QueryWrapper updateWrapper = new QueryWrapper<SystemConfigInfo>();
-            updateWrapper.eq("id", systemConfigInfoPre.getId());
-
-            boolean result = systemConfigDao.update(systemConfigInfoPre, updateWrapper);
-            //判断乐观锁
-            if (!result) {
-                throw new MarsException(RespCode.UPDATE_REFRESH_ERROR);
-            }
-            if (flag != 0) {
-                systemConfigHistoryDao.insert(generateHistoryInfo(systemConfigInfoPre, preFileJson,OperationTypeEnum.UPDATE));
-            }
+        boolean result = systemConfigDao.update(old, updateWrapper);
+        if (!result) {
+            throw new MarsException(RespCode.UPDATE_REFRESH_ERROR);
+        }
+        if (flag != 0) {
+            systemConfigHistoryDao.insert(generateHistoryInfo(old, old.getJson(),OperationTypeEnum.UPDATE));
         }
 
-        updateRelease(systemConfigInfoPre.getEnvCode(),systemConfigInfoPre.getAppName(),systemConfigInfoPre.getFileName());
+        updateRelease(old.getEnvCode(),old.getAppName(),old.getFileName());
 
     }
 
@@ -202,18 +195,20 @@ public class SystemConfigService {
 
         systemConfigRoleRelationDao.checkRole(id, SystemConfigRoleEnum.DELETE);
 
-        SystemConfigInfo systemConfigInfo = systemConfigDao.getById(id);
-        String preJson = systemConfigInfo.getJson();
-
+        SystemConfigInfo configInfo = systemConfigDao.getById(id);
+        if (configInfo==null){
+            throw new MarsException("配置不存在");
+        }
+        String preJson = configInfo.getJson();
         LoginModel login = userLoginService.getLogin();
         if (login!=null){
-            systemConfigInfo.setModifier(login.getUserName());
+            configInfo.setModifier(login.getUserName());
         }
-        systemConfigInfo.setJson("");
-
-        systemConfigHistoryDao.insert(generateHistoryInfo(systemConfigInfo, preJson, OperationTypeEnum.DELETE));
-        systemConfigRoleRelationDao.delete(new QueryWrapper<SystemConfigRoleRelation>().eq("system_config_id", id));
-        systemConfigDao.removeById(id);
+        systemConfigHistoryDao.insert(generateHistoryInfo(configInfo, preJson, OperationTypeEnum.DELETE));
+        //systemConfigRoleRelationDao.delete(new QueryWrapper<SystemConfigRoleRelation>().eq("system_config_id", id));
+        //systemConfigDao.removeById(id);
+        configInfo.setStatus(SystemStatusEnum.DELETE.getCode());
+        systemConfigDao.updateById(configInfo);
     }
 
 
@@ -222,7 +217,10 @@ public class SystemConfigService {
 
         SystemConfigInfo systemConfigInfo =  systemConfigDao.getById(id);
         if (systemConfigInfo!=null){
-            systemConfigInfo.setNowUpdateDate(systemConfigInfo.getUpdateDate()!=null?systemConfigInfo.getUpdateDate().getTime():null);
+            if (systemConfigInfo.getStatus().intValue() == SystemStatusEnum.UPDATE.getCode()
+                || systemConfigInfo.getStatus().intValue() == SystemStatusEnum.ADD.getCode() ) {
+                systemConfigInfo.setJson(systemConfigInfo.getTempJson());
+            }
         }
         return systemConfigInfo;
     }

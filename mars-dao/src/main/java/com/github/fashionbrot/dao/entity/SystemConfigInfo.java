@@ -42,6 +42,8 @@ public class SystemConfigInfo extends BaseEntity {
     @TableField("json")
     private String json;
 
+    @TableField("temp_json")
+    private String tempJson;
     /**
      * 文件类型 TEXT YAML  Properties
      */
