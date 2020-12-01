@@ -470,8 +470,8 @@ function loadData() {
                     },
                     {
                         targets:5, render: function (data, type, full, meta) {
-                            var html='<a class="btn btn-success btn-" onclick="publishById(\'' + full.id + '\')"><i class="glyphicon glyphicon-send"></i>发布 </a>';
-
+                            // var html='<a class="btn btn-success btn-" onclick="publishById(\'' + full.id + '\')"><i class="glyphicon glyphicon-send"></i>发布 </a>';
+                            var html="";
                             var html2= ""
                                 + '&nbsp;&nbsp;<a class="btn btn-success btn-" onclick="viewDiv(\'' + full.id + '\')"><i class="glyphicon glyphicon-eye-open"></i>查看 </a>'
                                 + '&nbsp;&nbsp;<a class="btn btn-success btn-" onclick="queryById(\'' + full.id + '\')"><i class="glyphicon glyphicon-edit"></i>修改 </a>'

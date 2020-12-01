@@ -36,10 +36,14 @@ public class SystemConfigHistoryInfo extends BaseEntity{
     @TableField(value = "app_name")
     private String appName;
 
+    /**
+     * 文件类型 TEXT YAML  Properties
+     */
+    @TableField(value = "file_type")
+    private String fileType;
 
     @TableField(value = "modifier")
     private String modifier;
-
 
     @TableField(value = "pre_json")
     private String preJson;

@@ -39,9 +39,9 @@ public class SystemReleaseEntity {
 	@TableField("app_name")
 	private String appName;
 
-	@ApiModelProperty("模板keys")
-	@TableField("template_keys")
-	private String templateKeys;
+	@ApiModelProperty("文件名")
+	@TableField("files")
+	private String files;
 
 	@ApiModelProperty("发布状态 1 发布 0未发布")
 	@TableField("release_flag")

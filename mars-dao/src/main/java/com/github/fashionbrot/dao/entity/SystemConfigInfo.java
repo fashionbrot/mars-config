@@ -24,15 +24,11 @@ import java.util.Date;
 public class SystemConfigInfo extends BaseEntity {
 
 
-
     @TableField(value = "env_code")
     private String envCode;
 
     @TableField(value = "app_name")
     private String appName;
-
-    @TableField(value = "creator")
-    private String creator;
 
     @TableField(value = "modifier")
     private String modifier;
@@ -54,9 +50,6 @@ public class SystemConfigInfo extends BaseEntity {
 
     @TableField(value = "status")
     private Integer status;
-
-    @TableField(value = "version")
-    private String version;
 
     private transient Long roleId;
 
