@@ -1,5 +1,6 @@
 package com.github.fashionbrot.console.controller;
 
+import com.github.fashionbrot.common.req.ConfigValueApiReq;
 import com.github.fashionbrot.common.req.DataConfigReq;
 import com.github.fashionbrot.common.vo.CheckForUpdateVo;
 import com.github.fashionbrot.common.vo.ForDataVo;
@@ -41,6 +42,12 @@ public class ApiConfigController {
     @ResponseBody
     public ForDataVo forDataVo(DataConfigReq dataConfig){
         return systemConfigService.forDataVo(dataConfig);
+    }
+
+    @PostMapping("/api/config/cluster/sync")
+    @ResponseBody
+    public Long clusterSync(ConfigValueApiReq apiReq){
+        return systemConfigService.clusterSync(apiReq);
     }
 
 }

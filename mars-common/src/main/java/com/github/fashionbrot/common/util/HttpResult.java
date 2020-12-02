@@ -13,7 +13,10 @@ public class HttpResult {
     public String content;
 
     public boolean isSuccess(){
-        return 200 == this.code;
+        if (this!=null) {
+            return 200 == this.code;
+        }
+        return false;
     }
     public boolean isFail(){
         if (200 == this.code){

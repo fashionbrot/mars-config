@@ -15,6 +15,7 @@ import com.github.fashionbrot.common.req.ConfigValueApiReq;
 import com.github.fashionbrot.common.req.ConfigValueReq;
 import com.github.fashionbrot.common.util.HttpClientUtil;
 import com.github.fashionbrot.common.util.HttpResult;
+import com.github.fashionbrot.common.util.ServerUtil;
 import com.github.fashionbrot.common.util.StringUtil;
 import com.github.fashionbrot.common.vo.*;
 import com.github.fashionbrot.core.UserLoginService;
@@ -332,7 +333,8 @@ public class ConfigValueService  {
             if (StringUtils.isEmpty(cluster)){
                 return;
             }
-            List<String> serverList = getServerList(cluster);
+
+            List<String> serverList = ServerUtil.getServerList(cluster,"/api/config/value/cluster/sync");
             int count = serverList.size();
             if (count<=0){
                 return;
@@ -363,28 +365,7 @@ public class ConfigValueService  {
         }
     }
 
-    private List<String> getServerList(String serverAddress){
 
-        String[] server = serverAddress.split(",");
-        List<String> serverList=new ArrayList<>(server.length);
-        if (StringUtil.isNotEmpty(serverAddress)) {
-            for (String s : server) {
-                String[] svr = s.split(":");
-                int port = 80;
-                if (svr.length == 2) {
-                    port = StringUtil.parseInteger(svr[1], 80);
-                }
-                String ip = svr[0];
-                if (!ip.startsWith("http")){
-                    ip="http://"+ip;
-                }
-                ip = ip+":"+port+"/api/config/value/cluster/sync";
-                serverList.add(ip);
-            }
-            return serverList;
-        }
-        return serverList;
-    }
 
 
     private void deleteByReleaseStatus(String envCode,String appName,Integer whereReleaseStatus){

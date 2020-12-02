@@ -10,7 +10,11 @@ import com.github.fashionbrot.common.enums.SystemStatusEnum;
 import com.github.fashionbrot.common.exception.CurdException;
 import com.github.fashionbrot.common.exception.MarsException;
 import com.github.fashionbrot.common.model.LoginModel;
+import com.github.fashionbrot.common.req.ConfigValueApiReq;
 import com.github.fashionbrot.common.req.DataConfigReq;
+import com.github.fashionbrot.common.util.HttpClientUtil;
+import com.github.fashionbrot.common.util.HttpResult;
+import com.github.fashionbrot.common.util.ServerUtil;
 import com.github.fashionbrot.common.vo.CheckForUpdateVo;
 import com.github.fashionbrot.common.vo.ForDataVo;
 import com.github.fashionbrot.common.vo.PageDataVo;
@@ -19,6 +23,8 @@ import com.github.fashionbrot.dao.dao.SystemConfigDao;
 import com.github.fashionbrot.dao.dao.SystemConfigHistoryDao;
 import com.github.fashionbrot.dao.dao.SystemConfigRoleRelationDao;
 import com.github.fashionbrot.dao.dao.SystemReleaseDao;
+import com.github.fashionbrot.dao.dto.ConfigValueDto;
+import com.github.fashionbrot.dao.dto.SystemConfigDto;
 import com.github.fashionbrot.dao.entity.*;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -26,12 +32,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 /**
@@ -59,6 +65,11 @@ public class SystemConfigService {
 
     @Autowired
     private SystemConfigCacheService systemConfigCacheService;
+
+    @Autowired
+    private Environment environment;
+
+    private static final String CLUSTER="mars.console.cluster";
 
 
     private boolean isFileHasExisted(SystemConfigInfo systemConfigInfo) {
@@ -208,7 +219,142 @@ public class SystemConfigService {
         //systemConfigRoleRelationDao.delete(new QueryWrapper<SystemConfigRoleRelation>().eq("system_config_id", id));
         //systemConfigDao.removeById(id);
         configInfo.setStatus(SystemStatusEnum.DELETE.getCode());
-        systemConfigDao.updateById(configInfo);
+        if (!systemConfigDao.updateById(configInfo)){
+            throw new MarsException(RespCode.DELETE_ERROR);
+        }
+    }
+
+    public void unDel(Long id) {
+        SystemConfigInfo configInfo = systemConfigDao.getById(id);
+        if (configInfo==null){
+            throw new MarsException("配置不存在");
+        }
+        configInfo.setStatus(SystemStatusEnum.RELEASE.getCode());
+        if (!systemConfigDao.updateById(configInfo)){
+            throw new MarsException("撤销失败");
+        }
+    }
+
+    private ExecutorService executorService = new ThreadPoolExecutor(5, 5, 0L, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<Runnable>(5),
+            new RejectedExecutionHandler() {
+                @Override
+                public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+                    if (!executor.isShutdown()) {
+                        //再尝试入队
+                        executor.execute(r);
+                    }
+                }
+            });
+
+    public void releaseConfig(SystemConfigInfo req) {
+        QueryWrapper q = new QueryWrapper<ConfigReleaseEntity>()
+                .eq("env_code",req.getEnvCode())
+                .eq("app_name",req.getAppName())
+                .eq("release_flag",0);
+        SystemReleaseEntity releaseEntity = systemReleaseDao.getOne(q);
+        if (releaseEntity==null){
+            throw new MarsException("没有要发布的应用");
+        }
+        systemConfigDao.updateRelease(SystemConfigDto.builder()
+                .envCode(req.getEnvCode())
+                .appName(req.getAppName())
+                .updateReleaseStatus(1)
+                .whereReleaseStatus(Arrays.asList(0,3))
+                .build());
+        deleteByReleaseStatus(req.getEnvCode(),req.getAppName(),3);
+
+
+        SystemReleaseEntity updateRelease=SystemReleaseEntity.builder()
+                .releaseFlag(1)
+                .build();
+        if (!systemReleaseDao.update(updateRelease,q)){
+            throw new MarsException(RespCode.FAIL);
+        }
+
+        String key = getKey(req.getEnvCode(),req.getAppName());
+        versionCache.put(key,releaseEntity.getId());
+
+        if (environment.containsProperty(CLUSTER)){
+            String cluster = environment.getProperty(CLUSTER);
+            if (StringUtils.isEmpty(cluster)){
+                return;
+            }
+
+            List<String> serverList = ServerUtil.getServerList(cluster,"/api/config/cluster/sync");
+            int count = serverList.size();
+            if (count<=0){
+                return;
+            }
+
+
+            List<String> params = new ArrayList<>();
+            params.add("envCode");
+            params.add(req.getEnvCode());
+            params.add("appId");
+            params.add(req.getAppName());
+            params.add("version");
+            params.add(releaseEntity.getId()+"");
+
+            for(String s : serverList){
+                executorService.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        for(int i=0;i<3;i++){
+                            HttpResult httpResult = HttpClientUtil.httpPost(s, null,params,"UTF-8",2000,2000);
+                            if (httpResult.isSuccess() && (releaseEntity.getId().longValue()+"").equals(httpResult.getContent())){
+                                break;
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+    }
+
+    private Map<String,Long> versionCache = new ConcurrentHashMap<>();
+
+    public Object checkVersion(ConfigValueApiReq req) {
+        String key =  getKey(req.getEnvCode(),req.getAppId());
+        if (versionCache.containsKey(key)){
+            return versionCache.get(key);
+        }
+
+        Long version = systemReleaseDao.getTopReleaseId(req.getEnvCode(),req.getAppId(),1);
+        if (version==null){
+            versionCache.put(key,-1L);
+            return -1;
+        }else{
+            versionCache.put(key,version);
+            return version;
+        }
+    }
+
+
+    public Long clusterSync(ConfigValueApiReq req) {
+        String key = getKey(req.getEnvCode(),req.getAppId());
+        long version =req.getVersion().longValue();
+        long v = 0;
+        if (versionCache.containsKey(key)){
+            v = versionCache.get(key).longValue();
+        }
+        if(v<version){
+            versionCache.put(key,req.getVersion());
+        }
+        return versionCache.get(key);
+    }
+
+    private String getKey(String env,String app){
+        return env+app;
+    }
+
+    private void deleteByReleaseStatus(String envCode,String appName,Integer whereReleaseStatus){
+        QueryWrapper<SystemConfigInfo> qq=new QueryWrapper();
+        qq.eq("env_code",envCode);
+        qq.eq("app_name",appName);
+        qq.eq("status",whereReleaseStatus);
+        systemConfigDao.remove(qq);
     }
 
 
@@ -380,4 +526,7 @@ public class SystemConfigService {
 
         return null;
     }
+
+
+
 }

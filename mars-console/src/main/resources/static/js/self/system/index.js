@@ -486,8 +486,11 @@ function loadData() {
                             if (status==3){
                                 html=view +undel;
                             }
-                            if (status==1 || status==4 || status==2){
+                            if (status==1 || status==4 ){
                                 html = view + edit +del;
+                            }
+                            if( status==2){
+                                html = view + edit;
                             }
                             return html;
                         }
@@ -505,7 +508,7 @@ function loadData() {
 function unDel(id) {
     loading();
     $.ajax({
-        url: "../admin/config/value/unDeleteById",
+        url: "/system/unDel",
         type: "post",
         data: {"id": id},
         dataType: "json",
