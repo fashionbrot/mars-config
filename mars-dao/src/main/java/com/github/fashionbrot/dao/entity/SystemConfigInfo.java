@@ -1,9 +1,6 @@
 package com.github.fashionbrot.dao.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,8 +18,16 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SystemConfigInfo extends BaseEntity {
+public class SystemConfigInfo {
 
+    @TableId(type = IdType.AUTO)
+    private Long id;
+
+    @TableField(value="create_date",fill = FieldFill.INSERT)
+    private Date createDate;
+
+    @TableField(value = "update_date",fill = FieldFill.UPDATE)
+    private Date updateDate;
 
     @TableField(value = "env_code")
     private String envCode;

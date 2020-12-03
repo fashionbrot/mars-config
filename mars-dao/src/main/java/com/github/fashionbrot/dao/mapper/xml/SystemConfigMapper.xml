@@ -85,7 +85,7 @@
 
 
     <update id="updateRelease" parameterType="com.github.fashionbrot.dao.dto.SystemConfigDto">
-        update system_release set json=temp_json , status=#{updateReleaseStatus},temp_json=null
+        update system_config_info set json=temp_json , status=#{updateReleaseStatus},temp_json=null
         where env_code=#{envCode} and app_name=#{appName}
         <if test="whereReleaseStatus != null and whereReleaseStatus.size()>0">
             and status in

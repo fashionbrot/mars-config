@@ -91,12 +91,9 @@ CREATE TABLE `system_config_info` (
   `file_type` varchar(16) NOT NULL DEFAULT '5' COMMENT '文件类型 TEXT JSON XML YAML HTML Properties',
   `json` text DEFAULT NULL COMMENT '配置文件内容',
   `temp_json` text DEFAULT NULL COMMENT '临时数据',
-  `status` int(2) NOT NULL DEFAULT '0' COMMENT '发布状态 1已发布 0未发布',
-  `create_id` bigint(11) NOT NULL COMMENT '创建者id',
+  `status` tinyint(2) NOT NULL DEFAULT '0' COMMENT '状态 1新增 2更新 3删除 4已发布',
   `create_date` datetime NOT NULL COMMENT '创建时间',
-  `update_id` bigint(11) DEFAULT NULL COMMENT '最近更新者id',
   `update_date` datetime DEFAULT NULL COMMENT '最近更新时间',
-  `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
   PRIMARY KEY (`id`),
   KEY `idx_envcode_appname` (`env_code`,`app_name`) USING BTREE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='应用系统配置表';
@@ -115,10 +112,7 @@ CREATE TABLE `system_config_history` (
   `operation_type` int(2) unsigned NOT NULL COMMENT '操作类型',
   `file_type` varchar(32) NOT NULL COMMENT '文件类型',
   `modifier` varchar(32) DEFAULT NULL COMMENT '修改人',
-  `create_id` bigint(11) NOT NULL COMMENT '创建者id',
   `create_date` datetime NOT NULL COMMENT '创建时间',
-  `update_id` bigint(11) DEFAULT NULL COMMENT '最近更新者id',
-  `update_date` datetime DEFAULT NULL COMMENT '最近更新时间',
   `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
   PRIMARY KEY (`id`),
   KEY `idx_envcode_appname` (`env_code`,`app_name`) USING BTREE

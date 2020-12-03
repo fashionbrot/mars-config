@@ -185,7 +185,7 @@ function callback(data){
     $("#diffId").val(data.id);
     $('#diffModal').modal('show');
     setTimeout(function () {
-        initUI("editDiff",data.preJson,data.json,"textile");
+        initUI("editDiff",data.json,data.preJson,"textile");
     },500);
 }
 
@@ -419,15 +419,15 @@ function loadData() {
                         }
                     }
                 }, {
-                    data : 'modifyTime',
+                    data : 'createDate',
                     bSortable : true,
                     width : "25px",
                     className : "text-center",
                     render : function (data, type, full, meta) {
-                        if(full.modifyTime!=null){
-                            return moment(full.modifyTime).format("YYYY-MM-DD HH:mm:ss");
+                        if(full.createDate!=null){
+                            return moment(full.createDate).format("YYYY-MM-DD HH:mm:ss");
                         }else{
-                            return moment(full.createTime).format("YYYY-MM-DD HH:mm:ss");
+                            return moment(full.createDate).format("YYYY-MM-DD HH:mm:ss");
                         }
                     }
                 },{
@@ -464,79 +464,6 @@ function loadData() {
         delete data.length;
         delete data.columns;
     });
-
-
-/*
-            $('#dataTables').dataTable().fnDestroy();
-            var table = $('#dataTables').DataTable({
-                ajax:{
-                    url: "../system/queryHistoryAll?v="+new Date().getTime(),
-                    type: "post",
-                    dataType: "json",
-                    data:{appName:appName,envCode:envCode},
-                },
-                stateSave: true,
-                searching: false,
-                paging: false,
-                info: true,
-                bAutoWidth: false,
-                lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
-                data: data,
-                dom: '<fB<t>ip>',
-                stripeClasses: ["odd", "even"],
-                paginationType: "full_numbers",
-                columnDefs: [
-
-                    {
-                        targets: 0, render: function (data, type, full, meta) {
-                            return full.fileName;
-                        }
-                    },
-                    {
-                        targets: 1, render: function (data, type, full, meta) {
-                            return full.modifier;
-                        }
-                    },
-                    {
-                        targets: 2, render: function (data, type, full, meta) {
-                            if(full.operationType==1){
-                                return "新增";
-                            }else if(full.operationType==2){
-                                return "修改";
-                            }else if(full.operationType==3){
-                                return "删除";
-                            }else if(full.operationType==4){
-                                return "导入";
-                            }else if(full.operationType==5){
-                                return "发布全部";
-                            }else if(full.operationType==6){
-                                return "回滚";
-                            }else{
-                                return "";
-                            }
-                        }
-                    },
-                    {
-                        targets:3, render: function (data, type, full, meta) {
-                            if(full.modifyTime!=null){
-                                return moment(full.modifyTime).format("YYYY-MM-DD HH:mm:ss");
-                            }else{
-                                return moment(full.createTime).format("YYYY-MM-DD HH:mm:ss");
-                            }
-                        }
-                    },
-                    {
-                        targets:4, render: function (data, type, full, meta) {
-
-                            var html2= ""
-                                + '&nbsp;&nbsp;<a class="btn btn-success btn-" onclick="queryById(\'' + full.id + '\')"><i class="glyphicon glyphicon-edit"></i>查看 </a>'
-                                + '&nbsp;&nbsp;<a class="btn btn-warning btn-circle" onclick="showModal(\'' + full.id + '\',this)"> <i class="glyphicon glyphicon-trash"></i>删除</a>';
-                                return html2;
-                        }
-                    }
-                ]
-
-            });*/
 
 }
 

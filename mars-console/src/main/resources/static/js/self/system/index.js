@@ -500,7 +500,7 @@ function loadData() {
             });
         },error: function (e) {
             loaded();
-            alert("网络错误，请重试！！");
+            alert("网络错误，请重试！");
         }
     });
 }
@@ -519,6 +519,30 @@ function unDel(id) {
             } else {
                 alert(data.msg);
             }
+        },error:function () {
+            alert("网络请求失败")
+            loaded();
+        }
+    });
+}
+
+function releaseConfig() {
+    loading();
+    $.ajax({
+        url: "/system/releaseConfig",
+        type: "post",
+        data: {"envCode": $("#envCode").val() ,"appName":$("#appName").val()},
+        dataType: "json",
+        success: function (data) {
+            loaded();
+            if (data.code == "0") {
+                loadData(true);
+            } else {
+                alert(data.msg);
+            }
+        },error:function () {
+            alert("网络请求失败")
+            loaded();
         }
     });
 }
