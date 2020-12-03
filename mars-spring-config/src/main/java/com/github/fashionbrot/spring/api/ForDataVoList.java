@@ -5,17 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ForDataVo {
+public class ForDataVoList {
 
+    private List<ForDataVo> list;
 
-    private String fileName;
-
-    private String fileType;
-
-    private String content;
-
+    private Long version;
 }

@@ -26,7 +26,6 @@ public class TestController {
         return abc;
     }
 
-
     /**
      * 方式2 根据类获取 配置
      */
@@ -43,11 +42,11 @@ public class TestController {
 
     /**
      * 方式三根据 配置发生变化获取到监听
-     * @param properties
+     * @param
      */
-    @MarsConfigListener(fileName = "test",type = ConfigTypeEnum.TEXT,autoRefreshed = false)
+    @MarsConfigListener(fileName = "test",autoRefreshed = true)
     public void testP(String properties){
-        System.out.println(properties.toString());
+        System.out.println("11111:"+properties.toString());
     }
     /**
     @MarsConfigListener(fileName = "app.text",type = ConfigTypeEnum.TEXT)

@@ -8,7 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.fashionbrot</groupId>
     <artifactId>mars-config-springboot-starter</artifactId>
-    <version>0.1.4</version>
+    <version>2.0.0</version>
     <description>mars-config-springboot-starter 动态配置  https://github.com/fashionbrot/mars-config</description>
     <name>mars-config-springboot-starter</name>
     <packaging>jar</packaging>
@@ -58,7 +58,7 @@
         <dependency>
             <groupId>com.github.fashionbrot</groupId>
             <artifactId>mars-spring-config</artifactId>
-            <version>0.1.4</version>
+            <version>2.0.0</version>
         </dependency>
 
         <dependency>

@@ -1,20 +1,17 @@
 package com.github.fashionbrot.spring.server;
 
-import com.alibaba.fastjson.JSON;
 import com.github.fashionbrot.ribbon.constants.GlobalConstants;
 import com.github.fashionbrot.ribbon.enums.SchemeEnum;
-import com.github.fashionbrot.ribbon.loadbalancer.ILoadBalancer;
 import com.github.fashionbrot.ribbon.loadbalancer.Server;
 import com.github.fashionbrot.ribbon.util.CollectionUtil;
 import com.github.fashionbrot.ribbon.util.HttpClientUtil;
 import com.github.fashionbrot.ribbon.util.HttpResult;
 import com.github.fashionbrot.ribbon.util.StringUtil;
 import com.github.fashionbrot.spring.api.ApiConstant;
-import com.github.fashionbrot.spring.api.CheckForUpdateVo;
 import com.github.fashionbrot.spring.api.ForDataVo;
+import com.github.fashionbrot.spring.api.ForDataVoList;
 import com.github.fashionbrot.spring.config.GlobalMarsProperties;
 import com.github.fashionbrot.spring.config.MarsDataConfig;
-import com.github.fashionbrot.spring.enums.ApiResultEnum;
 import com.github.fashionbrot.spring.enums.ConfigTypeEnum;
 import com.github.fashionbrot.spring.env.MarsPropertySource;
 import com.github.fashionbrot.spring.util.*;
@@ -25,7 +22,9 @@ import org.springframework.core.env.MutablePropertySources;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author fashionbrot
@@ -36,6 +35,7 @@ import java.util.Properties;
 @Slf4j
 public class ServerHttpAgent {
 
+    private static Map<String,Long> lastVersion =new ConcurrentHashMap<>();
 
     public static void loadLocalConfig(GlobalMarsProperties globalMarsProperties, ConfigurableEnvironment environment){
         String appId = globalMarsProperties.getAppName();
@@ -49,8 +49,7 @@ public class ServerHttpAgent {
                 String[] fileNames = file.getName().split("_");
                 String context = FileUtil.getFileContent(file);
                 if (StringUtil.isNotEmpty(context)) {
-
-                    buildEnv(environment, globalMarsProperties, fileNames[3], context, ConfigTypeEnum.PROPERTIES.getType(),false);
+                    buildEnv(environment, globalMarsProperties, fileNames[3], context, ConfigTypeEnum.PROPERTIES.getType());
                 }
             }
         }else{
@@ -59,52 +58,70 @@ public class ServerHttpAgent {
     }
 
 
-    public static void checkForUpdate(Server server, GlobalMarsProperties globalMarsProperties, ConfigurableEnvironment environment){
-        String appId = globalMarsProperties.getAppName();
-        String envCode = globalMarsProperties.getEnvCode();
 
-        CheckForUpdateVo checkForUpdateVo = ServerHttpAgent.checkForUpdate(server, envCode, appId,null);
-        if ((checkForUpdateVo == null ||  ApiResultEnum.codeOf(checkForUpdateVo.getResultCode()) == ApiResultEnum.FAILED)
-            && globalMarsProperties.isEnableLocalCache()) {
-
-            loadLocalConfig(globalMarsProperties,environment);
+    public static void saveRemoteResponse(ConfigurableEnvironment environment,
+                                GlobalMarsProperties globalProperties,
+                                ForDataVoList dataVo){
+        MutablePropertySources mutablePropertySources = environment.getPropertySources();
+        if (mutablePropertySources==null){
+            log.error("environment get property sources is null");
+            return;
         }
-        if (checkForUpdateVo != null && ApiResultEnum.codeOf(checkForUpdateVo.getResultCode()) == ApiResultEnum.SUCCESS_UPDATE){
-            List<String> updateFiles = checkForUpdateVo.getUpdateFiles();
-            if (CollectionUtil.isNotEmpty(updateFiles)) {
-                for (String file : updateFiles) {
-
-                    MarsDataConfig dataConfig = MarsDataConfig.builder()
-                            .envCode(envCode)
-                            .appId(appId)
-                            .fileName(file)
-                            .build();
-                    buildMarsPropertySource(server,globalMarsProperties,dataConfig,environment);
-                }
+        if (dataVo!=null && CollectionUtil.isNotEmpty(dataVo.getList())){
+            for(ForDataVo vo :dataVo.getList()){
+                buildEnvironmentAndWriteDisk(globalProperties,vo,mutablePropertySources);
             }
+            setLastVersion(globalProperties.getEnvCode(),globalProperties.getAppName(),dataVo.getVersion());
         }
     }
 
-    private static void buildMarsPropertySource(final Server server,GlobalMarsProperties globalMarsProperties,MarsDataConfig dataConfig,ConfigurableEnvironment environment){
-        ForDataVo forDataVo = ServerHttpAgent.getData(server, dataConfig);
-
-        if (forDataVo == null) {
-            if (log.isDebugEnabled()) {
-                log.debug(" triggerEvent  content is null dataConfig:{} ", JSON.toJSONString(dataConfig));
-            }
-            return;
-        }
-        if (ObjectUtils.isEmpty(forDataVo.getContent())) {
-            if (log.isDebugEnabled()) {
-                log.debug(" triggerEvent  content is null dataConfig:{} ", JSON.toJSONString(dataConfig));
-            }
-            return;
-        }
-
-        buildEnv(environment,globalMarsProperties,forDataVo.getFileName(),forDataVo.getContent(),forDataVo.getFileType(),true);
+    public static void setLastVersion(String envCode,String appName,Long version){
+        String key = getKey(envCode,appName);
+        lastVersion.put(key,version);
     }
 
-    public static void buildEnv(ConfigurableEnvironment environment,GlobalMarsProperties globalProperties,String fileName,String content,String configType,boolean writeLocal){
+    /**
+     * 写入 Environment 并且持久化到磁盘
+     * @param properties
+     * @param vo
+     * @param mutablePropertySources
+     */
+    public static void buildEnvironmentAndWriteDisk(GlobalMarsProperties properties,ForDataVo vo,MutablePropertySources mutablePropertySources){
+        String fileName = vo.getFileName();
+        String content = vo.getContent();
+
+        if (properties.isEnableLocalCache()){
+            if (StringUtil.isEmpty(properties.getLocalCachePath())){
+                properties.setLocalCachePath(FileUtil.getUserHome(properties.getAppName())) ;
+            }
+            /**
+             * 写入本地缓存文件
+             */
+            ServerHttpAgent.writePathFile(properties.getLocalCachePath(),properties.getAppName(),properties.getEnvCode(),fileName,content);
+        }
+
+        ConfigTypeEnum configTypeEnum = ConfigTypeEnum.valueTypeOf(vo.getFileType());
+        Properties value;
+        if (configTypeEnum == ConfigTypeEnum.YAML || configTypeEnum == ConfigTypeEnum.PROPERTIES || configTypeEnum == ConfigTypeEnum.TEXT) {
+            value = PropertiesSourceUtil.toProperties(content, configTypeEnum);
+        }else{
+            value = new Properties();
+        }
+
+        String environmentFileName =  ApiConstant.NAME+fileName;
+        MarsDataConfig dataConfig = new MarsDataConfig();
+        dataConfig.setContent(content);
+
+        MarsPropertySource marsPropertySource = new MarsPropertySource(environmentFileName, value, dataConfig);
+        mutablePropertySources.addLast(marsPropertySource);
+    }
+
+
+    public static void buildEnv(ConfigurableEnvironment environment,
+                                GlobalMarsProperties globalProperties,
+                                String fileName,
+                                String content,
+                                String fileType){
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
         if (mutablePropertySources==null){
             log.error("environment get property sources is null");
@@ -112,153 +129,104 @@ public class ServerHttpAgent {
         }
         String environmentFileName =  ApiConstant.NAME+fileName;
         if (globalProperties!=null) {
-            Boolean writeFlag = false;
-            if (globalProperties.isEnableLocalCache() && writeLocal){
-
-                if (StringUtil.isEmpty(globalProperties.getLocalCachePath())){
-                    globalProperties.setLocalCachePath(FileUtil.getUserHome(globalProperties.getAppName())) ;
-                }
-                /**
-                 * 写入本地缓存文件
-                 */
-                ServerHttpAgent.writePathFile(globalProperties.getLocalCachePath(),globalProperties.getAppName(),globalProperties.getEnvCode(),fileName,content);
-
-                writeFlag = true;
-            }else{
-                writeFlag = true;
-            }
-            ConfigTypeEnum configTypeEnum = match(fileName);
-            Properties properties;
-            if (configTypeEnum == ConfigTypeEnum.YAML || configTypeEnum == ConfigTypeEnum.PROPERTIES || configTypeEnum == ConfigTypeEnum.TEXT) {
-                properties = PropertiesSourceUtil.toProperties(content, configTypeEnum);
-            }else{
-                properties = new Properties();
-            }
-            if (writeFlag!=null && writeFlag.booleanValue()) {
-                MarsDataConfig dataConfig = new MarsDataConfig();
-                dataConfig.setContent(content);
-                dataConfig.setConfigType(ConfigTypeEnum.valueTypeOf(configType));
+            Properties properties = PropertiesSourceUtil.toProperties(content, ConfigTypeEnum.PROPERTIES);
+            if (properties!=null){
+                MarsDataConfig dataConfig = MarsDataConfig.builder()
+                        .content(content)
+                        .fileType(fileType)
+                        .fileName(fileName)
+                        .build();
                 MarsPropertySource marsPropertySource = new MarsPropertySource(environmentFileName, properties, dataConfig);
                 mutablePropertySources.addLast(marsPropertySource);
             }
         }
     }
 
-    public static ConfigTypeEnum match (String propertiesName){
-        if (ObjectUtils.isNotEmpty(propertiesName)) {
-            if (propertiesName.endsWith(".text")) {
-                return ConfigTypeEnum.TEXT;
-            }
-            if (propertiesName.endsWith(".properties")) {
-                return ConfigTypeEnum.PROPERTIES;
-            }
-            if (propertiesName.endsWith(".yaml")) {
-                return ConfigTypeEnum.YAML;
-            }
-        }
-        return ConfigTypeEnum.PROPERTIES;
-    }
 
+    public static ForDataVoList getForData(Server server,String envCode,String appId,boolean first){
 
-    public static void setServer(String serverAddress, ILoadBalancer loadBalancer) {
-        serverAddress = serverAddress.replaceAll("https://", "").replaceAll("http://", "");
-        String[] server = serverAddress.split(",");
-        List<Server> serverList = new ArrayList<>(server.length);
-        if (StringUtil.isNotEmpty(serverAddress)) {
-            for (String s : server) {
-                String[] svr = s.split(":");
-                int port = 80;
-                if (svr.length == 2) {
-                    port = StringUtil.parseInteger(svr[1], 80);
-
-                    serverList.add(Server.builder()
-                            .host(svr[0])
-                            .scheme(svr[0].startsWith("https") ? SchemeEnum.HTTPS : SchemeEnum.HTTP)
-                            .port(port)
-                            .path(ApiConstant.HEALTH)
-                            .build());
-                }
-
-            }
-            loadBalancer.addServers(serverList);
-        }
-    }
-
-
-    public static CheckForUpdateVo checkForUpdate(Server server, String env, String appId,String versions) {
-
-
-        String serverAddress =server.getServer();
-        if (ObjectUtils.isNotEmpty(serverAddress)) {
-            String url ;
-
-            List<String> params =new ArrayList<>(6);
-            params.add("envCode");
-            params.add(env);
-            params.add("appId");
-            params.add(appId);
-            if(StringUtil.isNotEmpty(versions)) {
-                params.add("version");
-                params.add(versions);
-            }
-            if (server.getScheme() == SchemeEnum.HTTP) {
-                url = String.format(ApiConstant.HTTP_CHECK_FOR_UPDATE_PATH_PARAM, server.getServerIp());
-            } else {
-                url = String.format(ApiConstant.HTTPS_CHECK_FOR_UPDATE_PATH_PARAM, server.getServerIp());
-            }
-            HttpResult httpResult  = null;
-            try {
-                httpResult  = HttpClientUtil.httpPost(url,null,params,GlobalConstants.ENCODE_UTF8,5000,5000);
-                if (httpResult.isSuccess()){
-                    return JsonUtil.parseObject(httpResult.getContent(),CheckForUpdateVo.class);
-                }
-                return CheckForUpdateVo.builder().resultCode(ApiResultEnum.FAILED.getResultCode()).build();
-            } catch (Exception e) {
-
-                log.error("checkForUpdate error url:{} httpCode:{} error:{}", url, httpResult != null ? httpResult.getCode() : "未知", e.getMessage());
-
-                return CheckForUpdateVo.builder().resultCode(ApiResultEnum.FAILED.getResultCode()).build();
-            }
+        List<String> params =getParams(envCode,appId,first);
+        String url = getForDataRequestUrl(server);
+        HttpResult httpResult =  HttpClientUtil.httpPost(url,null,params);
+        if (httpResult.isSuccess()){
+            return JsonUtil.parseObject(httpResult.getContent(), ForDataVoList.class);
         }
         return null;
     }
 
+    /**
+     * 请求最新 version，返回false 说明获取到了最新的version
+     * @param server
+     * @param env
+     * @param appId
+     * @param first
+     * @return
+     */
+    public static boolean checkForUpdate(Server server, String env, String appId,boolean first) {
 
+        List<String> params = getParams(env, appId,first);
+        String url = getCheckForUpdateRequestUrl(server);
 
-    public static ForDataVo getData(Server server, MarsDataConfig dataConfig){
-        if (server==null){
-            log.warn(" for data server is null");
-            return null;
-        }
-
-        if (dataConfig!=null){
-
-            List<String> params =new ArrayList<>(6);
-            params.add("envCode");
-            params.add(dataConfig.getEnvCode());
-            params.add("appId");
-            params.add(dataConfig.getAppId());
-            params.add("fileName");
-            params.add(dataConfig.getFileName());
-
-
-            String url ;
-            if (server.getScheme() == SchemeEnum.HTTP) {
-                url = String.format(ApiConstant.HTTP_LOAD_DATA, server.getServerIp());
-            } else {
-                url = String.format(ApiConstant.HTTPS_LOAD_DATA, server.getServerIp());
+        HttpResult httpResult  = HttpClientUtil.httpPost(url,null,params,GlobalConstants.ENCODE_UTF8,2000,2000);
+        if (httpResult.isSuccess() && StringUtil.isNotEmpty(httpResult.getContent()) ){
+            long responseVersion = ObjectUtils.parseLong(httpResult.getContent());
+            if (responseVersion == -1 || responseVersion == 0){
+                return true;
             }
-            try {
-                HttpResult httpResult =  HttpClientUtil.httpPost(url,null,params);
-                if (httpResult!=null && httpResult.isSuccess()){
-                    return JsonUtil.parseObject(httpResult.getContent(),ForDataVo.class);
+            String key = getKey(env,appId);
+            if (lastVersion.containsKey(key)){
+                Long last = lastVersion.get(key);
+                if (last.longValue() < responseVersion) {
+                    return false;
                 }
-                return null;
-            }catch (Exception e) {
-                log.error("for-data error  message:{}", e.getMessage());
             }
+
         }
-        return null;
+        return true;
+    }
+
+    public static String getKey(String envCode,String appName){
+        return envCode+appName;
+    }
+
+    private static String getCheckForUpdateRequestUrl(Server server) {
+        String url ;
+        if (server.getScheme() == SchemeEnum.HTTP) {
+            url = String.format(ApiConstant.HTTP_CHECK_FOR_UPDATE_PATH_PARAM, server.getServerIp());
+        } else {
+            url = String.format(ApiConstant.HTTPS_CHECK_FOR_UPDATE_PATH_PARAM, server.getServerIp());
+        }
+        return url;
+    }
+
+    private static List<String> getParams(String env, String appId,boolean first) {
+        List<String> params =new ArrayList<>(first?8:6);
+        params.add("envCode");
+        params.add(env);
+        params.add("appId");
+        params.add(appId);
+        params.add("version");
+        String key = getKey(env,appId);
+        if (lastVersion.containsKey(key)) {
+            params.add(lastVersion.get(key) + "");
+        }else{
+            params.add("0");
+        }
+        if (first){
+            params.add("first");
+            params.add("true");
+        }
+        return params;
+    }
+
+    private static String getForDataRequestUrl(Server server) {
+        String url ;
+        if (server.getScheme() == SchemeEnum.HTTP) {
+            url = String.format(ApiConstant.HTTP_LOAD_DATA, server.getServerIp());
+        } else {
+            url = String.format(ApiConstant.HTTPS_LOAD_DATA, server.getServerIp());
+        }
+        return url;
     }
 
 

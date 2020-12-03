@@ -4,12 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.github.fashionbrot.ribbon.loadbalancer.BaseLoadBalancer;
 import com.github.fashionbrot.ribbon.loadbalancer.ILoadBalancer;
 import com.github.fashionbrot.ribbon.loadbalancer.Server;
+import com.github.fashionbrot.ribbon.util.CollectionUtil;
 import com.github.fashionbrot.spring.api.ApiConstant;
-import com.github.fashionbrot.spring.api.CheckForUpdateVo;
 import com.github.fashionbrot.spring.api.ForDataVo;
+import com.github.fashionbrot.spring.api.ForDataVoList;
 import com.github.fashionbrot.spring.config.GlobalMarsProperties;
 import com.github.fashionbrot.spring.config.MarsDataConfig;
-import com.github.fashionbrot.spring.enums.ApiResultEnum;
 import com.github.fashionbrot.spring.enums.ConfigTypeEnum;
 import com.github.fashionbrot.spring.env.MarsPropertySource;
 import com.github.fashionbrot.spring.server.ServerHttpAgent;
@@ -58,7 +58,6 @@ public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,Applicat
      */
     private ScheduledExecutorService executorService;
 
-    private Map<String,String> versionMap = new ConcurrentHashMap<>();
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -95,8 +94,7 @@ public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,Applicat
             }
         });
         ILoadBalancer loadBalancer = new BaseLoadBalancer();
-        ServerHttpAgent.setServer(serverAddress, loadBalancer);
-
+        loadBalancer.setServer(serverAddress,ApiConstant.HEALTH);
 
         executorService.scheduleWithFixedDelay(new Runnable() {
             @Override
@@ -117,70 +115,43 @@ public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,Applicat
 
     }
 
-    public  void checkForUpdate(Server server, GlobalMarsProperties globalMarsProperties){
+    public void checkForUpdate(final Server server, final GlobalMarsProperties globalMarsProperties) {
         String appId = globalMarsProperties.getAppName();
         String envCode = globalMarsProperties.getEnvCode();
-
-        String versions = getVersion();
-
-        CheckForUpdateVo checkForUpdateVo = ServerHttpAgent.checkForUpdate(server, envCode, appId,versions);
-        if (checkForUpdateVo != null &&
-                ApiResultEnum.codeOf(checkForUpdateVo.getResultCode()) == ApiResultEnum.SUCCESS_UPDATE) {
-
-            List<String> updateFiles = checkForUpdateVo.getUpdateFiles();
-            if (!CollectionUtils.isEmpty(updateFiles)) {
-                for (String file : updateFiles) {
-
+        final boolean checkForUpdateVo = ServerHttpAgent.checkForUpdate(server, envCode, appId, false);
+        if (!checkForUpdateVo) {
+            final ForDataVoList forData = ServerHttpAgent.getForData(server, envCode, appId, false);
+            if (forData!=null && CollectionUtil.isNotEmpty(forData.getList())){
+                for(ForDataVo vo : forData.getList()){
                     MarsDataConfig dataConfig = MarsDataConfig.builder()
                             .envCode(envCode)
                             .appId(appId)
-                            .fileName(file)
+                            .fileName(vo.getFileName())
+                            .fileType(vo.getFileType())
+                            .content(vo.getContent())
                             .build();
                     buildMarsPropertySource(server,dataConfig);
-                    versionMap.put(file,dataConfig.getVersion());
                 }
+                ServerHttpAgent.setLastVersion(envCode,appId,forData.getVersion());
             }
         }
     }
 
-    private String getVersion(){
-        if (!CollectionUtils.isEmpty(versionMap)){
-            String versions =null;
-            for(Map.Entry<String,String > m: versionMap.entrySet()){
-                if (versions==null){
-                    versions= m.getValue();
-                }else{
-                    versions = versions.concat(",").concat(m.getValue());
-                }
-            }
-            return versions;
-        }
-        return null;
-    }
 
     private  void buildMarsPropertySource(final Server server,MarsDataConfig dataConfig){
-        ForDataVo forDataVo = ServerHttpAgent.getData(server, dataConfig);
-
-        if (forDataVo == null) {
-            if (log.isDebugEnabled()) {
-                log.debug(" triggerEvent  content is null dataConfig:{} ", JSON.toJSONString(dataConfig));
-            }
+        if (StringUtil.isEmpty(dataConfig.getContent())){
+            log.warn("forData is null or content is null");
             return;
         }
-        if (ObjectUtils.isEmpty(forDataVo.getContent())) {
-            if (log.isDebugEnabled()) {
-                log.debug(" triggerEvent  content is null dataConfig:{} ", JSON.toJSONString(dataConfig));
-            }
-            return;
-        }
-        ConfigTypeEnum configTypeEnum = ServerHttpAgent.match(dataConfig.getFileName());
-        Properties properties = PropertiesSourceUtil.toProperties(forDataVo.getContent(), configTypeEnum);
-
+        ConfigTypeEnum configTypeEnum = ConfigTypeEnum.valueTypeOf(dataConfig.getFileType());
+        Properties properties = PropertiesSourceUtil.toProperties(dataConfig.getContent(), configTypeEnum);
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
         if (mutablePropertySources==null){
             log.error("environment get MutablePropertySources  is null");
             return;
         }
+
+        //更新 environment
         String environmentFileName =  ApiConstant.NAME+dataConfig.getFileName();
         if (mutablePropertySources.contains(environmentFileName)){
             PropertySource propertySource = mutablePropertySources.remove(environmentFileName);
@@ -189,15 +160,13 @@ public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,Applicat
                     log.debug("environment propertySource remove success", environmentFileName);
                 }
             }
+            if (properties!=null) {
+                MarsPropertySource marsPropertySource = new MarsPropertySource(environmentFileName,properties,dataConfig);
+                mutablePropertySources.addLast(marsPropertySource);
+            }
         }
-        if (properties!=null) {
-            dataConfig.setContent(forDataVo.getContent());
-            dataConfig.setConfigType(configTypeEnum);
-            dataConfig.setVersion(forDataVo.getVersion());
-            MarsPropertySource marsPropertySource = new MarsPropertySource(environmentFileName,properties,dataConfig);
-            mutablePropertySources.addLast(marsPropertySource);
-        }
-        MarsListenerEvent marsListenerEvent = new MarsListenerEvent(this, forDataVo.getContent(), dataConfig);
+        //发送事件
+        MarsListenerEvent marsListenerEvent = new MarsListenerEvent(this, dataConfig.getContent(), dataConfig);
         applicationEventPublisher.publishEvent(marsListenerEvent);
     }
 
@@ -211,16 +180,6 @@ public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,Applicat
             executorService.shutdown();
         }
     }
-
-
-
-
-
-
-
-
-
-
 
     @Override
     public void setEnvironment(Environment environment) {

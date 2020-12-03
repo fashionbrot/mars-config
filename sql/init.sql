@@ -97,7 +97,7 @@ CREATE TABLE `system_config_info` (
   PRIMARY KEY (`id`),
   KEY `idx_envcode_appname` (`env_code`,`app_name`) USING BTREE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='应用系统配置表';
-ALTER TABLE system_config_info ADD INDEX index_del_flag (del_flag);
+
 
 
 DROP TABLE IF EXISTS `system_config_history`;

@@ -12,12 +12,10 @@ import com.github.fashionbrot.common.exception.MarsException;
 import com.github.fashionbrot.common.model.LoginModel;
 import com.github.fashionbrot.common.req.ConfigValueApiReq;
 import com.github.fashionbrot.common.req.DataConfigReq;
-import com.github.fashionbrot.common.util.HttpClientUtil;
-import com.github.fashionbrot.common.util.HttpResult;
-import com.github.fashionbrot.common.util.ServerUtil;
-import com.github.fashionbrot.common.util.StringUtil;
+import com.github.fashionbrot.common.util.*;
 import com.github.fashionbrot.common.vo.CheckForUpdateVo;
 import com.github.fashionbrot.common.vo.ForDataVo;
+import com.github.fashionbrot.common.vo.ForDataVoList;
 import com.github.fashionbrot.common.vo.PageDataVo;
 import com.github.fashionbrot.core.UserLoginService;
 import com.github.fashionbrot.dao.dao.SystemConfigDao;
@@ -292,7 +290,7 @@ public class SystemConfigService {
         }
 
         String key = getKey(req.getEnvCode(),req.getAppName());
-        versionCache.put(key,releaseEntity.getId());
+        systemConfigCacheService.setCache(key,releaseEntity.getId());
 
         if (environment.containsProperty(CLUSTER)){
             String cluster = environment.getProperty(CLUSTER);
@@ -332,36 +330,19 @@ public class SystemConfigService {
 
     }
 
-    private Map<String,Long> versionCache = new ConcurrentHashMap<>();
-
-    public Object checkVersion(ConfigValueApiReq req) {
-        String key =  getKey(req.getEnvCode(),req.getAppId());
-        if (versionCache.containsKey(key)){
-            return versionCache.get(key);
-        }
-
-        Long version = systemReleaseDao.getTopReleaseId(req.getEnvCode(),req.getAppId(),1);
-        if (version==null){
-            versionCache.put(key,-1L);
-            return -1;
-        }else{
-            versionCache.put(key,version);
-            return version;
-        }
-    }
 
 
     public Long clusterSync(ConfigValueApiReq req) {
         String key = getKey(req.getEnvCode(),req.getAppId());
         long version =req.getVersion().longValue();
         long v = 0;
-        if (versionCache.containsKey(key)){
-            v = versionCache.get(key).longValue();
+        if (systemConfigCacheService.containsKey(key)){
+            v = systemConfigCacheService.getCache(key).longValue();
         }
         if(v<version){
-            versionCache.put(key,req.getVersion());
+            systemConfigCacheService.setCache(key,req.getVersion());
         }
-        return versionCache.get(key);
+        return systemConfigCacheService.getCache(key);
     }
 
     private String getKey(String env,String app){
@@ -516,51 +497,71 @@ public class SystemConfigService {
 
 
 
-    public CheckForUpdateVo checkForUpdate(DataConfigReq req) {
+    public long checkForUpdate(DataConfigReq req) {
 
         String key =  systemConfigCacheService.getKey(req.getEnvCode(),req.getAppId());
-        if (!systemConfigCacheService.containsKey(key)){
-            return CheckForUpdateVo.builder()
-                    .code(MarsConst.SUCCESS)
-                    .version(-1L)
-                    .build();
+        if (systemConfigCacheService.containsKey(key)){
+            return systemConfigCacheService.getCache(key);
         }
+
         Long version = systemReleaseDao.getTopReleaseId(req.getEnvCode(),req.getAppId(),1);
         if (version==null){
             version = 0L;
+        }else {
+            systemConfigCacheService.setCache(key, version);
         }
-        systemConfigCacheService.setCache(key,version);
 
-        return CheckForUpdateVo.builder()
-                .code(MarsConst.SUCCESS)
-                .version(version)
+        return version;
+    }
+
+
+    public ForDataVoList forDataVo(DataConfigReq req) {
+        String key =  systemConfigCacheService.getKey(req.getEnvCode(),req.getAppId());
+        QueryWrapper<SystemConfigInfo> q=new QueryWrapper();
+        q.select("file_name,file_type,json");
+        q.eq("env_code",req.getEnvCode());
+        q.eq("app_name",req.getAppId());
+        //如果是客户端第一次调用,并且 本地缓存没有最新的version，则进行数据库查询
+        if (req.getFirst()!=null && req.getFirst()){
+            if (!systemConfigCacheService.containsKey(key)){
+                Long version = systemReleaseDao.getTopReleaseId(req.getEnvCode(),req.getAppId(),1);
+                if (version!=null){
+                    systemConfigCacheService.setCache(key, version);
+                }
+            }
+        }else{
+            SystemReleaseEntity release = systemReleaseDao.getById(req.getVersion());
+            if (release!=null){
+                List<String> keyList = Arrays.stream(release.getFiles().split(",")).collect(Collectors.toList());
+                if (CollectionUtil.isNotEmpty(keyList)){
+                    q.in("file_name",keyList);
+                }
+            }
+        }
+
+        List<SystemConfigInfo> list = systemConfigDao.list(q);
+        List<ForDataVo> forDataVoList = null;
+        if (CollectionUtil.isNotEmpty(list)){
+            forDataVoList = list.stream()
+                    .filter(m-> StringUtil.isNotEmpty(m.getJson()))
+                    .map(m-> changeForData(m))
+                    .collect(Collectors.toList());
+        }
+
+        Long lastVersion = systemConfigCacheService.getCache(key);
+        return ForDataVoList.builder()
+                .version(lastVersion)
+                .list(forDataVoList)
                 .build();
-
-        /*if (dataConfig != null && StringUtils.isEmpty(dataConfig.getToken())) {
-            return null;
-        }*/
-        /*MD5 md5 = MD5.getInstance();
-        String token =md5.getMD5String(getToken(dataConfig.getEnvCode(),dataConfig.getAppId(),dataConfig.getVersion()));
-        if (!token.equals(dataConfig.getToken())){
-            return null;
-        }*/
-        //return systemConfigDao.checkForUpdate(req);
     }
 
 
-    public ForDataVo forDataVo(DataConfigReq dataConfig) {
-        /*if (dataConfig != null && StringUtils.isEmpty(dataConfig.getToken())) {
-            return null;
-        }*/
-        /*MD5 md5 = MD5.getInstance();
-        String token =md5.getMD5String(getToken(dataConfig.getEnvCode(),dataConfig.getAppId(),dataConfig.getFileName(),dataConfig.getVersion()));
-        if (!token.equals(dataConfig.getToken())){
-            return null;
-        }*/
-
-        return null;
+    private ForDataVo changeForData(SystemConfigInfo info){
+        return ForDataVo.builder()
+                .fileName(info.getFileName())
+                .fileType(info.getFileType())
+                .content(info.getJson())
+                .build();
     }
-
-
 
 }

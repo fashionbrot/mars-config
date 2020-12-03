@@ -1,7 +1,6 @@
 package com.github.fashionbrot.spring.listener.annotation;
 
 
-import com.github.fashionbrot.spring.enums.ConfigTypeEnum;
 
 import java.lang.annotation.*;
 
@@ -11,6 +10,8 @@ import java.lang.annotation.*;
  * @date 2019/12/8 22:45
  *
  * Annotation that marks a method as a listener for mars Config change.
+ *
+ * 方法参数类型支持两种 [java.lang.String][java.util.Properties]
  *
  */
 @Retention(RetentionPolicy.RUNTIME)
@@ -23,13 +24,6 @@ public @interface MarsConfigListener {
      * @return
      */
     String fileName();
-
-    /**
-     * support properties text
-     * @see ConfigTypeEnum
-     * @return
-     */
-    ConfigTypeEnum type() default ConfigTypeEnum.PROPERTIES;
 
     /**
      * It indicates that the currently bound property is auto-refreshed when mars configuration is changed.

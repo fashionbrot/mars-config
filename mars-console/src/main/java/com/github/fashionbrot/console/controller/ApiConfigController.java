@@ -4,6 +4,7 @@ import com.github.fashionbrot.common.req.ConfigValueApiReq;
 import com.github.fashionbrot.common.req.DataConfigReq;
 import com.github.fashionbrot.common.vo.CheckForUpdateVo;
 import com.github.fashionbrot.common.vo.ForDataVo;
+import com.github.fashionbrot.common.vo.ForDataVoList;
 import com.github.fashionbrot.common.vo.RespVo;
 import com.github.fashionbrot.core.service.SystemConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,13 +35,13 @@ public class ApiConfigController {
 
     @PostMapping("/config/check-for-update")
     @ResponseBody
-    public CheckForUpdateVo checkForUpdate(DataConfigReq dataConfig){
+    public long checkForUpdate(DataConfigReq dataConfig){
         return systemConfigService.checkForUpdate(dataConfig);
     }
 
     @PostMapping("/config/for-data")
     @ResponseBody
-    public ForDataVo forDataVo(DataConfigReq dataConfig){
+    public ForDataVoList forDataVo(DataConfigReq dataConfig){
         return systemConfigService.forDataVo(dataConfig);
     }
 

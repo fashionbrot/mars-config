@@ -15,7 +15,9 @@ public class DataConfigReq {
 
     private String appId;
 
-    private String version;
+    private Long version;
+
+    private Boolean first;
 
     private String token;
 }
