@@ -239,6 +239,8 @@ public class SystemConfigService {
             throw new MarsException(RespCode.DELETE_ERROR);
         }
         insertSystemConfigLog(configInfo,SystemStatusEnum.DELETE);
+
+        updateRelease(configInfo.getEnvCode(),configInfo.getAppName(),configInfo.getFileName());
     }
 
     public void unDel(Long id) {

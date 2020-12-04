@@ -49,7 +49,7 @@ public class ServerHttpAgent {
                 String[] fileNames = file.getName().split("_");
                 String context = FileUtil.getFileContent(file);
                 if (StringUtil.isNotEmpty(context)) {
-                    buildEnv(environment, globalMarsProperties, fileNames[3], context, ConfigTypeEnum.PROPERTIES.getType());
+                    buildEnv(environment, globalMarsProperties, fileNames[3], context, fileNames[4]);
                 }
             }
         }else{
@@ -80,6 +80,23 @@ public class ServerHttpAgent {
         lastVersion.put(key,version);
     }
 
+    public static void setLastVersion(String envCode,String appName,Long version,boolean first){
+        String key = getKey(envCode,appName);
+        if (first){
+            Long clientVersion = lastVersion.get(key);
+            if (log.isDebugEnabled()){
+                log.debug("last-version clientVersion:{} responseVersion:{}",clientVersion,version);
+            }
+            if (clientVersion.longValue()+1 < version.longValue()){
+                lastVersion.put(key,clientVersion.longValue()+1);
+            }else if (clientVersion.longValue()+1 == version.longValue()){
+                lastVersion.put(key,version);
+            }
+        }else{
+            lastVersion.put(key,version);
+        }
+    }
+
     /**
      * 写入 Environment 并且持久化到磁盘
      * @param properties
@@ -88,17 +105,10 @@ public class ServerHttpAgent {
      */
     public static void buildEnvironmentAndWriteDisk(GlobalMarsProperties properties,ForDataVo vo,MutablePropertySources mutablePropertySources){
         String fileName = vo.getFileName();
+        String fileType = vo.getFileType();
         String content = vo.getContent();
 
-        if (properties.isEnableLocalCache()){
-            if (StringUtil.isEmpty(properties.getLocalCachePath())){
-                properties.setLocalCachePath(FileUtil.getUserHome(properties.getAppName())) ;
-            }
-            /**
-             * 写入本地缓存文件
-             */
-            ServerHttpAgent.writePathFile(properties.getLocalCachePath(),properties.getAppName(),properties.getEnvCode(),fileName,content);
-        }
+
 
         ConfigTypeEnum configTypeEnum = ConfigTypeEnum.valueTypeOf(vo.getFileType());
         Properties value;
@@ -106,6 +116,14 @@ public class ServerHttpAgent {
             value = PropertiesSourceUtil.toProperties(content, configTypeEnum);
         }else{
             value = new Properties();
+        }
+
+        if (properties.isEnableLocalCache()){
+            if (StringUtil.isEmpty(properties.getLocalCachePath())){
+                properties.setLocalCachePath(FileUtil.getUserHome(properties.getAppName())) ;
+            }
+            //写入本地缓存文件
+            ServerHttpAgent.writePathFile(properties.getLocalCachePath(),properties.getAppName(),properties.getEnvCode(),fileName,fileType,content);
         }
 
         String environmentFileName =  ApiConstant.NAME+fileName;
@@ -129,7 +147,7 @@ public class ServerHttpAgent {
         }
         String environmentFileName =  ApiConstant.NAME+fileName;
         if (globalProperties!=null) {
-            Properties properties = PropertiesSourceUtil.toProperties(content, ConfigTypeEnum.PROPERTIES);
+            Properties properties = PropertiesSourceUtil.toProperties(content, ConfigTypeEnum.valueTypeOf(fileType));
             if (properties!=null){
                 MarsDataConfig dataConfig = MarsDataConfig.builder()
                         .content(content)
@@ -238,12 +256,13 @@ public class ServerHttpAgent {
      * @param fileName
      * @param content
      */
-    public static void writePathFile(String localCachePath,String appName,String envCode,String fileName,String content){
+    public static void writePathFile(String localCachePath,String appName,String envCode,String fileName,String fileType,String content){
         StringBuilder path = new StringBuilder();
         path.append(localCachePath).append(File.separator).append(ApiConstant.NAME);
         path.append(appName).append("_");
         path.append(envCode).append("_");
-        path.append(fileName);
+        path.append(fileName).append("_");
+        path.append(fileType);
         if (log.isDebugEnabled()){
             log.debug("writePathFile path:{} content:{}",path,content);
         }

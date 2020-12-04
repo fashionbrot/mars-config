@@ -12,22 +12,25 @@ import java.util.*;
 public class PropertiesSourceUtil {
 
 
-    private static Map<ConfigTypeEnum, MarsPropertySourceFactory> DEFAULT_CONFIG_PARSE_MAP = new HashMap(8);
+    private static Map<ConfigTypeEnum, MarsPropertySourceFactory> cache = new HashMap(8);
 
     static {
         // register  default ConfigParse
         MarsPropertySourceFactory marsPropertySourceFactory = new DefaultPropertiesSourceFactory();
+        MarsPropertySourceFactory yaml = new DefaultYamlSourceFactory();
+        Map<ConfigTypeEnum, MarsPropertySourceFactory> DEFAULT_CONFIG_PARSE_MAP = new HashMap(8);
         DEFAULT_CONFIG_PARSE_MAP.put(ConfigTypeEnum.TEXT,  marsPropertySourceFactory);
         DEFAULT_CONFIG_PARSE_MAP.put(ConfigTypeEnum.PROPERTIES, marsPropertySourceFactory);
-        DEFAULT_CONFIG_PARSE_MAP.put(ConfigTypeEnum.YAML, new DefaultYamlSourceFactory());
-        DEFAULT_CONFIG_PARSE_MAP = Collections.unmodifiableMap(DEFAULT_CONFIG_PARSE_MAP);
+        DEFAULT_CONFIG_PARSE_MAP.put(ConfigTypeEnum.YAML, yaml);
+
+        cache = Collections.unmodifiableMap(DEFAULT_CONFIG_PARSE_MAP);
     }
 
     public static Properties toProperties(final String context, ConfigTypeEnum configTypeEnum) {
 
-        if (DEFAULT_CONFIG_PARSE_MAP.containsKey(configTypeEnum)) {
+        if (cache.containsKey(configTypeEnum)) {
             try {
-                return DEFAULT_CONFIG_PARSE_MAP.get(configTypeEnum).createPropertySource(context);
+                return cache.get(configTypeEnum).createPropertySource(context);
             }catch (Exception e){
                 log.error("createPropertySource error:{} context:{} configType:{}",e,context,configTypeEnum.getType());
                 return new Properties();
