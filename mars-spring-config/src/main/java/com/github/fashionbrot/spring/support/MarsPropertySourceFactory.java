@@ -2,6 +2,7 @@ package com.github.fashionbrot.spring.support;
 
 import com.github.fashionbrot.spring.exception.CreatePropertySourceException;
 
+import java.io.File;
 import java.util.Properties;
 
 /**
@@ -12,6 +13,8 @@ import java.util.Properties;
 public interface MarsPropertySourceFactory {
 
     Properties createPropertySource(String context)throws CreatePropertySourceException;
+
+    Properties fileToProperties(File file);
 
     String sourceType();
 }

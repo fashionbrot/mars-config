@@ -18,8 +18,12 @@ import com.github.fashionbrot.spring.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MutablePropertySources;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,9 +51,10 @@ public class ServerHttpAgent {
         if (CollectionUtil.isNotEmpty(fileList)){
             for(File file : fileList){
                 String[] fileNames = file.getName().split("_");
+                String[] fileType = file.getName().split("\\.");
                 String context = FileUtil.getFileContent(file);
                 if (StringUtil.isNotEmpty(context)) {
-                    buildEnv(environment, globalMarsProperties, fileNames[3], context, fileNames[4]);
+                    buildEnv(environment, globalMarsProperties, fileNames[3], context, fileType[1],file);
                 }
             }
         }else{
@@ -139,7 +144,8 @@ public class ServerHttpAgent {
                                 GlobalMarsProperties globalProperties,
                                 String fileName,
                                 String content,
-                                String fileType){
+                                String fileType,
+                                File file){
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
         if (mutablePropertySources==null){
             log.error("environment get property sources is null");
@@ -147,14 +153,15 @@ public class ServerHttpAgent {
         }
         String environmentFileName =  ApiConstant.NAME+fileName;
         if (globalProperties!=null) {
-            Properties properties = PropertiesSourceUtil.toProperties(content, ConfigTypeEnum.valueTypeOf(fileType));
+
+            Properties  properties = PropertiesSourceUtil.toProperties(file, ConfigTypeEnum.valueTypeOf(fileType));
             if (properties!=null){
                 MarsDataConfig dataConfig = MarsDataConfig.builder()
                         .content(content)
                         .fileType(fileType)
                         .fileName(fileName)
                         .build();
-                MarsPropertySource marsPropertySource = new MarsPropertySource(environmentFileName, properties, dataConfig);
+                 MarsPropertySource marsPropertySource = new MarsPropertySource(environmentFileName, properties, dataConfig);
                 mutablePropertySources.addLast(marsPropertySource);
             }
         }
@@ -197,6 +204,9 @@ public class ServerHttpAgent {
                 if (last.longValue() < responseVersion) {
                     return false;
                 }
+            }else{
+                lastVersion.put(key,responseVersion);
+                return false;
             }
 
         }
@@ -261,14 +271,23 @@ public class ServerHttpAgent {
         path.append(localCachePath).append(File.separator).append(ApiConstant.NAME);
         path.append(appName).append("_");
         path.append(envCode).append("_");
-        path.append(fileName).append("_");
+        path.append(fileName).append(".");
+        String lastFile = path.toString();
         path.append(fileType);
         if (log.isDebugEnabled()){
             log.debug("writePathFile path:{} content:{}",path,content);
         }
-        File file =  new File(path.toString());
+        /*File file =  new File(path.toString());
         if (file.exists()){
             FileUtil.deleteFile(file);
+        }*/
+        String keyWord = ApiConstant.NAME+appName+"_"+envCode+"_"+fileName;
+        //删除同名的file
+        List<File> files = FileUtil.searchFiles(new File(localCachePath), keyWord);
+        if (CollectionUtil.isNotEmpty(files)){
+            files.forEach(f->{
+                FileUtil.deleteFile(f);
+            });
         }
         FileUtil.writeFile(new File(path.toString()),content);
     }

@@ -150,7 +150,7 @@ public class YamlParser {
     }
 
     private static void buildMultilayerMap(Map<String, Object> parent, String path,Object value) {
-        String[] keys =path.split(".");
+        String[] keys =path.split("\\.");
         String key = keys[0];
         if (key.endsWith("]")) {
             String listKey=key.substring(0,key.indexOf("["));
@@ -171,7 +171,7 @@ public class YamlParser {
 
     @SuppressWarnings("unchecked")
     private static void buildMultilayerList(List<Object> parent,String path,Object value) {
-        String[] keys = path.split(".");
+        String[] keys = path.split("\\.");
         String key = keys[0];
         int index=Integer.valueOf(key.replace("[", "").replace("]", ""));
         if (keys.length == 1) {

@@ -6,6 +6,7 @@ import com.github.fashionbrot.spring.support.DefaultYamlSourceFactory;
 import com.github.fashionbrot.spring.support.MarsPropertySourceFactory;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
 import java.util.*;
 
 @Slf4j
@@ -33,6 +34,20 @@ public class PropertiesSourceUtil {
                 return cache.get(configTypeEnum).createPropertySource(context);
             }catch (Exception e){
                 log.error("createPropertySource error:{} context:{} configType:{}",e,context,configTypeEnum.getType());
+                return new Properties();
+            }
+        } else {
+            throw new UnsupportedOperationException("Parsing is not yet supported for this configTypeEnum profile : " + configTypeEnum);
+        }
+    }
+
+
+    public static Properties toProperties(final File file, ConfigTypeEnum configTypeEnum) {
+        if (cache.containsKey(configTypeEnum)) {
+            try {
+                return cache.get(configTypeEnum).fileToProperties(file);
+            }catch (Exception e){
+                log.error("fileToProperties error:{} context:{} configType:{}",e,file,configTypeEnum.getType());
                 return new Properties();
             }
         } else {

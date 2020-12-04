@@ -121,6 +121,11 @@ public class SystemConfigService {
 
     @Transactional(rollbackFor = Exception.class)
     public void add(SystemConfigInfo info) {
+        QueryWrapper<SystemConfigInfo> q=new QueryWrapper();
+        q.eq("file_name",info.getFileName());
+        if(systemConfigDao.count(q)>0){
+            throw new MarsException(info.getFileName()+" 文件名称重复,请重新输入");
+        }
         try {
             if ("yaml".equalsIgnoreCase(info.getFileType())) {
                 //TODO 需要验证 数据格式
@@ -147,6 +152,13 @@ public class SystemConfigService {
 
     @Transactional(rollbackFor = Exception.class)
     public void update(SystemConfigInfo info) {
+
+        QueryWrapper<SystemConfigInfo> q=new QueryWrapper();
+        q.eq("file_name",info.getFileName());
+        SystemConfigInfo temp = systemConfigDao.getOne(q);
+        if(temp!=null && temp.getId().intValue()!=info.getId().intValue()){
+            throw new MarsException(info.getFileName()+" 文件名称重复,请重新输入");
+        }
 
         systemConfigRoleRelationDao.checkRole(info.getId(), SystemConfigRoleEnum.EDIT);
 

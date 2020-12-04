@@ -6,8 +6,12 @@ import com.github.fashionbrot.spring.enums.ConfigTypeEnum;
 import com.github.fashionbrot.spring.exception.CreatePropertySourceException;
 import com.github.fashionbrot.spring.util.YamlParser;
 import lombok.extern.slf4j.Slf4j;
+import org.yaml.snakeyaml.Yaml;
 
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.*;
 
 /**
@@ -28,6 +32,21 @@ public class DefaultYamlSourceFactory implements MarsPropertySourceFactory {
             result.putAll(map);
         }
         return result;
+    }
+
+    @Override
+    public Properties fileToProperties(File file) {
+        Properties properties=new Properties();
+        Yaml yaml =new Yaml();
+        try {
+            Map<String,Object> map = yaml.load(new FileInputStream(file));
+            if (CollectionUtil.isNotEmpty(map)) {
+                properties.putAll(map);
+            }
+        } catch (FileNotFoundException e) {
+            log.error("fileToProperties error",e);
+        }
+        return properties;
     }
 
     @Override
