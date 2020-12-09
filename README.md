@@ -3,7 +3,7 @@
 #### 介绍 mars系统配置  
 
 
-#### <span id="jump"> 软件架构及软件架构说明</span>
+#### 软件架构及软件架构说明
 1.  后端使用技术 ：springboot mybatis jwt
 2.  前端使用：thymeleaf 模板引擎
 3.  数据库 ：mysql
@@ -14,6 +14,14 @@
 1.  先创建数据库mars_db ,导入 sql目录下的 init.sql 文件
 2.  修改 mars-console-2.0.0.jar 包中的配置文件 \BOOT-INF\classes\application.properties 中的mysql 配置，及端口，使用命令 java -jar mars-console-2.0.0.jar 启动
 3.  访问地址：ip + port  账户：mars 密码：mars  权限：超级管理员
+4.  mars-console-2.0.0.jar 可以配置化集群模式
+ 
+```properties
+#【后端系统】集群配置
+mars.cluster.address=ip:port,ip2:port,ip3:port
+#【后端系统】同步其他服务器重试次数（默认3）
+mars.cluster.sync.retry=3
+```
 
 #### 使用说明
 #### 1、【客户端】 引入jar 包, 分为spring、springboot|springcloud 各自支持的jar
@@ -105,8 +113,8 @@ public class TestConfig {
 
 ### mars 数据库配置系统 介绍
 
-####  [软件架构及软件架构说明](#jump)
-####  [安装教程](#jump)
+####  [软件架构及软件架构说明](#软件架构及软件架构说明)如上
+####  [安装教程](#安装教程)如上
 
 #### 使用说明
 #### 1、【客户端】 引入jar 包, 分为spring、springboot|springcloud 各自支持的jar
