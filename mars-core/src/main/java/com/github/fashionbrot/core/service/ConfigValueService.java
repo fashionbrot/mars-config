@@ -284,7 +284,8 @@ public class ConfigValueService  {
     @Autowired
     private Environment environment;
 
-    private static final String CLUSTER="mars.value.cluster";
+    private static final String CLUSTER="mars.cluster.address";
+    private static final String SYNC_RETRY = "mars.cluster.sync.retry";
 
     private ExecutorService executorService = new ThreadPoolExecutor(5, 5, 0L, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<Runnable>(5),
@@ -329,14 +330,20 @@ public class ConfigValueService  {
         versionCache.put(key,configReleaseEntity.getId());
 
         if (environment.containsProperty(CLUSTER)){
+
             String cluster = environment.getProperty(CLUSTER);
             if (StringUtils.isEmpty(cluster)){
                 return;
             }
+            final int retry ;
+            if (environment.containsProperty(SYNC_RETRY)){
+                retry = StringUtil.parseInteger(environment.getProperty(SYNC_RETRY),3);
+            }else{
+                retry = 3;
+            }
 
             List<String> serverList = ServerUtil.getServerList(cluster,"/api/config/value/cluster/sync");
-            int count = serverList.size();
-            if (count<=0){
+            if (serverList.size() <= 0){
                 return;
             }
 
@@ -349,13 +356,13 @@ public class ConfigValueService  {
             params.add("version");
             params.add(configReleaseEntity.getId()+"");
 
-            for(String s : serverList){
+            for (String s : serverList) {
                 executorService.submit(new Runnable() {
                     @Override
                     public void run() {
-                        for(int i=0;i<3;i++){
-                            HttpResult httpResult = HttpClientUtil.httpPost(s, null,params,"UTF-8",2000,2000);
-                            if (httpResult!=null && httpResult.isSuccess() && (configReleaseEntity.getId().longValue()+"").equals(httpResult.getContent())){
+                        for (int i = 0; i < retry; i++) {
+                            HttpResult httpResult = HttpClientUtil.httpPost(s, null, params, "UTF-8", 2000, 2000);
+                            if (httpResult.isSuccess() && (configReleaseEntity.getId().longValue() + "").equals(httpResult.getContent())) {
                                 break;
                             }
                         }
