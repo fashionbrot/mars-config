@@ -68,7 +68,8 @@ public class SystemConfigService {
     @Autowired
     private Environment environment;
 
-    private static final String CLUSTER="mars.console.cluster";
+    private static final String CLUSTER="mars.cluster.address";
+    private static final String SYNC_RETRY = "mars.cluster.sync.retry";
 
 
     private boolean isFileHasExisted(SystemConfigInfo systemConfigInfo) {
@@ -311,6 +312,12 @@ public class SystemConfigService {
             if (StringUtils.isEmpty(cluster)){
                 return;
             }
+            final int retry ;
+            if (environment.containsProperty(SYNC_RETRY)){
+                retry = StringUtil.parseInteger(environment.getProperty(SYNC_RETRY),3);
+            }else{
+                retry = 3;
+            }
 
             List<String> serverList = ServerUtil.getServerList(cluster,"/api/config/cluster/sync");
             int count = serverList.size();
@@ -327,13 +334,13 @@ public class SystemConfigService {
             params.add("version");
             params.add(releaseEntity.getId()+"");
 
-            for(String s : serverList){
+            for (String s : serverList) {
                 executorService.submit(new Runnable() {
                     @Override
                     public void run() {
-                        for(int i=0;i<3;i++){
-                            HttpResult httpResult = HttpClientUtil.httpPost(s, null,params,"UTF-8",2000,2000);
-                            if (httpResult.isSuccess() && (releaseEntity.getId().longValue()+"").equals(httpResult.getContent())){
+                        for (int i = 0; i < retry; i++) {
+                            HttpResult httpResult = HttpClientUtil.httpPost(s, null, params, "UTF-8", 2000, 2000);
+                            if (httpResult.isSuccess() && (releaseEntity.getId().longValue() + "").equals(httpResult.getContent())) {
                                 break;
                             }
                         }
