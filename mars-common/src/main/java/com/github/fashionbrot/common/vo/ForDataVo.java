@@ -11,14 +11,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ForDataVo {
 
-    private String appId;
-
-    private String envCode;
 
     private String fileName;
 
-    private String content;
+    private String fileType;
 
-    private String version;
+    private String content;
 
 }

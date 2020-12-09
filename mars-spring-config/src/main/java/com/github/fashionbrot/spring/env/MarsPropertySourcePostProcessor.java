@@ -3,6 +3,10 @@ package com.github.fashionbrot.spring.env;
 import com.github.fashionbrot.ribbon.loadbalancer.BaseLoadBalancer;
 import com.github.fashionbrot.ribbon.loadbalancer.ILoadBalancer;
 import com.github.fashionbrot.ribbon.loadbalancer.Server;
+import com.github.fashionbrot.ribbon.util.CollectionUtil;
+import com.github.fashionbrot.spring.api.ApiConstant;
+import com.github.fashionbrot.spring.api.ForDataVo;
+import com.github.fashionbrot.spring.api.ForDataVoList;
 import com.github.fashionbrot.spring.config.GlobalMarsProperties;
 import com.github.fashionbrot.spring.server.ServerHttpAgent;
 import com.github.fashionbrot.spring.util.BeanUtil;
@@ -63,14 +67,23 @@ public class MarsPropertySourcePostProcessor implements BeanDefinitionRegistryPo
             return;
         }
         ILoadBalancer loadBalancer = new BaseLoadBalancer();
-        ServerHttpAgent.setServer(serverAddress, loadBalancer);
-        loadBalancer.setEnableLog(globalMarsProperties.isEnableErrorLog());
+        loadBalancer.setServer(serverAddress, ApiConstant.HEALTH);
+
         Server server = loadBalancer.chooseServer();
         if (server == null) {
             ServerHttpAgent.loadLocalConfig(globalMarsProperties,environment);
             return;
         }
-        ServerHttpAgent.checkForUpdate(server, globalMarsProperties, environment);
+
+
+        //如果远程server version 比本地version 大，获取最新的配置文件集合
+        ForDataVoList dataVo = ServerHttpAgent.getForData(server,envCode,appId,true);
+        //写入 environment，并且持久化到 磁盘, 并且更新最新本地version
+        ServerHttpAgent.saveRemoteResponse(environment,globalMarsProperties,dataVo);
+        //如果返回数据为空，加载本地配置
+        if (dataVo==null || CollectionUtil.isEmpty(dataVo.getList())){
+            ServerHttpAgent.loadLocalConfig(globalMarsProperties,environment);
+        }
 
     }
 

@@ -43,7 +43,7 @@ public class RoundRobinRule extends AbstractLoadBalancerRule {
             int nextServerIndex = incrementAndGetModulo(serverCount);
             server = allServers.get(nextServerIndex);
 
-            if (server!=null && lb.getPing().isAlive(server,lb.enableLog())){
+            if (server!=null && lb.getPing().isAlive(server)){
                 return server;
             }
         }

@@ -158,9 +158,9 @@ public class TableColumnDao {
     }
 
     public Map<String, Object> selectTable(ConfigValueEntity configValue) {
-        if (!configValue.getTableName().startsWith( MarsConst.TABLE_PREFIX )){
+        /*if (!configValue.getTableName().startsWith( MarsConst.TABLE_PREFIX )){
             configValue.setTableName(MarsConst.TABLE_PREFIX + configValue.getTableName());
-        }
+        }*/
         return tableColumnMapper.selectTable(configValue);
     }
 

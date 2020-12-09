@@ -61,7 +61,7 @@ function initCodeMirror(id) {
         autofocus:true,
         mode: "properties",
         matchBrackets: true,
-        height: 200,
+        height: 150,
         width: 500,
         lint: true,
         tabMode: 'indent',
@@ -94,7 +94,7 @@ function editCodeMirror(id) {
         autofocus:true,
         mode: "properties",
         matchBrackets: true,
-        height: 200,
+        height: 150,
         width: 500,
         lint: true,
         tabMode: 'indent',
@@ -447,11 +447,17 @@ function loadData() {
                     },
                     {
                         targets: 2, render: function (data, type, full, meta) {
-                            if (full.status == "1") {
+                            var status=full.status;
+                            if (status == "4") {
                                 return "已发布";
-                            } else {
-                                return "<span style='color:red;font-weight: bold;'>未发布</span>";
+                            } else if (status==3){
+                                return "<span style='color:red;font-weight: bold;'>已删除</span>";
+                            } else if (status==2){
+                                return "<span style='color:red;font-weight: bold;'>已修改</span>";
+                            }else if (status==1){
+                                return "<span style='color:red;font-weight: bold;'>新增</span>";
                             }
+                            return "";
                         }
                     },
                     {
@@ -470,17 +476,23 @@ function loadData() {
                     },
                     {
                         targets:5, render: function (data, type, full, meta) {
-                            var html='<a class="btn btn-success btn-" onclick="publishById(\'' + full.id + '\')"><i class="glyphicon glyphicon-send"></i>发布 </a>';
-
-                            var html2= ""
-                                + '&nbsp;&nbsp;<a class="btn btn-success btn-" onclick="viewDiv(\'' + full.id + '\')"><i class="glyphicon glyphicon-eye-open"></i>查看 </a>'
-                                + '&nbsp;&nbsp;<a class="btn btn-success btn-" onclick="queryById(\'' + full.id + '\')"><i class="glyphicon glyphicon-edit"></i>修改 </a>'
-                                + '&nbsp;&nbsp;<a class="btn btn-warning btn-circle" onclick="showModal(\'' + full.id + '\',this)"> <i class="glyphicon glyphicon-trash"></i>删除</a>';
-                            if (full.status==0){
-                                return html+html2;
-                            }else{
-                                return html+html2;
+                            var status=full.status;
+                            var view='<a class="btn btn-success btn-" onclick="viewDiv(\'' + full.id + '\')"><i class="glyphicon glyphicon-eye-open"></i>查看 </a>';
+                            var edit='&nbsp;<a class="btn btn-success btn-" onclick="queryById(\'' + full.id + '\')"><i class="glyphicon glyphicon-edit"></i>修改 </a>';
+                            var del='&nbsp;<a class="btn btn-warning btn-circle" onclick="showModal(\'' + full.id + '\',this)"> <i class="glyphicon glyphicon-trash"></i>删除</a>';
+                            var undel='&nbsp;<a class="btn btn-warning btn-circle" onclick="unDel(\'' + full.id + '\',this)"> <i class="glyphicon glyphicon-star-empty"></i>撤销</a>';
+                            // var html='<a class="btn btn-success btn-" onclick="publishById(\'' + full.id + '\')"><i class="glyphicon glyphicon-send"></i>发布 </a>';
+                            var html="";
+                            if (status==3){
+                                html=view +undel;
                             }
+                            if (status==1 || status==4 ){
+                                html = view + edit +del;
+                            }
+                            if( status==2){
+                                html = view + edit;
+                            }
+                            return html;
                         }
                     }
                 ]
@@ -488,11 +500,52 @@ function loadData() {
             });
         },error: function (e) {
             loaded();
-            alert("网络错误，请重试！！");
+            alert("网络错误，请重试！");
         }
     });
 }
 
+function unDel(id) {
+    loading();
+    $.ajax({
+        url: "/system/unDel",
+        type: "post",
+        data: {"id": id},
+        dataType: "json",
+        success: function (data) {
+            loaded();
+            if (data.code == "0") {
+                loadData(true);
+            } else {
+                alert(data.msg);
+            }
+        },error:function () {
+            alert("网络请求失败")
+            loaded();
+        }
+    });
+}
+
+function releaseConfig() {
+    loading();
+    $.ajax({
+        url: "/system/releaseConfig",
+        type: "post",
+        data: {"envCode": $("#envCode").val() ,"appName":$("#appName").val()},
+        dataType: "json",
+        success: function (data) {
+            loaded();
+            if (data.code == "0") {
+                loadData(true);
+            } else {
+                alert(data.msg);
+            }
+        },error:function () {
+            alert("网络请求失败")
+            loaded();
+        }
+    });
+}
 
 
 

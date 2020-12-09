@@ -48,7 +48,7 @@ public class RandomRule extends AbstractLoadBalancerRule {
             int index = rand.nextInt(serverCount);
             server = allList.get(index);
             count++;
-            if (server != null && lb.getPing().isAlive(server,lb.enableLog())) {
+            if (server != null && lb.getPing().isAlive(server)) {
                 return (server);
             }
         }

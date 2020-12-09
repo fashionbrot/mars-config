@@ -23,16 +23,8 @@ public class MarsDataConfig {
 
     private String fileName;
 
-    private String version;
-
-    private String token;
-
-    private String parentPath;
+    private String fileType;
 
     private String content;
 
-    /**
-     * @see ConfigTypeEnum
-     */
-    private ConfigTypeEnum configType;
 }

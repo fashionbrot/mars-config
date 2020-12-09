@@ -1,5 +1,6 @@
 package com.github.fashionbrot.spring.value;
 
+import com.github.fashionbrot.spring.enums.ConfigTypeEnum;
 import com.github.fashionbrot.spring.event.MarsListenerEvent;
 import com.github.fashionbrot.spring.util.PropertiesSourceUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -92,10 +93,9 @@ public class MarsValueAnnotationBeanPostProcessor extends AbstractAnnotationInje
     @Override
     public void onApplicationEvent(MarsListenerEvent event) {
         String content = event.getContent();
-
         if (!StringUtils.isEmpty(content) ) {
-
-            Properties properties = PropertiesSourceUtil.toProperties( content, event.getDataConfig().getConfigType());
+            ConfigTypeEnum configTypeEnum = ConfigTypeEnum.valueTypeOf(event.getDataConfig().getFileType());
+            Properties properties = PropertiesSourceUtil.toProperties( content, configTypeEnum);
             if (properties==null || properties.isEmpty()){
                 log.info("MarsValue onApplicationEvent content toProperties is null content:{}",content);
                 return;

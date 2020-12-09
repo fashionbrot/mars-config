@@ -100,7 +100,7 @@ public class PropertyService  {
             throw new CurdException(RespCode.SAVE_ERROR);
         }
 
-        tableColumnDao.operateTableColumn(entity, OptionEnum.ADD);
+        //tableColumnDao.operateTableColumn(entity, OptionEnum.ADD);
     }
 
 
@@ -137,7 +137,7 @@ public class PropertyService  {
             throw new CurdException(RespCode.UPDATE_ERROR);
         }
 
-        String tableName = entity.getAppName()+"_"+entity.getTemplateKey();
+       /* String tableName = entity.getAppName()+"_"+entity.getTemplateKey();
         List<PropertyEntity> list=new ArrayList<>(2);
         list.add(entity);
         if (StringUtils.isNotEmpty(byId.getVariableKey()) && StringUtils.isEmpty(entity.getVariableKey())){
@@ -148,7 +148,7 @@ public class PropertyService  {
                     .build();
             list.add(p);
         }
-        tableColumnDao.editTableColumn(tableName,list, OptionEnum.MODIFY);
+        tableColumnDao.editTableColumn(tableName,list, OptionEnum.MODIFY);*/
     }
 
 
@@ -186,7 +186,7 @@ public class PropertyService  {
             throw new CurdException(RespCode.DELETE_ERROR);
         }
 
-        String tableName = byId.getAppName()+"_"+byId.getTemplateKey();
+        /*String tableName = byId.getAppName()+"_"+byId.getTemplateKey();
         List<PropertyEntity> list=new ArrayList<>(2);
         list.add(byId);
         if (StringUtils.isNotEmpty(byId.getVariableKey()) ){
@@ -196,7 +196,7 @@ public class PropertyService  {
                     .build();
             list.add(p);
         }
-        tableColumnDao.editTableColumn(tableName,list, OptionEnum.DROP);
+        tableColumnDao.editTableColumn(tableName,list, OptionEnum.DROP);*/
     }
 
 
@@ -247,7 +247,7 @@ public class PropertyService  {
             propertyDao.saveBatch(list);
 
 
-            String tableName = appName+"_"+templateKey;
+           /* String tableName = appName+"_"+templateKey;
             List<PropertyEntity> propertyList =new ArrayList<>();
 
             for(PropertyEntity pp : list){
@@ -262,7 +262,7 @@ public class PropertyService  {
                     propertyList.add(p);
                 }
             }
-            tableColumnDao.editTableColumn(tableName,propertyList,OptionEnum.ADD);
+            tableColumnDao.editTableColumn(tableName,propertyList,OptionEnum.ADD);*/
         }
     }
 

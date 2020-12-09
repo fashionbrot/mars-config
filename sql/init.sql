@@ -85,23 +85,19 @@ CREATE TABLE `system_config_info` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `app_name` varchar(32) NOT NULL COMMENT '应用名称',
   `env_code` varchar(32) NOT NULL COMMENT '环境code',
-  `creator` varchar(32) NOT NULL COMMENT '创建人',
   `modifier` varchar(32) DEFAULT NULL COMMENT '修改人',
   `file_name` varchar(32) NOT NULL COMMENT '文件名称',
   `file_desc` varchar(1000) DEFAULT NULL COMMENT '文件描述',
   `file_type` varchar(16) NOT NULL DEFAULT '5' COMMENT '文件类型 TEXT JSON XML YAML HTML Properties',
-  `json` text NOT NULL COMMENT '配置文件内容',
-  `status` int(2) NOT NULL DEFAULT '0' COMMENT '发布状态 1已发布 0未发布',
-  `version` varchar(32) NOT NULL COMMENT 'version',
-  `create_id` bigint(11) NOT NULL COMMENT '创建者id',
+  `json` text DEFAULT NULL COMMENT '配置文件内容',
+  `temp_json` text DEFAULT NULL COMMENT '临时数据',
+  `status` tinyint(2) NOT NULL DEFAULT '0' COMMENT '状态 1新增 2更新 3删除 4已发布',
   `create_date` datetime NOT NULL COMMENT '创建时间',
-  `update_id` bigint(11) DEFAULT NULL COMMENT '最近更新者id',
   `update_date` datetime DEFAULT NULL COMMENT '最近更新时间',
-  `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
   PRIMARY KEY (`id`),
   KEY `idx_envcode_appname` (`env_code`,`app_name`) USING BTREE
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='应用系统配置表';
-ALTER TABLE system_config_info ADD INDEX index_del_flag (del_flag);
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='应用系统配置表';
+
 
 
 DROP TABLE IF EXISTS `system_config_history`;
@@ -114,15 +110,13 @@ CREATE TABLE `system_config_history` (
   `json` text DEFAULT NULL COMMENT '配置文件内容-修改前',
   `pre_json` text DEFAULT NULL COMMENT '配置文件内容-修改后',
   `operation_type` int(2) unsigned NOT NULL COMMENT '操作类型',
+  `file_type` varchar(32) NOT NULL COMMENT '文件类型',
   `modifier` varchar(32) DEFAULT NULL COMMENT '修改人',
-  `create_id` bigint(11) NOT NULL COMMENT '创建者id',
   `create_date` datetime NOT NULL COMMENT '创建时间',
-  `update_id` bigint(11) DEFAULT NULL COMMENT '最近更新者id',
-  `update_date` datetime DEFAULT NULL COMMENT '最近更新时间',
   `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
   PRIMARY KEY (`id`),
   KEY `idx_envcode_appname` (`env_code`,`app_name`) USING BTREE
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='应用系统配置历史表';
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='应用系统配置历史表';
 ALTER TABLE system_config_history ADD INDEX index_del_flag (del_flag);
 
 
@@ -238,7 +232,7 @@ INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id
 INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id`, `priority`, `code`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`) VALUES ('54', '配置数据管理', '1', '', '0', '700', '', '1', '2020-10-18 00:07:29', '1', '2020-10-18 00:07:40', '0');
 INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id`, `priority`, `code`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`) VALUES ('55', '配置数据列表', '2', '/admin/config/value/index', '54', '701', '', '1', '2020-10-18 00:08:06', NULL, NULL, '0');
 INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id`, `priority`, `code`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`) VALUES ('56', '环境变量列表', '2', '/admin/variable/index', '51', '690', '', '1', '2020-10-13 10:39:43', NULL, NULL, '0');
-INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id`, `priority`, `code`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`) VALUES ('57', '配置数据记录', '2', '/admin/config/record/index', '55', '800', '', '1', '2020-10-14 17:14:49', '1', '2020-10-22 17:27:04', '0');
+INSERT INTO `menu` (`id`, `menu_name`, `menu_level`, `menu_url`, `parent_menu_id`, `priority`, `code`, `create_id`, `create_date`, `update_id`, `update_date`, `del_flag`) VALUES ('57', '配置数据记录', '2', '/admin/config/record/index', '54', '800', '', '1', '2020-10-14 17:14:49', '1', '2020-10-22 17:27:04', '0');
 
 
 
@@ -273,7 +267,7 @@ CREATE TABLE `property` (
   `create_date` datetime NOT NULL COMMENT '创建时间',
   `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='属性表';
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='属性表';
 
 INSERT INTO `property` (`column_length`,`property_name`, `property_key`, `property_type`, `label_type`, `label_value`, `app_name`, `variable_key`, `template_key`, `attribute_type`, `create_id`, `create_date`,  `del_flag`, `priority`) VALUES (64, '标题', 'title', 'varchar', 'input', '', '-1', '', '-1', '1', '1', '2020-10-14 14:56:59', '0', '1');
 INSERT INTO `property` (`column_length`,`property_name`, `property_key`, `property_type`, `label_type`, `label_value`, `app_name`, `variable_key`, `template_key`, `attribute_type`, `create_id`, `create_date`, `del_flag`, `priority`) VALUES (0,'开始时间', 'startDate', 'datetime', 'input', '', '-1', '', '-1', '0', '1', '2020-10-14 14:58:03', '0', '2');
@@ -324,15 +318,18 @@ CREATE TABLE `config_value` (
   `status` tinyint(2) NOT NULL DEFAULT '0' COMMENT '状态 1开启 0关闭',
   `description` varchar(255) DEFAULT NULL COMMENT '描述',
   `priority` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '优先级',
-  `release_status` tinyint(1) DEFAULT '0' COMMENT '发布状态 1发布 0未发布',
+  `release_status` tinyint(1) DEFAULT '0' COMMENT '发布状态 1已发布 0修改 2已删除 3新增',
   `user_name` varchar(32) DEFAULT NULL COMMENT '用户名',
+  `json` text DEFAULT NULL COMMENT '实例json',
+  `temp_json` text DEFAULT NULL COMMENT 'temp json',
   `create_id` bigint(11) NOT NULL COMMENT '创建者id',
   `create_date` datetime NOT NULL COMMENT '创建时间',
   `update_id` bigint(11) DEFAULT NULL COMMENT '最近更新者id',
   `update_date` datetime DEFAULT NULL COMMENT '最近更新时间',
   `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='配置数据表';
+  PRIMARY KEY (`id`),
+  KEY `index_eat` (`env_code`,`app_name`,`template_key`) USING BTREE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='配置数据表';
 
 
 
@@ -342,8 +339,8 @@ CREATE TABLE `config_record` (
   `app_name` varchar(32) NOT NULL COMMENT '应用名',
   `template_key` varchar(32) NOT NULL COMMENT '模板key',
   `config_id` bigint(11) DEFAULT  NULL COMMENT '配置id',
-  `json` text NOT NULL COMMENT '实例json',
-  `new_json` text NOT NULL COMMENT '实例json',
+  `json` text DEFAULT NULL COMMENT '实例json',
+  `new_json` text DEFAULT NULL COMMENT '实例json',
   `user_name` varchar(32) DEFAULT NULL COMMENT '用户名',
   `operation_type` tinyint(1) DEFAULT '0' COMMENT '操作类型 2编辑 3:删除',
   `description` varchar(255) DEFAULT NULL COMMENT '描述',
@@ -351,7 +348,7 @@ CREATE TABLE `config_record` (
   `create_date` datetime NOT NULL COMMENT '创建时间',
   `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='配置数据记录表';
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='配置数据记录表';
 
 
 
@@ -370,3 +367,25 @@ CREATE TABLE `value_data` (
   `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='导入导出记录表';
+
+CREATE TABLE `config_release` (
+  `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `env_code` varchar(32) NOT NULL COMMENT '环境code',
+  `app_name` varchar(32) NOT NULL COMMENT '应用名',
+  `template_keys` varchar(255) DEFAULT NULL COMMENT '模板keys',
+  `update_date` datetime DEFAULT NULL COMMENT '最近更新时间',
+  `release_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
+  PRIMARY KEY (`id`),
+  KEY `index_envCode_appName` (`env_code`,`app_name`) USING BTREE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='配置数据发布表';
+
+CREATE TABLE `system_release` (
+  `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `env_code` varchar(32) NOT NULL COMMENT '环境code',
+  `app_name` varchar(32) NOT NULL COMMENT '应用名',
+  `files` varchar(255) DEFAULT NULL COMMENT '模板keys',
+  `update_date` datetime DEFAULT NULL COMMENT '最近更新时间',
+  `release_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志位 1删除 0未删除',
+  PRIMARY KEY (`id`),
+  KEY `index_envCode_appName` (`env_code`,`app_name`) USING BTREE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='系统配置发布表';

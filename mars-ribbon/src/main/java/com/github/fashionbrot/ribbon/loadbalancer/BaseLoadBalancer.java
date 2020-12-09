@@ -1,10 +1,12 @@
 package com.github.fashionbrot.ribbon.loadbalancer;
 
+import com.github.fashionbrot.ribbon.enums.SchemeEnum;
 import com.github.fashionbrot.ribbon.ping.IPing;
 import com.github.fashionbrot.ribbon.ping.PingUrl;
 import com.github.fashionbrot.ribbon.rule.IRule;
 import com.github.fashionbrot.ribbon.rule.RoundRobinRule;
 import com.github.fashionbrot.ribbon.util.CollectionUtil;
+import com.github.fashionbrot.ribbon.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -30,9 +32,6 @@ public class BaseLoadBalancer  implements ILoadBalancer {
 
     protected IPing ping = new PingUrl();
 
-    protected boolean enableLog = false;
-
-
     @Override
     public void addServers(List<Server> newServers) {
         if (CollectionUtil.isNotEmpty(newServers)){
@@ -43,6 +42,28 @@ public class BaseLoadBalancer  implements ILoadBalancer {
         }
     }
 
+    @Override
+    public void setServer(String serverAddress,String healthUrl) {
+
+        String[] server = serverAddress.split(",");
+        List<Server> serverList = new ArrayList<>(server.length);
+        if (StringUtil.isNotEmpty(serverAddress)) {
+            for (String s : server) {
+                String[] svr = s.split(":");
+                int port = 80;
+                if (svr.length == 2) {
+                    port = StringUtil.parseInteger(svr[1], 80);
+                }
+                serverList.add(Server.builder()
+                        .host(svr[0].replaceAll("https://", "").replaceAll("http://", ""))
+                        .scheme(svr[0].startsWith("https") ? SchemeEnum.HTTPS : SchemeEnum.HTTP)
+                        .port(port)
+                        .path(healthUrl)
+                        .build());
+            }
+            this.addServers(serverList);
+        }
+    }
 
     @Override
     public List<Server> getAllServers() {
@@ -85,15 +106,6 @@ public class BaseLoadBalancer  implements ILoadBalancer {
         return this.ping;
     }
 
-    @Override
-    public boolean enableLog() {
-        return this.enableLog;
-    }
-
-    @Override
-    public void setEnableLog(boolean enableLog) {
-        this.enableLog = enableLog;
-    }
 
 
     /**

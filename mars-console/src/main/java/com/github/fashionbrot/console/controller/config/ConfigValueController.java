@@ -43,6 +43,7 @@ public class ConfigValueController {
         return "/value/index";
     }
 
+
     @ApiOperation("数据列表—分页")
     @GetMapping("/page")
     @ResponseBody
@@ -84,11 +85,20 @@ public class ConfigValueController {
         configValueService.updateById(entity);
         return RespVo.success();
     }
+
     @ApiOperation("根据id删除")
     @PostMapping("/deleteById")
     @ResponseBody
     public RespVo deleteById(Long id){
         configValueService.deleteById(id);
+        return RespVo.success();
+    }
+
+    @ApiOperation("撤销删除")
+    @PostMapping("/unDeleteById")
+    @ResponseBody
+    public RespVo unDeleteById(Long id){
+        configValueService.unDeleteById(id);
         return RespVo.success();
     }
 
@@ -101,5 +111,12 @@ public class ConfigValueController {
         return RespVo.success();
     }
 
+    @ApiOperation("发布")
+    @PostMapping("/release")
+    @ResponseBody
+    public RespVo release(ConfigValueReq req){
+        configValueService.release(req);
+        return RespVo.success();
+    }
 
 }

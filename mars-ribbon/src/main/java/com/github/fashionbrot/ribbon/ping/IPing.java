@@ -16,7 +16,7 @@ public interface IPing {
      * considered a candidate while loadbalancing
      *
      */
-    boolean isAlive(Server server,boolean enableLog);
+    boolean isAlive(Server server);
 
 
 

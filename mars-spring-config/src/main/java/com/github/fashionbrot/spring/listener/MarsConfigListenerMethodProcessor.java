@@ -59,20 +59,16 @@ public class MarsConfigListenerMethodProcessor extends AbstractAnnotationListene
 
     private void invokeMethod(MarsListenerSourceTarget target){
         String fileName = target.getListener().fileName();
-        ConfigTypeEnum type = target.getListener().type();
+        ConfigTypeEnum type = ConfigTypeEnum.PROPERTIES;
         Class<?>[] parameterTypes = target.getMethod().getParameterTypes();
         if (parameterTypes.length!=1){
             log.error(" processListenerMethod invokeMethod target method parameterType can not be empty ");
             return;
         }
-        Class parameterType = Properties.class ;
-        if (target.getListener().type() == ConfigTypeEnum.TEXT){
-            parameterType =  String.class;
+        if (parameterTypes[0]  == String.class){
+            type =  ConfigTypeEnum.TEXT;
         }
-        if (parameterTypes[0] != parameterType){
-            log.error(" processListenerMethod invokeMethod target method parameterType Parameter type mismatch ");
-            return;
-        }
+
         MarsPropertySource marsPropertySource = (MarsPropertySource) environment.getPropertySources().get(ApiConstant.NAME+target.getListener().fileName());
         if (marsPropertySource!=null) {
             try {

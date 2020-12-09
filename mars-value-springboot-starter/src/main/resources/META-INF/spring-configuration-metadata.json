@@ -1,0 +1,44 @@
+{
+  "hints": [],
+  "groups": [
+    {
+      "sourceType": "com.github.fashionbrot.value.MarsConfigValueConfigurationProperties",
+      "name": "mars.value",
+      "type": "com.github.fashionbrot.value.MarsConfigValueConfigurationProperties"
+    }
+  ],
+  "properties": [
+    {
+      "sourceType": "com.github.fashionbrot.value.MarsConfigValueConfigurationProperties",
+      "name": "mars.value.app-id",
+      "description": "应用id",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.github.fashionbrot.value.MarsConfigValueConfigurationProperties",
+      "defaultValue": false,
+      "name": "mars.value.enable-listen-log",
+      "description": "轮训日志是否开启",
+      "type": "java.lang.Boolean"
+    },
+    {
+      "sourceType": "com.github.fashionbrot.value.MarsConfigValueConfigurationProperties",
+      "name": "mars.value.env-code",
+      "description": "环境code",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.github.fashionbrot.value.MarsConfigValueConfigurationProperties",
+      "defaultValue": 5000,
+      "name": "mars.value.listen-long-poll-ms",
+      "description": "客户端轮训毫秒数",
+      "type": "java.lang.Long"
+    },
+    {
+      "sourceType": "com.github.fashionbrot.value.MarsConfigValueConfigurationProperties",
+      "name": "mars.value.server-address",
+      "description": "服务器地址 多个逗号分隔",
+      "type": "java.lang.String"
+    }
+  ]
+}

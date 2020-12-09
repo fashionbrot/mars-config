@@ -1,9 +1,6 @@
 package com.github.fashionbrot.dao.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,18 +18,22 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SystemConfigInfo extends BaseEntity {
+public class SystemConfigInfo {
 
+    @TableId(type = IdType.AUTO)
+    private Long id;
 
+    @TableField(value="create_date",fill = FieldFill.INSERT)
+    private Date createDate;
+
+    @TableField(value = "update_date",fill = FieldFill.UPDATE)
+    private Date updateDate;
 
     @TableField(value = "env_code")
     private String envCode;
 
     @TableField(value = "app_name")
     private String appName;
-
-    @TableField(value = "creator")
-    private String creator;
 
     @TableField(value = "modifier")
     private String modifier;
@@ -46,6 +47,8 @@ public class SystemConfigInfo extends BaseEntity {
     @TableField("json")
     private String json;
 
+    @TableField("temp_json")
+    private String tempJson;
     /**
      * 文件类型 TEXT YAML  Properties
      */
@@ -53,10 +56,7 @@ public class SystemConfigInfo extends BaseEntity {
     private String fileType;
 
     @TableField(value = "status")
-    private int status;
-
-    @TableField(value = "version")
-    private String version;
+    private Integer status;
 
     private transient Long roleId;
 

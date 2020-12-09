@@ -13,6 +13,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.fashionbrot.springboot</groupId>
     <artifactId>springboot-test</artifactId>
+    <version>0.0.1</version>
 
     <dependencies>
         <dependency>
@@ -32,8 +33,14 @@
 
         <dependency>
             <groupId>com.github.fashionbrot</groupId>
-            <artifactId>mars-spring-config</artifactId>
-            <version>0.1.1</version>
+            <artifactId>mars-config-springboot-starter</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.fashionbrot</groupId>
+            <artifactId>mars-value-springboot-starter</artifactId>
+            <version>0.1.0</version>
         </dependency>
 
         <dependency>

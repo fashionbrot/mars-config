@@ -76,7 +76,7 @@ public class SystemConfigRoleRelationDao {
         if (!CollectionUtils.isEmpty(ids)) {
             queryWrapper.notIn("id", ids);
         }
-        List<SystemConfigInfo> list = systemConfigDao.queryAll(queryWrapper);
+        List<SystemConfigInfo> list = systemConfigDao.list(queryWrapper);
         if (CollectionUtils.isEmpty(list)){
             return 1;
         }

@@ -6,11 +6,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.fashionbrot.common.enums.DateEnum;
 import com.github.fashionbrot.common.req.ConfigValueReq;
 import com.github.fashionbrot.common.util.DateUtil;
+import com.github.fashionbrot.common.vo.ConfigValueVo;
 import com.github.fashionbrot.dao.dao.ConfigValueDao;
 import com.github.fashionbrot.dao.dao.TableColumnDao;
+import com.github.fashionbrot.dao.dto.ConfigValueDto;
 import com.github.fashionbrot.dao.entity.ConfigValueEntity;
 import com.github.fashionbrot.dao.entity.PropertyEntity;
 import com.github.fashionbrot.dao.mapper.ConfigValueMapper;
+import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,9 +31,13 @@ public class ConfigValueDaoImpl  extends ServiceImpl<ConfigValueMapper, ConfigVa
     private TableColumnDao tableColumnDao;
 
 
+    @Override
+    public int updateDelete(Long id) {
+        return configValueMapper.updateDelete(id);
+    }
 
     @Override
-    public    List<Map<String,Object>> configValueList(ConfigValueReq req) {
+    public    List<ConfigValueEntity> configValueList(ConfigValueReq req) {
         return configValueMapper.configValueList(req);
     }
 
@@ -38,9 +45,9 @@ public class ConfigValueDaoImpl  extends ServiceImpl<ConfigValueMapper, ConfigVa
     public ConfigValueEntity queryById(Long id) {
         ConfigValueEntity entity = configValueMapper.selectById(id);
         if (entity!=null){
-            entity.setTableName(entity.getAppName()+"_"+entity.getTemplateKey());
+            /*entity.setTableName(entity.getAppName()+"_"+entity.getTemplateKey());
             Map<String, Object> map = tableColumnDao.selectTable(entity);
-            entity.setValue(map);
+            entity.setValue(map);*/
         }
         return entity;
     }
@@ -85,5 +92,13 @@ public class ConfigValueDaoImpl  extends ServiceImpl<ConfigValueMapper, ConfigVa
         }
     }
 
+    @Override
+    public List<ConfigValueVo> selectByJson(Map<String,Object> map) {
+        return configValueMapper.selectByJson( map);
+    }
 
+    @Override
+    public void updateRelease(ConfigValueDto dto) {
+        configValueMapper.updateRelease(dto);
+    }
 }

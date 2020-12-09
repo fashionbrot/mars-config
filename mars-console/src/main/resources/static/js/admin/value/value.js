@@ -162,6 +162,28 @@ var userInfoDel = function () {
 
 }
 
+function unDel(id) {
+
+    loading();
+    $.ajax({
+        url: "../admin/config/value/unDeleteById",
+        type: "post",
+        data: {"id": id},
+        dataType: "json",
+        success: function (data) {
+            loaded();
+            if (data.code == "0") {
+                loadData(true);
+            } else {
+                alert(data.msg);
+            }
+        }
+    });
+
+
+}
+
+
 
 
 var queryByUserId = function (id) {
@@ -202,7 +224,7 @@ var queryByUserId = function (id) {
                 $("#editEndTime").val('');
             }
 
-            loadPropertyAttrDiv("editPropertyDiv",data.templateKey,data.appName,"editPropertyClass",data.value,false,false);
+            loadPropertyAttrDiv("editPropertyDiv",data.templateKey,data.appName,"editPropertyClass",data.json,false,false);
 
             $("#editTemplateKey").on("change",function () {
                 var templateKey =$("#editTemplateKey").val();
@@ -338,7 +360,7 @@ function loadDataEnvAndApp(envCode,appName,templateKey,description) {
                     width : "20px",
                     className : "text-center",
                     render :dataTableConfig.DATA_TABLES.RENDER.ELLIPSIS
-                },{
+                },/*{
                     data : 'id',
                     bSortable : true,
                     width : "20px",
@@ -378,7 +400,7 @@ function loadDataEnvAndApp(envCode,appName,templateKey,description) {
                         }
                         return html;
                     }
-                },
+                },*/
                 {
                     data : 'description',
                     bSortable : true,
@@ -392,20 +414,24 @@ function loadDataEnvAndApp(envCode,appName,templateKey,description) {
                         }
                     }
                 },{
-                    data : 'releaseType',
+                    data : 'releaseStatus',
                     bSortable : true,
                     width : "20px",
                     className : "text-center",
                     render :function (data, type, full, meta) {
-                        if (full.releaseType == "1") {
-                            return "已发布";
-                        } else {
-                            return "<span style='color:red;font-weight: bold;'>未发布</span>";
+                        if (data == "1") {
+                            return "<span style='color:dodgerblue;font-weight: bold;'>已发布</span>";
+                        } else if (data==0){
+                            return "<span style='color:red;font-weight: bold;'>已修改</span>";
+                        }else if (data==2){
+                            return "<span style='color:red;font-weight: bold;'>已删除</span>";
+                        }else if (data==3){
+                            return "<span style='color:red;font-weight: bold;'>新增</span>";
                         }
                     }
                 },
                 {
-                    data : 'user_name',
+                    data : 'userName',
                     bSortable : true,
                     width : "20px",
                     className : "text-center",
@@ -428,8 +454,16 @@ function loadDataEnvAndApp(envCode,appName,templateKey,description) {
                     visible: true,
                     width : '130px',
                     render: function (data, type, full) {
-                        return '<a class="btn btn-success btn-" onclick="queryByUserId(\'' + full.config_id + '\')"><i class="glyphicon glyphicon-edit"></i>修改</a>'
-                            + '&nbsp;&nbsp;<a class="btn btn-warning btn-circle" onclick="showModal(\'' + full.config_id + '\',this)"> <i class="glyphicon glyphicon-trash"></i>删除</a>';
+                        var releaseStatus= full.releaseStatus;
+                        if(releaseStatus==0 || releaseStatus==3){
+                            return '<a class="btn btn-success btn-" onclick="queryByUserId(\'' + full.id + '\')"><i class="glyphicon glyphicon-edit"></i>修改</a>';
+                        }else if (releaseStatus==2){
+                            return '<a class="btn btn-success btn-" onclick="unDel(\'' + full.id + '\')"><i class="glyphicon glyphicon-star-empty"></i>撤销</a>';
+                        }else{
+                            return '<a class="btn btn-success btn-" onclick="queryByUserId(\'' + full.id + '\')"><i class="glyphicon glyphicon-edit"></i>修改</a>'
+                                + '&nbsp;&nbsp;<a class="btn btn-warning btn-circle" onclick="showModal(\'' + full.id + '\',this)"> <i class="glyphicon glyphicon-trash"></i>删除</a>';
+                        }
+
                     }
                 }
             ]
@@ -509,29 +543,27 @@ function releaseConfig(releaseType) {
         alert("请选择应用");
         return false;
     }
-
+    releaseType=0;
     var tempalteText="";
     if(releaseType==1){
         tempalteText="-《已修改》模板";
     }else if(releaseType==0){
         tempalteText="-《全部》模板";
     }
-    var res = confirm("您确定要发布<"+$("#envCode option:selected").text()+">-<"+$("#appName option:selected").text()+"项目> "+tempalteText+" 吗?");
+    var res = confirm("您确定要发布<"+$("#envCode option:selected").text()+">-<"+$("#appName option:selected").text().trim()+"项目> "+tempalteText+" 吗?");
 
     if(res == true){
         loading();
         $.ajax({
-            url: "../release/release",
+            url: "/admin/config/value/release",
             type: "post",
             dataType: "json",
             data: {envCode: envCode, appName: appName,releaseType:releaseType},
             success: function (data) {
-
+                loaded();
                 if(data.code==0){
-                    loaded();
-                    alert("发布成功");
+                    loadData();
                 }else{
-                    loaded();
                     alert(data.msg);
                 }
             }

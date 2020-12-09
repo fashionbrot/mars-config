@@ -29,15 +29,10 @@ public class GlobalMarsProperties {
      * server ip:port  separator[,]
      */
     private String serverAddress;
-
     /**
      * listen long poll timeout
      */
     private long listenLongPollMs;
-    /**
-     * listen long poll enabled
-     */
-    boolean enableErrorLog;
 
     private boolean enableLocalCache;
 

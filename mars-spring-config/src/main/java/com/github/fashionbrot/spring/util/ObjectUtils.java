@@ -1,12 +1,14 @@
 package com.github.fashionbrot.spring.util;
 
 import com.github.fashionbrot.spring.properties.annotation.MarsIgnoreField;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Map;
 
+@Slf4j
 public  class ObjectUtils {
 
     public static void cleanMapOrCollectionField(final Object bean) {
@@ -78,4 +80,14 @@ public  class ObjectUtils {
     }
 
 
+    public static long parseLong(String content) {
+        if (isNotEmpty(content)){
+            try {
+                return Long.valueOf(content);
+            }catch (Exception e){
+                return 0L;
+            }
+        }
+        return 0L;
+    }
 }

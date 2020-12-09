@@ -1,9 +1,6 @@
 package com.github.fashionbrot.dao.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,8 +18,13 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SystemConfigHistoryInfo extends BaseEntity{
+public class SystemConfigHistoryInfo {
 
+    @TableId(type = IdType.AUTO)
+    private Long id;
+
+    @TableField(value="create_date",fill = FieldFill.INSERT)
+    private Date createDate;
 
     @TableField(value = "file_id")
     private Long fileId;
@@ -35,11 +37,14 @@ public class SystemConfigHistoryInfo extends BaseEntity{
 
     @TableField(value = "app_name")
     private String appName;
-
+    /**
+     * 文件类型 TEXT YAML  Properties
+     */
+    @TableField(value = "file_type")
+    private String fileType;
 
     @TableField(value = "modifier")
     private String modifier;
-
 
     @TableField(value = "pre_json")
     private String preJson;

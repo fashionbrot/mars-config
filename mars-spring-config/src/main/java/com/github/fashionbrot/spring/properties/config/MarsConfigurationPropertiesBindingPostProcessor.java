@@ -63,8 +63,7 @@ public class MarsConfigurationPropertiesBindingPostProcessor implements BeanPost
 
         MarsConfigurationPropertiesBinder binder;
         try {
-            binder = applicationContext
-                    .getBean(MarsConfigurationPropertiesBinder.BEAN_NAME, MarsConfigurationPropertiesBinder.class);
+            binder = applicationContext.getBean(MarsConfigurationPropertiesBinder.BEAN_NAME, MarsConfigurationPropertiesBinder.class);
             if (binder == null) {
                 binder = new MarsConfigurationPropertiesBinder(applicationContext);
             }

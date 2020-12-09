@@ -9,7 +9,7 @@ spring:
         enabled: true
         encoding: UTF-8
         mode: LEGACYHTML5
-        prefix: classpath:/templates/
+        prefix: classpath:/templates
         servlet:
             content-type: text/html
         suffix: .html

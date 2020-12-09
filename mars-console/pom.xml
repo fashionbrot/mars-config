@@ -5,16 +5,14 @@
     <parent>
         <artifactId>mars-config</artifactId>
         <groupId>com.github.fashionbrot</groupId>
-        <version>0.1.0</version>
+        <version>2.0.0</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
 
+    <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.fashionbrot</groupId>
     <artifactId>mars-console</artifactId>
-    <packaging>war</packaging>
-    <properties>
-        <profiles.dir>src/profiles</profiles.dir>
-    </properties>
+    <packaging>jar</packaging>
+
 
     <dependencies>
         <dependency>
@@ -80,7 +78,6 @@
                 <filtering>false</filtering>
             </resource>
         </resources>
-
     </build>
 
 </project>

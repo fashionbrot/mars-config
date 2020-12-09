@@ -7,8 +7,11 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.fashionbrot.common.enums.DateEnum;
 import com.github.fashionbrot.common.req.ConfigValueReq;
 import com.github.fashionbrot.common.util.DateUtil;
+import com.github.fashionbrot.common.vo.ConfigValueVo;
+import com.github.fashionbrot.dao.dto.ConfigValueDto;
 import com.github.fashionbrot.dao.entity.ConfigValueEntity;
 import com.github.fashionbrot.dao.entity.PropertyEntity;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
@@ -25,12 +28,17 @@ import java.util.Map;
 
 public interface ConfigValueDao extends IService<ConfigValueEntity> {
 
+    int updateDelete(Long id);
 
-    List<Map<String,Object>> configValueList(ConfigValueReq req);
+    List<ConfigValueEntity> configValueList(ConfigValueReq req);
 
     ConfigValueEntity queryById(Long id);
 
     void formatDate(List<PropertyEntity> list, Map<String, Object> map);
 
     void formatDate(List<PropertyEntity> list, Map.Entry<String, Object> map, String column);
+
+    List<ConfigValueVo> selectByJson(Map<String,Object> map);
+
+    void updateRelease(ConfigValueDto dto);
 }

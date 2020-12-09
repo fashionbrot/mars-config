@@ -7,6 +7,7 @@ import com.github.fashionbrot.common.vo.RespVo;
 import com.github.fashionbrot.core.service.SystemConfigService;
 import com.github.fashionbrot.dao.entity.SystemConfigHistoryInfo;
 import com.github.fashionbrot.dao.entity.SystemConfigInfo;
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,6 +60,23 @@ public class SystemConfigController  {
     @MarsPermission("config:list:del")
     public RespVo deleteById(Long id) {
         systemConfigFacade.deleteById(id);
+        return RespVo.success();
+    }
+
+
+    @RequestMapping(value = "unDel")
+    @ResponseBody
+    //@MarsPermission("config:list:unDel")
+    public RespVo unDel(Long id) {
+        systemConfigFacade.unDel(id);
+        return RespVo.success();
+    }
+
+    @RequestMapping(value = "releaseConfig")
+    @ResponseBody
+    //@MarsPermission("config:list:releaseConfig")
+    public RespVo releaseConfig(SystemConfigInfo req) {
+        systemConfigFacade.releaseConfig(req);
         return RespVo.success();
     }
 
