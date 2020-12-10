@@ -196,7 +196,7 @@ public class ConfigValueController extends  MarsTemplateKeyMapping{
     public List test3(String templateKey){
 
         //通过 MarsConfigValueCache.getTemplateObject 方式获取， templatekey 是模块key
-        //getDeepTemplateObject 浅copy，会污染上层数据
+        //getTemplateObject 浅copy，会污染上层数据
         List list = MarsConfigValueCache.getTemplateObject(templateKey);
         return list;
     }
