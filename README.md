@@ -53,22 +53,17 @@ mars.cluster.sync.retry=3
 |mars.config.local-cache-path|本地缓存路径(默认user.home)|否|
 |mars.config.enable-error-log|是否开启http轮询访问日志|否|
 
-#### 3、【客户端】spring 需要注解启动（springboot|springcloud 不需要） @EnableMarsConfig
+#### 3、【客户端】spring 需要@EnableMarsConfig注解启动（springboot|springcloud 不需要） 
 ```java
-import EnableMarsConfig;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+package com.github.fashionbrot.springboot.config;
+import com.github.fashionbrot.spring.config.annotation.EnableMarsConfig;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
-//在启动类上使用 @EnableMarsConfig 开启系统配置功能使用
+@Component
+@Configuration
 @EnableMarsConfig
-public class Main  extends SpringBootServletInitializer {
-
-    public static void main(String[] args) {
-        SpringApplication.run(Main.class, args);
-    }
+public class SpringConfig {
 }
 ```
 
@@ -143,22 +138,21 @@ public class TestConfig {
 |mars.value.listen-long-poll-ms|客户端轮训毫秒数（默认10000）|否|
 |mars.value.enable-listen-log|轮训日志是否开启|否|
 
-#### 3、【客户端】spring 需要注解启动（springboot|springcloud 不需要） @EnableMarsConfig
+#### 3、【客户端】spring 需要@EnableMarsValue注解启动（springboot|springcloud 不需要） 
 ```java
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+package com.github.fashionbrot.springboot.config;
+import com.github.fashionbrot.value.config.annotation.EnableMarsValue;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
-//在启动类上使用 @EnableMarsValue 开启系统配置功能使用
+@Component
+@Configuration
 @EnableMarsValue
-public class Main  extends SpringBootServletInitializer {
-    public static void main(String[] args) {
-        SpringApplication.run(Main.class, args);
-    }
+public class SpringConfigValue {
+    
 }
 ```
+
 
 #### 4、使用系统配置
 ###### (1)、【后端系统】应用环境管理 菜单 创建 应用、环境
