@@ -17,11 +17,11 @@ import java.util.Properties;
  * @date 2019/12/10 0:01
  */
 @Slf4j
-public class DefaultPropertiesSourceFactory implements MarsPropertySourceFactory{
+public class PropertiesSourceParse implements SourceParse{
 
 
     @Override
-    public Properties createPropertySource(String context) {
+    public Properties parse(String context) {
         Properties properties = new Properties();
         try {
             if (StringUtils.hasText(context)) {
@@ -45,8 +45,8 @@ public class DefaultPropertiesSourceFactory implements MarsPropertySourceFactory
     }
 
     @Override
-    public String sourceType() {
-        return ConfigTypeEnum.PROPERTIES.getType();
+    public ConfigTypeEnum sourceType() {
+        return ConfigTypeEnum.PROPERTIES;
     }
 
 

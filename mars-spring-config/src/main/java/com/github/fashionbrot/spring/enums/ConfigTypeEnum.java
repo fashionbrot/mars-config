@@ -29,7 +29,11 @@ public enum ConfigTypeEnum {
     /**
      * config type is "yaml"
      */
-    YAML("yaml");
+    YAML("yaml"),
+
+    CONF("conf"),
+
+    NONE("");
 
     String type;
 

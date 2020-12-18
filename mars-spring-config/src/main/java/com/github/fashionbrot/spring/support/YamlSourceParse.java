@@ -3,7 +3,6 @@ package com.github.fashionbrot.spring.support;
 
 import com.github.fashionbrot.ribbon.util.CollectionUtil;
 import com.github.fashionbrot.spring.enums.ConfigTypeEnum;
-import com.github.fashionbrot.spring.exception.CreatePropertySourceException;
 import com.github.fashionbrot.spring.util.YamlParser;
 import lombok.extern.slf4j.Slf4j;
 import org.yaml.snakeyaml.Yaml;
@@ -21,11 +20,11 @@ import java.util.*;
  */
 
 @Slf4j
-public class DefaultYamlSourceFactory implements MarsPropertySourceFactory {
+public class YamlSourceParse  implements SourceParse{
 
 
     @Override
-    public Properties createPropertySource( String context){
+    public Properties parse( String context){
         Properties result = new Properties();
         Map<String, Object> map = YamlParser.yamlToFlattenedMap(context);
         if (CollectionUtil.isNotEmpty(map)){
@@ -50,8 +49,8 @@ public class DefaultYamlSourceFactory implements MarsPropertySourceFactory {
     }
 
     @Override
-    public String sourceType() {
-        return ConfigTypeEnum.YAML.getType();
+    public ConfigTypeEnum sourceType() {
+        return ConfigTypeEnum.YAML;
     }
 
 

@@ -1,0 +1,3 @@
+com.github.fashionbrot.spring.support.PropertiesSourceParse
+com.github.fashionbrot.spring.support.YamlSourceParse
+com.github.fashionbrot.spring.support.ConfSourceParse
