@@ -11,19 +11,14 @@ import com.github.fashionbrot.spring.api.ApiConstant;
 import com.github.fashionbrot.spring.api.ForDataVo;
 import com.github.fashionbrot.spring.api.ForDataVoList;
 import com.github.fashionbrot.spring.config.GlobalMarsProperties;
-import com.github.fashionbrot.spring.config.MarsDataConfig;
 import com.github.fashionbrot.spring.enums.ConfigTypeEnum;
 import com.github.fashionbrot.spring.env.MarsPropertySource;
+import com.github.fashionbrot.spring.support.SourceParseFactory;
 import com.github.fashionbrot.spring.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MutablePropertySources;
-import org.yaml.snakeyaml.Yaml;
-
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -52,9 +47,11 @@ public class ServerHttpAgent {
             for(File file : fileList){
                 String[] fileNames = file.getName().split("_");
                 String[] fileType = file.getName().split("\\.");
-                String context = FileUtil.getFileContent(file);
-                if (StringUtil.isNotEmpty(context)) {
-                    buildEnv(environment, globalMarsProperties, fileNames[3], context, fileType[1],file);
+                if (fileNames.length>2 && fileType.length>1){
+                    String context = FileUtil.getFileContent(file);
+                    if (StringUtil.isNotEmpty(context)) {
+                        buildEnv(environment, globalMarsProperties, fileNames[3], context, fileType[1],file);
+                    }
                 }
             }
         }else{
@@ -113,13 +110,9 @@ public class ServerHttpAgent {
         String fileType = vo.getFileType();
         String content = vo.getContent();
 
-
-
         ConfigTypeEnum configTypeEnum = ConfigTypeEnum.valueTypeOf(vo.getFileType());
-        Properties value;
-        if (configTypeEnum == ConfigTypeEnum.YAML || configTypeEnum == ConfigTypeEnum.PROPERTIES || configTypeEnum == ConfigTypeEnum.TEXT) {
-            value = PropertiesSourceUtil.toProperties(content, configTypeEnum);
-        }else{
+        Properties value = SourceParseFactory.toProperties(content, configTypeEnum);
+        if (value==null){
             value = new Properties();
         }
 
@@ -132,10 +125,8 @@ public class ServerHttpAgent {
         }
 
         String environmentFileName =  ApiConstant.NAME+fileName;
-        MarsDataConfig dataConfig = new MarsDataConfig();
-        dataConfig.setContent(content);
 
-        MarsPropertySource marsPropertySource = new MarsPropertySource(environmentFileName, value, dataConfig);
+        MarsPropertySource marsPropertySource = new MarsPropertySource(environmentFileName, value);
         mutablePropertySources.addLast(marsPropertySource);
     }
 
@@ -145,23 +136,17 @@ public class ServerHttpAgent {
                                 String fileName,
                                 String content,
                                 String fileType,
-                                File file){
+                                File file) {
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
-        if (mutablePropertySources==null){
+        if (mutablePropertySources == null) {
             log.error("environment get property sources is null");
             return;
         }
-        String environmentFileName =  ApiConstant.NAME+fileName;
-        if (globalProperties!=null) {
-
-            Properties  properties = PropertiesSourceUtil.toProperties(file, ConfigTypeEnum.valueTypeOf(fileType));
-            if (properties!=null){
-                MarsDataConfig dataConfig = MarsDataConfig.builder()
-                        .content(content)
-                        .fileType(fileType)
-                        .fileName(fileName)
-                        .build();
-                 MarsPropertySource marsPropertySource = new MarsPropertySource(environmentFileName, properties, dataConfig);
+        String environmentFileName = ApiConstant.NAME + fileName;
+        if (globalProperties != null) {
+            Properties properties = SourceParseFactory.toProperties(file, ConfigTypeEnum.valueTypeOf(fileType));
+            if (properties != null) {
+                MarsPropertySource marsPropertySource = new MarsPropertySource(environmentFileName, properties);
                 mutablePropertySources.addLast(marsPropertySource);
             }
         }
@@ -236,7 +221,7 @@ public class ServerHttpAgent {
         params.add("version");
         String key = getKey(env,appId);
         if (lastVersion.containsKey(key)) {
-            params.add(lastVersion.get(key) + "");
+            params.add((lastVersion.get(key) +1)+"");
         }else{
             params.add("0");
         }

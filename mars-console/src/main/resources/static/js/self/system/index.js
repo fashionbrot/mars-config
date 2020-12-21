@@ -301,7 +301,7 @@ function publishById(id) {
 
             if (dataData.code==0) {
                 var data= dataData.data;
-
+                var fileType = data.fileType;
                 $("#id").val(data.id);
                 $("#editFileName").val(data.fileName);
                 $("#editFileName").attr("readonly", "readonly");
@@ -326,6 +326,9 @@ function publishById(id) {
                     if (data.fileType == 'text') {
                         editMode = "textile";
                         editChangeMode("textile")
+                    } else if (fileType=="conf"){
+                        editMode = 'javascript';
+                        editChangeMode(editMode);
                     } else {
                         editMode = data.fileType;
                         editChangeMode(data.fileType);
@@ -375,6 +378,9 @@ function viewDiv(id) {
                     if (data.fileType=='text'){
                         editMode="textile";
                         editChangeMode("textile")
+                    } else if (data.fileType=="conf"){
+                        editMode = 'javascript';
+                        editChangeMode(editMode);
                     } else{
                         editMode=data.fileType;
                         editChangeMode(data.fileType);

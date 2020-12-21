@@ -9,14 +9,13 @@ import com.github.fashionbrot.spring.api.ApiConstant;
 import com.github.fashionbrot.spring.api.ForDataVo;
 import com.github.fashionbrot.spring.api.ForDataVoList;
 import com.github.fashionbrot.spring.config.GlobalMarsProperties;
-import com.github.fashionbrot.spring.config.MarsDataConfig;
 import com.github.fashionbrot.spring.enums.ConfigTypeEnum;
 import com.github.fashionbrot.spring.env.MarsPropertySource;
 import com.github.fashionbrot.spring.server.ServerHttpAgent;
+import com.github.fashionbrot.spring.support.SourceParseFactory;
 import com.github.fashionbrot.spring.util.BeanUtil;
 import com.github.fashionbrot.spring.util.FileUtil;
 import com.github.fashionbrot.spring.util.ObjectUtils;
-import com.github.fashionbrot.spring.util.PropertiesSourceUtil;
 import com.github.fashionbrot.ribbon.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -32,7 +31,6 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
-import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -131,14 +129,8 @@ public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,Applicat
             // 并且更新最新本地version
             if (forData!=null && CollectionUtil.isNotEmpty(forData.getList())){
                 for(ForDataVo vo : forData.getList()){
-                    MarsDataConfig dataConfig = MarsDataConfig.builder()
-                            .envCode(envCode)
-                            .appId(appId)
-                            .fileName(vo.getFileName())
-                            .fileType(vo.getFileType())
-                            .content(vo.getContent())
-                            .build();
-                    buildMarsPropertySource(server,dataConfig,globalMarsProperties);
+
+                    buildMarsPropertySource(server,vo,globalMarsProperties);
                 }
                 ServerHttpAgent.setLastVersion(envCode,appId,forData.getVersion(),true);
             }
@@ -146,7 +138,7 @@ public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,Applicat
     }
 
 
-    private  void buildMarsPropertySource(final Server server,MarsDataConfig dataConfig,GlobalMarsProperties globalMarsProperties){
+    private  void buildMarsPropertySource(final Server server,ForDataVo dataConfig,GlobalMarsProperties globalMarsProperties){
         if (StringUtil.isEmpty(dataConfig.getContent())){
             log.warn("forData is null or content is null");
             return;
@@ -155,7 +147,7 @@ public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,Applicat
         String fileName = dataConfig.getFileName();
         String fileType = dataConfig.getFileType();
         ConfigTypeEnum configTypeEnum = ConfigTypeEnum.valueTypeOf(dataConfig.getFileType());
-        Properties properties = PropertiesSourceUtil.toProperties(dataConfig.getContent(), configTypeEnum);
+        Properties properties = SourceParseFactory.toProperties(dataConfig.getContent(), configTypeEnum);
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
         if (mutablePropertySources==null){
             log.error("environment get MutablePropertySources  is null");
@@ -181,11 +173,11 @@ public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,Applicat
             }
         }
         if (properties!=null) {
-            MarsPropertySource marsPropertySource = new MarsPropertySource(environmentFileName,properties,dataConfig);
+            MarsPropertySource marsPropertySource = new MarsPropertySource(environmentFileName,properties);
             mutablePropertySources.addLast(marsPropertySource);
         }
         //发送事件
-        MarsListenerEvent marsListenerEvent = new MarsListenerEvent(this, dataConfig.getContent(), dataConfig);
+        MarsListenerEvent marsListenerEvent = new MarsListenerEvent(this,fileName );
         applicationEventPublisher.publishEvent(marsListenerEvent);
     }
 

@@ -31,9 +31,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.env.YamlPropertySourceLoader;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.yaml.snakeyaml.Yaml;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -168,17 +170,19 @@ public class SystemConfigService {
             throw new MarsException(RespCode.EXIST_SYSTEM_CONFIG_ERROR);
         }
         int oldStatus = old.getStatus().intValue();
-        //TODO 需要验证
-         /*try {
-         if ("yaml".equalsIgnoreCase(systemConfigInfo.getFileType())) {
-         }
-         }catch (Exception e){
-         log.error(" update parse content error",e);
-         throw new MarsException("填写格式错误,请检查输入格式（ymal填写时不能有 TAB 换行）");
-         }*/
+
+        try {
+            if ("yaml".equalsIgnoreCase(info.getFileType())) {
+                Yaml yaml=new Yaml();
+                yaml.load(info.getJson());
+            }
+        } catch (Exception e) {
+            log.error(" update parse content error", e);
+            throw new MarsException("填写格式错误,请检查输入格式（ymal填写时不能有 TAB 换行）");
+        }
         String oldJson = StringUtil.isEmpty(old.getJson())?"":old.getJson();
         int flag = oldJson.compareTo(info.getJson());
-        if (flag != 0) {
+        if (flag != 0 || !old.getFileType().equals(info.getFileType())) {
             //如果不是发布状态下修改，则状态还是保持
             if (oldStatus == SystemStatusEnum.RELEASE.getCode()) {
                 old.setStatus(SystemStatusEnum.UPDATE.getCode());

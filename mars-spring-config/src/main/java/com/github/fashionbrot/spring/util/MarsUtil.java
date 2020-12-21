@@ -2,9 +2,11 @@ package com.github.fashionbrot.spring.util;
 
 
 
+import com.github.fashionbrot.ribbon.util.CollectionUtil;
 import com.github.fashionbrot.spring.enums.ConfigTypeEnum;
 import com.github.fashionbrot.spring.properties.annotation.MarsIgnoreField;
 import com.github.fashionbrot.spring.properties.annotation.MarsProperty;
+import com.github.fashionbrot.spring.support.SourceParseFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValues;
@@ -33,14 +35,12 @@ public class MarsUtil {
 
 
 
-    public static PropertyValues resolvePropertyValues(Object bean, final String prefix, String content, ConfigTypeEnum configTypeEnum) {
-        final Properties configProperties = PropertiesSourceUtil.toProperties(content, configTypeEnum);
-        final MutablePropertyValues propertyValues = new MutablePropertyValues();
-        if (configProperties==null || configProperties.isEmpty()){
-            log.info("bind POJO toProperties is null  bean:{} content:",bean,content );
-            return propertyValues;
+    public static PropertyValues resolvePropertyValues(Object bean, final String prefix,Map<String,Object> source ) {
+        final Properties configProperties = new Properties();
+        if (CollectionUtil.isNotEmpty(source)){
+            configProperties.putAll(source);
         }
-
+        final MutablePropertyValues propertyValues = new MutablePropertyValues();
         ReflectionUtils.doWithFields(bean.getClass(), new ReflectionUtils.FieldCallback() {
             @Override
             public void doWith(Field field) throws IllegalArgumentException {

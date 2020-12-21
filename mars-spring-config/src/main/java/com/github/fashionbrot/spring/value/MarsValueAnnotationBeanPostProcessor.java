@@ -1,8 +1,11 @@
 package com.github.fashionbrot.spring.value;
 
+import com.github.fashionbrot.ribbon.util.CollectionUtil;
+import com.github.fashionbrot.spring.api.ApiConstant;
 import com.github.fashionbrot.spring.enums.ConfigTypeEnum;
+import com.github.fashionbrot.spring.env.MarsPropertySource;
 import com.github.fashionbrot.spring.event.MarsListenerEvent;
-import com.github.fashionbrot.spring.util.PropertiesSourceUtil;
+import com.github.fashionbrot.spring.support.SourceParseFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.TypeConverter;
@@ -11,7 +14,10 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.annotation.InjectionMetadata;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.EnvironmentAware;
 import org.springframework.core.MethodParameter;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
@@ -33,9 +39,16 @@ import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
  */
 @Slf4j
 public class MarsValueAnnotationBeanPostProcessor extends AbstractAnnotationInjectedBeanPostProcessor<MarsValue>
-        implements BeanFactoryAware, ApplicationListener<MarsListenerEvent> {
+        implements BeanFactoryAware, EnvironmentAware, ApplicationListener<MarsListenerEvent> {
 
     public static final String BEAN_NAME = "marsValueAnnotationBeanPostProcessor";
+
+    private ConfigurableEnvironment environment;
+
+    @Override
+    public void setEnvironment(Environment environment) {
+        this.environment  = (ConfigurableEnvironment) environment;
+    }
 
     /**
      * placeholder, marsValueTarget
@@ -92,14 +105,16 @@ public class MarsValueAnnotationBeanPostProcessor extends AbstractAnnotationInje
 
     @Override
     public void onApplicationEvent(MarsListenerEvent event) {
-        String content = event.getContent();
-        if (!StringUtils.isEmpty(content) ) {
-            ConfigTypeEnum configTypeEnum = ConfigTypeEnum.valueTypeOf(event.getDataConfig().getFileType());
-            Properties properties = PropertiesSourceUtil.toProperties( content, configTypeEnum);
-            if (properties==null || properties.isEmpty()){
-                log.info("MarsValue onApplicationEvent content toProperties is null content:{}",content);
+
+        MarsPropertySource marsPropertySource = (MarsPropertySource) environment.getPropertySources().get(ApiConstant.NAME+event.getFileName());
+        if (marsPropertySource!=null) {
+
+            Properties properties = new Properties();
+            if (CollectionUtil.isEmpty(marsPropertySource.getSource())){
+                log.info("MarsValue onApplicationEvent  source is null");
                 return;
             }
+            properties.putAll(marsPropertySource.getSource());
 
             for (Object key : properties.keySet()) {
                 String propertyKey = (String) key;
@@ -250,6 +265,7 @@ public class MarsValueAnnotationBeanPostProcessor extends AbstractAnnotationInje
             this.field = field;
         }
     }
+
 
 
 }

@@ -1,13 +1,10 @@
 package com.github.fashionbrot.spring.listener;
 
+import com.github.fashionbrot.ribbon.util.CollectionUtil;
 import com.github.fashionbrot.spring.api.ApiConstant;
-import com.github.fashionbrot.spring.config.MarsDataConfig;
-import com.github.fashionbrot.spring.enums.ConfigTypeEnum;
 import com.github.fashionbrot.spring.env.MarsPropertySource;
 import com.github.fashionbrot.spring.event.MarsListenerEvent;
 import com.github.fashionbrot.spring.listener.annotation.MarsConfigListener;
-
-import com.github.fashionbrot.spring.util.PropertiesSourceUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.EnvironmentAware;
@@ -59,43 +56,29 @@ public class MarsConfigListenerMethodProcessor extends AbstractAnnotationListene
 
     private void invokeMethod(MarsListenerSourceTarget target){
         String fileName = target.getListener().fileName();
-        ConfigTypeEnum type = ConfigTypeEnum.PROPERTIES;
         Class<?>[] parameterTypes = target.getMethod().getParameterTypes();
         if (parameterTypes.length!=1){
             log.error(" processListenerMethod invokeMethod target method parameterType can not be empty ");
             return;
         }
-        if (parameterTypes[0]  == String.class){
-            type =  ConfigTypeEnum.TEXT;
+        if (parameterTypes[0]!=Properties.class){
+            log.error(" MarsConfigListener invokeMethod target method parameterType not Properties.class  targetClass:{}",target);
+            return;
         }
-
-        MarsPropertySource marsPropertySource = (MarsPropertySource) environment.getPropertySources().get(ApiConstant.NAME+target.getListener().fileName());
+        MarsPropertySource marsPropertySource = (MarsPropertySource) environment.getPropertySources().get(ApiConstant.NAME+fileName);
         if (marsPropertySource!=null) {
-            try {
-                MarsDataConfig marsDataConfig =  marsPropertySource.getMarsDataConfig();
-                if (marsDataConfig!=null) {
-                    String content = marsDataConfig.getContent();
-                    if (type == ConfigTypeEnum.TEXT) {
-                        ReflectionUtils.invokeMethod(target.getMethod(), target.getBean(), content);
-                    } else if (type == ConfigTypeEnum.PROPERTIES) {
-                        Properties p = PropertiesSourceUtil.toProperties(content, ConfigTypeEnum.PROPERTIES);
-                        ReflectionUtils.invokeMethod(target.getMethod(), target.getBean(), p);
-                    } else if (type == ConfigTypeEnum.YAML) {
-                        Properties p = PropertiesSourceUtil.toProperties(content, ConfigTypeEnum.YAML);
-                        ReflectionUtils.invokeMethod(target.getMethod(), target.getBean(), p);
-                    }
-                }
-            } catch (Exception e) {
-                if (log.isErrorEnabled()) {
-                    log.error("invokeMethod can't add Listener for fileName: {} error:{} ", fileName, e);
-                }
+            Map<String, Object> source = marsPropertySource.getSource();
+            if (CollectionUtil.isNotEmpty(source)){
+                Properties p = new Properties();
+                p.putAll(source);
+                ReflectionUtils.invokeMethod(target.getMethod(), target.getBean(), p);
             }
         }
     }
 
     @Override
     public void onApplicationEvent(MarsListenerEvent marsListenerEvent) {
-        MarsListenerSourceTarget target =targetMap.get(marsListenerEvent.getDataConfig().getFileName());
+        MarsListenerSourceTarget target =targetMap.get(marsListenerEvent.getFileName());
         if (target!=null && target.getListener().autoRefreshed()){
             invokeMethod(target);
         }

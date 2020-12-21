@@ -1,7 +1,6 @@
 package com.github.fashionbrot.spring.properties.config;
 
 import com.alibaba.fastjson.JSON;
-import com.github.fashionbrot.spring.config.MarsDataConfig;
 import com.github.fashionbrot.spring.event.MarsListenerEvent;
 import com.github.fashionbrot.spring.properties.annotation.MarsConfigurationProperties;
 import lombok.AllArgsConstructor;
@@ -92,12 +91,8 @@ public class MarsConfigurationPropertiesBindingPostProcessor implements BeanPost
             log.info("onApplicationEvent event is null ");
             return;
         }
-        MarsDataConfig marsDataConfig = event.getDataConfig();
-        if (marsDataConfig==null){
-            log.info("onApplicationEvent marsDataConfig is null ");
-        }
-        String fileName = marsDataConfig.getFileName();
 
+        String fileName = event.getFileName();
         MarsConfigurationTarget target= configurationTargetMap.get(fileName);
         if (target==null){
             if (log.isDebugEnabled()){

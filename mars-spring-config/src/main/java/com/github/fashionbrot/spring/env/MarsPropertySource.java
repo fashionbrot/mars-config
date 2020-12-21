@@ -1,6 +1,5 @@
 package com.github.fashionbrot.spring.env;
 
-import com.github.fashionbrot.spring.config.MarsDataConfig;
 import org.springframework.core.env.PropertiesPropertySource;
 
 import java.util.Properties;
@@ -12,19 +11,8 @@ import java.util.Properties;
  */
 public class MarsPropertySource extends PropertiesPropertySource {
 
-    private MarsDataConfig marsDataConfig;
 
-    public MarsPropertySource( String name, Properties source ,MarsDataConfig marsDataConfig) {
+    public MarsPropertySource( String name, Properties source ) {
         super(name, source);
-        this.marsDataConfig =  marsDataConfig;
-    }
-
-
-    public MarsDataConfig getMarsDataConfig() {
-        return marsDataConfig;
-    }
-
-    public void setMarsDataConfig(MarsDataConfig marsDataConfig) {
-        this.marsDataConfig = marsDataConfig;
     }
 }

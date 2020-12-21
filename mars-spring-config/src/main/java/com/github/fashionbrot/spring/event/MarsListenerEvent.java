@@ -1,6 +1,5 @@
 package com.github.fashionbrot.spring.event;
 
-import com.github.fashionbrot.spring.config.MarsDataConfig;
 import org.springframework.context.ApplicationEvent;
 
 /**
@@ -12,10 +11,7 @@ public class MarsListenerEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 975253233625382817L;
 
-
-    private MarsDataConfig dataConfig;
-
-    private String content;
+    private String fileName;
 
     /**
      * Create a new ApplicationEvent.
@@ -26,25 +22,16 @@ public class MarsListenerEvent extends ApplicationEvent {
         super(source);
     }
 
-    public MarsListenerEvent(Object source, String content, MarsDataConfig dataConfig) {
+    public MarsListenerEvent(Object source, String fileName) {
         super(source);
-        this.content = content;
-        this.dataConfig = dataConfig;
+        this.fileName = fileName;
     }
 
-    public MarsDataConfig getDataConfig() {
-        return dataConfig;
+    public String getFileName() {
+        return fileName;
     }
 
-    public void setDataConfig(MarsDataConfig dataConfig) {
-        this.dataConfig = dataConfig;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 }

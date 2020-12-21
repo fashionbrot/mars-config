@@ -1,7 +1,7 @@
 package com.github.fashionbrot.spring.properties.config;
 
+import com.github.fashionbrot.ribbon.util.CollectionUtil;
 import com.github.fashionbrot.spring.api.ApiConstant;
-import com.github.fashionbrot.spring.config.MarsDataConfig;
 import com.github.fashionbrot.spring.env.MarsPropertySource;
 import com.github.fashionbrot.spring.properties.annotation.MarsConfigurationProperties;
 import com.github.fashionbrot.spring.util.MarsUtil;
@@ -13,8 +13,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.util.Assert;
 import org.springframework.validation.DataBinder;
+import java.util.Map;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
-import static org.springframework.util.StringUtils.hasText;
 
 /**
  * @author fashionbrot
@@ -61,32 +61,23 @@ public class MarsConfigurationPropertiesBinder {
 
         MarsPropertySource marsPropertySource = (MarsPropertySource) environment.getPropertySources().get(ApiConstant.NAME+properties.fileName());
         if (marsPropertySource!=null){
-            MarsDataConfig marsDataConfig  = marsPropertySource.getMarsDataConfig();
-            if (marsDataConfig!=null) {
-                String content = marsDataConfig.getContent();
-                if (hasText(content)) {
-                    doBind(bean, beanName, properties, content);
-                }
-            }
+            doBind(bean, properties, marsPropertySource.getSource());
         }
     }
 
-    protected void doBind(Object bean, String beanName,MarsConfigurationProperties properties, String content) {
-
-        PropertyValues propertyValues = MarsUtil.resolvePropertyValues(bean, properties.prefix(), content, properties.type());
-
-        doBind(bean, properties, propertyValues);
+    private void doBind(Object bean,MarsConfigurationProperties properties, Map<String,Object> source) {
+        if (CollectionUtil.isNotEmpty(source)) {
+            PropertyValues propertyValues = MarsUtil.resolvePropertyValues(bean, properties.prefix(), source);
+            bindBean(bean, properties, propertyValues);
+        }
     }
 
-    private void doBind(Object bean, MarsConfigurationProperties properties,
-                        PropertyValues propertyValues) {
+    private void bindBean(Object bean, MarsConfigurationProperties properties, PropertyValues propertyValues) {
         ObjectUtils.cleanMapOrCollectionField(bean);
         DataBinder dataBinder = new DataBinder(bean);
         dataBinder.setIgnoreInvalidFields(properties.ignoreInvalidFields());
         dataBinder.setIgnoreUnknownFields(properties.ignoreUnknownFields());
-        /*dataBinder.setAutoGrowNestedPaths(properties.ignoreNestedProperties());
-        dataBinder.setIgnoreInvalidFields(properties.ignoreInvalidFields());
-        dataBinder.setIgnoreUnknownFields(properties.ignoreUnknownFields());*/
+        dataBinder.setAutoGrowNestedPaths(properties.autoGrowNestedPaths());
         dataBinder.bind(propertyValues);
     }
 

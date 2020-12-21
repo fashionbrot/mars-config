@@ -26,22 +26,8 @@
                             <textarea class="form-control" id="viewFileDesc" name="fileDesc" rows="3" placeholder="请输入文件描述"></textarea>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <!--<div class="form-group">
                         <label  class="col-control-left control-label">文件类型</label>
-                        <!--<div class="col-control-right">
-                            <div style="width: 100px;float: left;line-height: 34px;">
-                                <input type="radio" style="min-height: 34px" class="radio viewFileType" disabled name="fileType" onchange="editChangeMode('textile')" mode="textile" value="text" />
-                                <span style="line-height: 25px;">TEXT</span>
-                            </div>
-                            <div style="width: 120px;float: left;line-height: 34px;">
-                                <input type="radio" style="min-height: 34px"  class="radio viewFileType" disabled name="fileType" onchange="editChangeMode('properties')" mode="properties"   value="properties" />
-                                <span style="line-height: 25px;">PROPERTIES</span>
-                            </div>
-                            <div style="width: 120px;float: left;line-height: 34px;">
-                                <input type="radio" style="min-height: 34px"  class="radio viewFileType" disabled name="fileType" onchange="editChangeMode('yaml')" mode="yaml"  value="yaml" />
-                                <span style="line-height: 25px;">YAML</span>
-                            </div>
-                        </div>-->
                         <div class="col-control-right">
 
                             <div style="width: 120px;float: left;" onclick="editChangeMode('properties')">
@@ -59,8 +45,13 @@
                                     <label><input type="radio"  class="viewFileType" name="fileType" onchange="editChangeMode('textile')" mode="textile" value="text"  />TEXT </label>
                                 </div>
                             </div>
+                            <div style="width: 120px;float: left;" onclick="editChangeMode('javascript')">
+                                <div style="float: left;padding-top: 7px;">
+                                    <label><input type="radio"  class="viewFileType" name="fileType" onchange="editChangeMode('javascript')" mode="javascript" value="text"  />CONF </label>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    </div>-->
                     <div class="form-group">
                         <label for="viewContent" class="col-control-left control-label">配置内容</label>
                         <div class="col-control-right">

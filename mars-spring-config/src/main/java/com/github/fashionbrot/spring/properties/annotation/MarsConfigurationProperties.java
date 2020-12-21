@@ -1,6 +1,5 @@
 package com.github.fashionbrot.spring.properties.annotation;
 
-import com.github.fashionbrot.spring.enums.ConfigTypeEnum;
 import org.springframework.stereotype.Component;
 
 import java.lang.annotation.*;
@@ -42,12 +41,10 @@ public @interface MarsConfigurationProperties {
 
 
     /**
-     * config style
-     *
-     * @return default value is {@link ConfigTypeEnum#PROPERTIES}
+     * 是否自动增加嵌套路径，默认值：true
+     * @return the flag value (default false)
      */
-    ConfigTypeEnum type() default ConfigTypeEnum.PROPERTIES;
-
+    boolean autoGrowNestedPaths() default true;
 
     /**
      * Flag to indicate that when binding to this object invalid fields should be ignored.

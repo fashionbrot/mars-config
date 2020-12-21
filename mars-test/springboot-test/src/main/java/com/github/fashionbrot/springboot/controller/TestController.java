@@ -55,7 +55,7 @@ public class TestController {
      * @param
      */
     @MarsConfigListener(fileName = "test",autoRefreshed = true)
-    public void testP(String properties){
+    public void testP(Properties properties){
         System.out.println("11111:"+properties.toString());
     }
 
