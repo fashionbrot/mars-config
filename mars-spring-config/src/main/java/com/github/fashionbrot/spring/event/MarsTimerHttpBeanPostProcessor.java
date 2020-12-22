@@ -139,31 +139,46 @@ public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,Applicat
 
 
     private  void buildMarsPropertySource(final Server server,ForDataVo dataConfig,GlobalMarsProperties globalMarsProperties){
-        if (StringUtil.isEmpty(dataConfig.getContent())){
-            log.warn("forData is null or content is null");
-            return;
-        }
+        String environmentFileName =  ApiConstant.NAME+dataConfig.getFileName();
         String content = dataConfig.getContent();
         String fileName = dataConfig.getFileName();
         String fileType = dataConfig.getFileType();
-        ConfigTypeEnum configTypeEnum = ConfigTypeEnum.valueTypeOf(dataConfig.getFileType());
-        Properties properties = SourceParseFactory.toProperties(dataConfig.getContent(), configTypeEnum);
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
         if (mutablePropertySources==null){
             log.error("environment get MutablePropertySources  is null");
             return;
         }
+        if (StringUtil.isEmpty(globalMarsProperties.getLocalCachePath())){
+            globalMarsProperties.setLocalCachePath(FileUtil.getUserHome(globalMarsProperties.getAppName())) ;
+        }
+        if(dataConfig.getDelFlag()!=null && dataConfig.getDelFlag()){
+            //if del remove env
+            removeEnvironment(mutablePropertySources,environmentFileName);
+            //remove local file
+            ServerHttpAgent.removeSearchFiles(globalMarsProperties.getLocalCachePath(),globalMarsProperties.getAppName(),globalMarsProperties.getEnvCode(),fileName);
+            return;
+        }
 
+        ConfigTypeEnum configTypeEnum = ConfigTypeEnum.valueTypeOf(dataConfig.getFileType());
+        Properties properties = SourceParseFactory.toProperties(dataConfig.getContent(), configTypeEnum);
         if (globalMarsProperties.isEnableLocalCache()){
-            if (StringUtil.isEmpty(globalMarsProperties.getLocalCachePath())){
-                globalMarsProperties.setLocalCachePath(FileUtil.getUserHome(globalMarsProperties.getAppName())) ;
-            }
             //写入本地缓存文件
             ServerHttpAgent.writePathFile(globalMarsProperties.getLocalCachePath(),globalMarsProperties.getAppName(),globalMarsProperties.getEnvCode(),fileName,fileType,content);
         }
 
-        //更新 environment
-        String environmentFileName =  ApiConstant.NAME+dataConfig.getFileName();
+        //remove environment
+        removeEnvironment(mutablePropertySources, environmentFileName);
+
+        if (properties!=null) {
+            MarsPropertySource marsPropertySource = new MarsPropertySource(environmentFileName,properties);
+            mutablePropertySources.addLast(marsPropertySource);
+        }
+        //发送事件
+        MarsListenerEvent marsListenerEvent = new MarsListenerEvent(this,fileName );
+        applicationEventPublisher.publishEvent(marsListenerEvent);
+    }
+
+    private void removeEnvironment(MutablePropertySources mutablePropertySources, String environmentFileName) {
         if (mutablePropertySources.contains(environmentFileName)){
             PropertySource propertySource = mutablePropertySources.remove(environmentFileName);
             if (propertySource!=null){
@@ -172,13 +187,6 @@ public class MarsTimerHttpBeanPostProcessor implements BeanFactoryAware,Applicat
                 }
             }
         }
-        if (properties!=null) {
-            MarsPropertySource marsPropertySource = new MarsPropertySource(environmentFileName,properties);
-            mutablePropertySources.addLast(marsPropertySource);
-        }
-        //发送事件
-        MarsListenerEvent marsListenerEvent = new MarsListenerEvent(this,fileName );
-        applicationEventPublisher.publishEvent(marsListenerEvent);
     }
 
 

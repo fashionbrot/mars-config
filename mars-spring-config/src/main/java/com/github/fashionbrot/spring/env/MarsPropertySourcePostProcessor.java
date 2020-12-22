@@ -70,7 +70,7 @@ public class MarsPropertySourcePostProcessor implements BeanDefinitionRegistryPo
         loadBalancer.setServer(serverAddress, ApiConstant.HEALTH);
 
         Server server = loadBalancer.chooseServer();
-        if (server == null) {
+        if (server == null && globalMarsProperties.isEnableLocalCache()) {
             ServerHttpAgent.loadLocalConfig(globalMarsProperties,environment);
             return;
         }
@@ -81,7 +81,7 @@ public class MarsPropertySourcePostProcessor implements BeanDefinitionRegistryPo
         //写入 environment，并且持久化到 磁盘, 并且更新最新本地version
         ServerHttpAgent.saveRemoteResponse(environment,globalMarsProperties,dataVo);
         //如果返回数据为空，加载本地配置
-        if (dataVo==null || CollectionUtil.isEmpty(dataVo.getList())){
+        if ((dataVo==null || CollectionUtil.isEmpty(dataVo.getList()) ) &&   globalMarsProperties.isEnableLocalCache()){
             ServerHttpAgent.loadLocalConfig(globalMarsProperties,environment);
         }
 

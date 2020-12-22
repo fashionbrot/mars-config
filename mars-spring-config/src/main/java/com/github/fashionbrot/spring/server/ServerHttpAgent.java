@@ -257,15 +257,17 @@ public class ServerHttpAgent {
         path.append(appName).append("_");
         path.append(envCode).append("_");
         path.append(fileName).append(".");
-        String lastFile = path.toString();
         path.append(fileType);
         if (log.isDebugEnabled()){
             log.debug("writePathFile path:{} content:{}",path,content);
         }
-        /*File file =  new File(path.toString());
-        if (file.exists()){
-            FileUtil.deleteFile(file);
-        }*/
+
+        removeSearchFiles(localCachePath, appName, envCode, fileName);
+
+        FileUtil.writeFile(new File(path.toString()),content);
+    }
+
+    public static void removeSearchFiles(String localCachePath, String appName, String envCode, String fileName) {
         String keyWord = ApiConstant.NAME+appName+"_"+envCode+"_"+fileName;
         //删除同名的file
         List<File> files = FileUtil.searchFiles(new File(localCachePath), keyWord);
@@ -274,7 +276,6 @@ public class ServerHttpAgent {
                 FileUtil.deleteFile(f);
             });
         }
-        FileUtil.writeFile(new File(path.toString()),content);
     }
 
 

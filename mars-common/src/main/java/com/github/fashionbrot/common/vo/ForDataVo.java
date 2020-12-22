@@ -18,4 +18,5 @@ public class ForDataVo {
 
     private String content;
 
+    private Boolean delFlag;
 }

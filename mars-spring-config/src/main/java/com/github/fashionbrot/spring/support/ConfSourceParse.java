@@ -1,14 +1,11 @@
 package com.github.fashionbrot.spring.support;
 
 import com.github.fashionbrot.ribbon.util.CollectionUtil;
-import com.github.fashionbrot.ribbon.util.StringUtil;
 import com.github.fashionbrot.spring.enums.ConfigTypeEnum;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import com.typesafe.config.ConfigUtil;
 import com.typesafe.config.ConfigValue;
 import lombok.extern.slf4j.Slf4j;
-import org.ini4j.Ini;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,16 +51,6 @@ public class ConfSourceParse implements SourceParse {
     }
 
     public static void main(String[] args) {
-        Ini ini = new Ini();
-        try {
-            ini.load(new StringReader("[camera]\n" +
-                    "model = 0\n" +
-                    "\n" +
-                    "[detection]\n" +
-                    "type = 0"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
         Config  config = ConfigFactory.parseString("lobbyserver= {\n" +
                 "  ip= ${globalIP}\n" +

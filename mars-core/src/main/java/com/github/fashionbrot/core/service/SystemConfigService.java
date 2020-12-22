@@ -40,6 +40,7 @@ import org.yaml.snakeyaml.Yaml;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author fashionbrot
@@ -72,6 +73,7 @@ public class SystemConfigService {
 
     private static final String CLUSTER="mars.cluster.address";
     private static final String SYNC_RETRY = "mars.cluster.sync.retry";
+    private static final String SYSTEM_CONFIG_DEL="[del]";
 
 
     private boolean isFileHasExisted(SystemConfigInfo systemConfigInfo) {
@@ -248,8 +250,6 @@ public class SystemConfigService {
             configInfo.setModifier(login.getUserName());
         }
 
-        //systemConfigRoleRelationDao.delete(new QueryWrapper<SystemConfigRoleRelation>().eq("system_config_id", id));
-        //systemConfigDao.removeById(id);
 
         configInfo.setStatus(SystemStatusEnum.DELETE.getCode());
         if (!systemConfigDao.updateById(configInfo)){
@@ -257,7 +257,7 @@ public class SystemConfigService {
         }
         insertSystemConfigLog(configInfo,SystemStatusEnum.DELETE);
 
-        updateRelease(configInfo.getEnvCode(),configInfo.getAppName(),configInfo.getFileName());
+        updateRelease(configInfo.getEnvCode(),configInfo.getAppName(),configInfo.getFileName()+SYSTEM_CONFIG_DEL);
     }
 
     public void unDel(Long id) {
@@ -546,6 +546,9 @@ public class SystemConfigService {
         q.select("file_name,file_type,json");
         q.eq("env_code",req.getEnvCode());
         q.eq("app_name",req.getAppId());
+        SystemReleaseEntity release = null;
+        List<String> delKeyList = null;
+        List<String> keyList = null;
         //如果是客户端第一次调用,并且 本地缓存没有最新的version，则进行数据库查询
         if (req.getFirst()!=null && req.getFirst()){
             if (!systemConfigCacheService.containsKey(key)){
@@ -554,30 +557,68 @@ public class SystemConfigService {
                     systemConfigCacheService.setCache(key, version);
                 }
             }
+
+            List<SystemConfigInfo> list  = systemConfigDao.list(q);
+            List<ForDataVo> forDataVoList = null;
+            if (CollectionUtil.isNotEmpty(list)){
+                forDataVoList = list.stream()
+                        .filter(m-> StringUtil.isNotEmpty(m.getJson()))
+                        .map(m-> changeForData(m))
+                        .collect(Collectors.toList());
+            }
+            Long lastVersion = systemConfigCacheService.getCache(key);
+            return ForDataVoList.builder()
+                    .version(lastVersion)
+                    .list(forDataVoList)
+                    .build();
         }else{
-            SystemReleaseEntity release = systemReleaseDao.getById(req.getVersion());
+            release = systemReleaseDao.getById(req.getVersion());
             if (release!=null){
-                List<String> keyList = Arrays.stream(release.getFiles().split(",")).collect(Collectors.toList());
+                List<String> stringStream =  Arrays.stream(release.getFiles().split(",")).collect(Collectors.toList());
+                keyList = stringStream.stream().filter(k-> !k.endsWith(SYSTEM_CONFIG_DEL)).collect(Collectors.toList());
+                delKeyList = stringStream.stream().filter(k-> k.endsWith(SYSTEM_CONFIG_DEL)).map(k-> k.replace(SYSTEM_CONFIG_DEL,"")).collect(Collectors.toList());
                 if (CollectionUtil.isNotEmpty(keyList)){
                     q.in("file_name",keyList);
                 }
             }
-        }
 
-        List<SystemConfigInfo> list = systemConfigDao.list(q);
-        List<ForDataVo> forDataVoList = null;
-        if (CollectionUtil.isNotEmpty(list)){
-            forDataVoList = list.stream()
-                    .filter(m-> StringUtil.isNotEmpty(m.getJson()))
-                    .map(m-> changeForData(m))
-                    .collect(Collectors.toList());
-        }
+            List<SystemConfigInfo> list = null;
+            if (CollectionUtil.isNotEmpty(keyList)) {
+                list = systemConfigDao.list(q);
+            }
+            List<ForDataVo> forDataVoList = null;
+            if (CollectionUtil.isNotEmpty(list)){
+                forDataVoList = list.stream()
+                        .filter(m-> StringUtil.isNotEmpty(m.getJson()))
+                        .map(m-> changeForData(m))
+                        .collect(Collectors.toList());
 
-        Long lastVersion = systemConfigCacheService.getCache(key);
-        return ForDataVoList.builder()
-                .version(lastVersion)
-                .list(forDataVoList)
-                .build();
+                addDelKey(delKeyList, forDataVoList);
+            }else{
+                forDataVoList = new ArrayList<>(delKeyList.size());
+                addDelKey(delKeyList, forDataVoList);
+            }
+
+            Long lastVersion = systemConfigCacheService.getCache(key);
+            return ForDataVoList.builder()
+                    .version(lastVersion)
+                    .list(forDataVoList)
+                    .build();
+
+        }
+    }
+
+    private void addDelKey(List<String> delKeyList, List<ForDataVo> forDataVoList) {
+        if (CollectionUtil.isNotEmpty(delKeyList)) {
+            for (int i = 0; i < delKeyList.size(); i++) {
+                forDataVoList.add(ForDataVo.builder()
+                        .fileName(delKeyList.get(i))
+                        .fileType("properties")
+                        .content(null)
+                        .delFlag(true)
+                        .build());
+            }
+        }
     }
 
 
@@ -589,4 +630,7 @@ public class SystemConfigService {
                 .build();
     }
 
+    public static void main(String[] args) {
+        System.out.println(SYSTEM_CONFIG_DEL.replace(SYSTEM_CONFIG_DEL,""));
+    }
 }
