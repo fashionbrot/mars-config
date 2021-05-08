@@ -73,7 +73,7 @@
         <commons-lang3>3.8.1</commons-lang3>
         <slf4j-api>1.7.28</slf4j-api>
         <pagehelper-spring-boot-starter>1.2.10</pagehelper-spring-boot-starter>
-        <shiro-core>1.4.2</shiro-core>
+        <shiro-core>1.6.0</shiro-core>
     </properties>
 
     <dependencyManagement>
