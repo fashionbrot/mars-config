@@ -61,7 +61,7 @@
 
         <lombok.version>1.18.2</lombok.version>
         <mybatis-plus.boot.version>3.0.5</mybatis-plus.boot.version>
-        <mysql-connect.version>5.1.34</mysql-connect.version>
+        <mysql-connect.version>8.0.28</mysql-connect.version>
         <springboot-shiro.version>1.4.0</springboot-shiro.version>
         <commons-codes.version>1.9</commons-codes.version>
         <thymeleaf-shiro.version>2.0.0</thymeleaf-shiro.version>
