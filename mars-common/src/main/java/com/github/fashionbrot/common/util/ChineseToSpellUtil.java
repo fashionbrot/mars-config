@@ -13,11 +13,7 @@ import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombi
 public class ChineseToSpellUtil {
 
     public static void main(String[] args) {
-        System.out.println("获取汉子首字母："+getFirstSpell("贵阳银行"));
-        System.out.println("汉子转化为拼音："+getPingYin("贵阳银行"));
-        System.out.println("汉子转化为拼音："+getFullSpell("贵阳银行"));
-        //System.out.println("将字符串转换成ASCII码:"+getCnASCII("贵阳银行"));
-        System.out.println("判断是否是一个字符："+"贵".matches("[\\u4E00-\\u9FA5]+"));
+
     }
 
 
